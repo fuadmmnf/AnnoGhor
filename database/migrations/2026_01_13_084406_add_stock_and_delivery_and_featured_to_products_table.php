@@ -1,0 +1,24 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class AddStockAndDeliveryAndFeaturedToProductsTable extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('products', function (Blueprint $table) {
+            $table->integer('stock_quantity')->default(0)->after('discount_price');
+            $table->integer('delivery_days')->nullable()->after('stock_quantity');
+            $table->boolean('is_featured')->default(false)->after('delivery_days');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropColumn(['stock_quantity', 'delivery_days', 'is_featured']);
+        });
+    }
+}

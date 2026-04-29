@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Cart extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'product_id',
+        'quantity',
+        'price',
+        'total_price'
+    ];
+
+    // User relationship
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // Product relationship
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    // Calculate total price
+    public function calculateTotal()
+    {
+        $this->total_price = $this->quantity * $this->price;
+        return $this;
+    }
+}
