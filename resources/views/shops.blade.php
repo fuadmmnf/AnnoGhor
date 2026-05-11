@@ -32,7 +32,7 @@
                                     </div>
                                     <div class="col-sm-5 col-8">
                                         <div class="filter-product-category d-flex align-items-center">
-                                            <select name="sort" class="wide" onchange="this.form.submit()">
+                                            <select id="sortProducts" name="sort" class="wide" onchange="this.form.submit()">
                                                 <option value="latest"
                                                     {{ request('sort') == 'latest' || !request('sort') ? 'selected' : '' }}>
                                                     Default (Latest)</option>
@@ -50,6 +50,15 @@
                                                     {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name: Z-A
                                                 </option>
                                             </select>
+                                            @foreach (request()->except(['sort', 'page']) as $name => $value)
+                                                @if (is_array($value))
+                                                    @foreach ($value as $singleValue)
+                                                        <input type="hidden" name="{{ $name }}[]" value="{{ $singleValue }}">
+                                                    @endforeach
+                                                @else
+                                                    <input type="hidden" name="{{ $name }}" value="{{ $value }}">
+                                                @endif
+                                            @endforeach
                                         </div>
                                     </div>
                                 </div>
@@ -228,7 +237,7 @@
                 </div>
 
                 <!--=== Sidebar Area ===-->
-                
+
                 <div class="col-xl-3">
                     <div class="shop-sidebar-area">
                         <div class="product-widget product-categories-widget mb-40" data-aos="fade-up"
@@ -237,7 +246,7 @@
                                 <h4 class="widget-title">Product Categories</h4>
                                 <ul class="categories-list">
                                     @php
-                                        $selectedCategories = explode(',', request('category_id', ''));
+                                        $selectedCategories = explode(',', request('category', request('category_id', '')));
                                     @endphp
 
                                     @forelse($categories as $category)
@@ -245,7 +254,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input category-filter" type="checkbox"
                                                     value="{{ $category->id }}" id="category_{{ $category->id }}"
-                                                    {{ in_array($category->id, $selectedCategories) ? 'checked' : '' }}>
+                                                    {{ in_array((string) $category->id, $selectedCategories, true) ? 'checked' : '' }}>
 
                                                 <label class="form-check-label" for="category_{{ $category->id }}">
                                                     {{ $category->name }}
@@ -324,18 +333,23 @@
             }
 
             $(document).on('change', '.category-filter', function() {
-                // যদি ইউজার নতুন একটি বক্স চেক করে
-                if ($(this).is(':checked')) {
-                    // বাকি সব বক্স থেকে টিক চিহ্ন সরিয়ে দেওয়া (UI level)
-                    $('.category-filter').not(this).prop('checked', false);
+                const selectedIds = $('.category-filter:checked').map(function() {
+                    return $(this).val();
+                }).get();
+                const url = new URL(window.location.href);
+                const params = new URLSearchParams(url.search);
 
-                    // শুধুমাত্র বর্তমান বক্সের আইডি নিয়ে URL আপডেট করা
-                    const selectedId = $(this).val();
-                    updateURLAndRedirect('category_id', selectedId);
+                if (selectedIds.length) {
+                    params.set('category', selectedIds.join(','));
                 } else {
-                    // যদি ইউজার টিক চিহ্ন তুলে দেয় (Uncheck), তবে ফিল্টার ক্লিয়ার করা
-                    updateURLAndRedirect('category_id', null);
+                    params.delete('category');
                 }
+
+                // Category বদলালে old subcategory filter stale হয়ে যেতে পারে
+                params.delete('subcategory');
+                params.delete('page');
+
+                window.location.href = url.pathname + (params.toString() ? '?' + params.toString() : '');
             });
 
             $(document).on('change', '#sortProducts', function() {

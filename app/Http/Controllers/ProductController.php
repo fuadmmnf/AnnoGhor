@@ -40,8 +40,15 @@ class ProductController extends Controller
 {
     $query = Product::with(['category', 'subcategory', 'images']);
 
-    // ১. শুরুতে ভেরিয়েবলটি খালি অ্যারে বা কালেকশন হিসেবে ডিফাইন করুন
-    $activeSubcategories = collect(); 
+    // Keep backward compatibility: old URLs may still use `category_id`.
+    $rawCategoryFilter = $request->input('category', $request->input('category_id'));
+    $categoryIds = collect(is_array($rawCategoryFilter) ? $rawCategoryFilter : explode(',', (string) $rawCategoryFilter))
+        ->filter(fn ($id) => is_numeric($id))
+        ->map(fn ($id) => (int) $id)
+        ->unique()
+        ->values();
+
+    $activeSubcategories = collect();
 
     // সার্চ ফিল্টার...
     if ($request->filled('search')) {
@@ -52,16 +59,53 @@ class ProductController extends Controller
     }
 
     // ২. ক্যাটাগরি ফিল্টার
-    if ($request->filled('category')) {
-        $categoryIds = is_array($request->category) ? $request->category : explode(',', $request->category);
-        $query->whereIn('category_id', $categoryIds);
-        
-        // এখানে ডাটা অ্যাসাইন হচ্ছে
-        $activeSubcategories = Subcategory::whereIn('category_id', $categoryIds)->get();
+    if ($categoryIds->isNotEmpty()) {
+        $query->whereIn('category_id', $categoryIds->all());
+        $activeSubcategories = Subcategory::whereIn('category_id', $categoryIds->all())->get();
     }
 
-    // বাকি ফিল্টার এবং সর্টিং কোড আগের মতোই থাকবে...
-    // ... (Sorting, Pagination)
+    if ($request->filled('subcategory') && is_numeric($request->subcategory)) {
+        $query->where('subcategory_id', (int) $request->subcategory);
+
+        if ($activeSubcategories->isEmpty()) {
+            $selectedSubcategory = Subcategory::find((int) $request->subcategory);
+            if ($selectedSubcategory) {
+                $activeSubcategories = Subcategory::where('category_id', $selectedSubcategory->category_id)->get();
+            }
+        }
+    }
+
+    if ($request->filled('price_range') && str_contains((string) $request->price_range, '-')) {
+        [$min, $max] = explode('-', (string) $request->price_range, 2);
+        $min = is_numeric($min) ? (float) $min : null;
+        $max = is_numeric($max) ? (float) $max : null;
+
+        if ($min !== null && $max !== null) {
+            $query->whereBetween('regular_price', [$min, $max]);
+        }
+    }
+
+    switch ($request->input('sort', 'latest')) {
+        case 'newest':
+        case 'latest':
+            $query->latest();
+            break;
+        case 'price_high':
+            $query->orderByRaw('(CASE WHEN discount_price IS NULL OR discount_price = 0 THEN regular_price ELSE discount_price END) DESC');
+            break;
+        case 'price_low':
+            $query->orderByRaw('(CASE WHEN discount_price IS NULL OR discount_price = 0 THEN regular_price ELSE discount_price END) ASC');
+            break;
+        case 'name_asc':
+            $query->orderBy('name');
+            break;
+        case 'name_desc':
+            $query->orderByDesc('name');
+            break;
+        default:
+            $query->latest();
+            break;
+    }
 
     $products = $query->paginate(9)->withQueryString();
     $categories = Category::withCount('products')->get();
@@ -69,6 +113,6 @@ class ProductController extends Controller
     // ৩. এখন compact ব্যবহার করলে আর এরর দিবে না
     return view('shops', compact('products', 'categories', 'activeSubcategories'));
 }
-    
+
 
 }

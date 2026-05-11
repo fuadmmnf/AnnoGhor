@@ -116,7 +116,7 @@
             <div class="row g-4 row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 justify-content-center">
                 @foreach ($categories as $category)
                     <div class="col">
-                        <a href="{{ url('category/' . $category->slug) }}" class="category-card-link">
+                        <a href="{{ route('shops', ['category' => $category->id]) }}" class="category-card-link">
                             <div class="category-card-inner text-center">
                                 <div class="category-icon-box shadow-sm mx-auto">
                                     <img src="{{ asset('uploads/category/' . $category->image) }}" class="img-fluid"
