@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'auth.user' => \App\Http\Middleware\AuthenticateUser::class,
+            'role' => \App\Http\Middleware\EnsureRole::class,
         ]);
          $middleware->web(append: [
             ShareCurrencyData::class,

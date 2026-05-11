@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use App\Mail\OrderInvoiceMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Setting;
+use Throwable;
 
 
 
@@ -32,89 +33,89 @@ class OrderController extends Controller
         ]);
 
         try {
-            DB::beginTransaction();
+            $order = DB::transaction(function () use ($request) {
+                $cartItems = Cart::where('user_id', Auth::id())
+                    ->with('product')
+                    ->lockForUpdate()
+                    ->get();
 
-            $cartItems = Cart::where('user_id', Auth::id())
-                ->with('product')
-                ->get();
+                if ($cartItems->isEmpty()) {
+                    throw new \RuntimeException('Your cart is empty!');
+                }
 
-            if ($cartItems->isEmpty()) {
-                return back()->with('error', 'Your cart is empty!');
-            }
+                $subtotal = $cartItems->sum('total_price');
+                $shippingCost = 0;
+                $tax = 0;
+                $totalAmount = $subtotal + $shippingCost + $tax;
+                $orderNumber = '#' . strtoupper(uniqid());
+                $expectedDelivery = now()->addDays(7)->toDateString();
 
-            // Calculate totals
-            $subtotal = $cartItems->sum('total_price');
-            $shippingCost = 0;
-            $tax = 0;
-            $totalAmount = $subtotal + $shippingCost + $tax;
-
-            // Generate unique order number
-            $orderNumber = '#' . strtoupper(uniqid());
-
-            $expectedDelivery = now()->addDays(7)->toDateString();
-
-            $order = Order::create([
-                'user_id' => Auth::id(),
-                'order_number' => $orderNumber,
-                'subtotal' => $subtotal,
-                'shipping_cost' => $shippingCost,
-                'tax' => $tax,
-                'total_amount' => $totalAmount,
-                'payment_method' => $request->payment_method,
-                'payment_status' => 'Pending',
-                'order_status' => 'Pending',
-                'order_notes' => $request->order_notes,
-                'country' => $request->country,
-                'city' => $request->city,
-                'postcode' => $request->postcode,
-                'street_address' => $request->street_address,
-                'phone' => $request->phone,
-                'email' => $request->email,
-                'expected_delivery_date' => $expectedDelivery,
-            ]);
-
-            // Order items
-            foreach ($cartItems as $item) {
-                if ($item->product->stock_quantity < $item->quantity) {
-        throw new \Exception("Product '{$item->product->name}' is out of stock.");
-    }
-
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item->product_id,
-                    'product_name' => $item->product->name,
-                    'product_image' => $item->product->thumbnail,
-                    'quantity' => $item->quantity,
-                    'price' => $item->price,
-                    'total_price' => $item->total_price,
+                $order = Order::create([
+                    'user_id' => Auth::id(),
+                    'order_number' => $orderNumber,
+                    'subtotal' => $subtotal,
+                    'shipping_cost' => $shippingCost,
+                    'tax' => $tax,
+                    'total_amount' => $totalAmount,
+                    'payment_method' => $request->payment_method,
+                    'payment_status' => 'Pending',
+                    'order_status' => 'Pending',
+                    'order_notes' => $request->order_notes,
+                    'country' => $request->country,
+                    'city' => $request->city,
+                    'postcode' => $request->postcode,
+                    'street_address' => $request->street_address,
+                    'phone' => $request->phone,
+                    'email' => $request->email,
+                    'expected_delivery_date' => $expectedDelivery,
                 ]);
 
-                // Product-er stock_quantity column theke quantity komano
-                $item->product->decrement('stock_quantity', $item->quantity);
-            }
+                foreach ($cartItems as $item) {
+                    if (!$item->product) {
+                        throw new \RuntimeException('One of the cart items is no longer available.');
+                    }
 
-            // Initial tracking entry
-            OrderTracking::create([
-                'order_id' => $order->id,
-                'status' => 'Receiving orders',
-                'description' => 'Your order has been received and is being processed.',
-                'location' => $request->city . ', ' . $request->country,
-                'tracking_date' => now(),
-            ]);
+                    if ($item->quantity < 1) {
+                        throw new \RuntimeException("Invalid quantity for '{$item->product->name}'.");
+                    }
 
-            // Cart clear
-            Cart::where('user_id', Auth::id())->delete();
+                    if ($item->product->stock_quantity < $item->quantity) {
+                        throw new \RuntimeException("Product '{$item->product->name}' is out of stock.");
+                    }
 
-            // User profile update with latest address
-Auth::user()->update([
-    'country'        => $request->country,
-    'city'           => $request->city,
-    'postcode'       => $request->postcode,
-    'street_address' => $request->street_address,
-    'phone'          => $request->phone,
-]);
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_id' => $item->product_id,
+                        'product_name' => $item->product->name,
+                        'product_image' => $item->product->thumbnail,
+                        'quantity' => $item->quantity,
+                        'price' => $item->price,
+                        'total_price' => $item->total_price,
+                    ]);
 
-            DB::commit();
+                    $item->product->decrement('stock_quantity', $item->quantity);
+                }
+
+                OrderTracking::create([
+                    'order_id' => $order->id,
+                    'status' => 'Receiving orders',
+                    'description' => 'Your order has been received and is being processed.',
+                    'location' => trim(($request->city ?? '') . ', ' . $request->country, ', '),
+                    'tracking_date' => now(),
+                ]);
+
+                Cart::where('user_id', Auth::id())->delete();
+
+                Auth::user()?->update([
+                    'country' => $request->country,
+                    'city' => $request->city,
+                    'postcode' => $request->postcode,
+                    'street_address' => $request->street_address,
+                    'phone' => $request->phone,
+                ]);
+
+                return $order;
+            });
 
             $order->load(['user', 'orderItems']);
             $siteSettings = Setting::first();
@@ -123,17 +124,16 @@ Auth::user()->update([
             Mail::to($order->email)
                 ->send(new OrderInvoiceMail($order, $siteSettings));
 
-            return redirect()->route('order.success', $order->id)
+            return redirect()->route('order.success', ['order' => $order->id])
                 ->with('success', 'Order placed successfully!');
-        } catch (\Exception $e) {
-            DB::rollBack();
+        } catch (Throwable $e) {
             return back()->with('error', 'Failed to place order: ' . $e->getMessage());
         }
     }
 
-    public function orderSuccess($orderId)
+    public function orderSuccess(Order $order)
     {
-        $order = Order::with(['user', 'orderItems.product'])->findOrFail($orderId);
+        $order->load(['user', 'orderItems.product']);
 
         if ($order->user_id !== Auth::id()) {
             abort(403);

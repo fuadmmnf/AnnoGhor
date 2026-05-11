@@ -234,7 +234,7 @@ Route::post('/reset-password', [ResetPasswordController::class, 'update'])
 Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
 
 // Cart Routes with authentication middleware
-Route::middleware(['auth.user'])->group(function () {
+Route::middleware(['auth.user', 'role:user'])->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
     Route::post('/cart/add-item/{productId}', [CartController::class, 'addToCart'])->name('cart.add.item');
     Route::get('/cart/add-item/{productId}', [CartController::class, 'addToCart'])->name('cart.add.item.get');
@@ -245,7 +245,7 @@ Route::middleware(['auth.user'])->group(function () {
 
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
     Route::post('/order/place', [OrderController::class, 'placeOrder'])->name('order.place');
-    Route::get('/order/success/{orderId}', [OrderController::class, 'orderSuccess'])->name('order.success');
+    Route::get('/order/success/{order}', [OrderController::class, 'orderSuccess'])->name('order.success');
     Route::get('/my-orders', [OrderController::class, 'userOrders'])->name('user.orders');
 
 

@@ -45,7 +45,14 @@ class CartController extends Controller
 
         try {
             $product = Product::findOrFail($productId);
-               $quantity = $request->input('quantity', 1);
+            $quantity = max(1, (int) $request->input('quantity', 1));
+
+            if ($product->stock_quantity < $quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Requested quantity is not available in stock.'
+                ], 422);
+            }
 
             //$quantity = $request->quantity ?? 1;
 
@@ -57,6 +64,14 @@ class CartController extends Controller
             if ($existingCartItem) {
                 // Update quantity
                 $existingCartItem->quantity += $quantity;
+
+                if ($product->stock_quantity < $existingCartItem->quantity) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Requested quantity exceeds available stock.'
+                    ], 422);
+                }
+
                 $existingCartItem->total_price = $existingCartItem->quantity * $existingCartItem->price;
                 $existingCartItem->save();
                 $message = 'Product quantity updated in cart.';
@@ -102,7 +117,11 @@ class CartController extends Controller
 
         try {
             $product = Product::findOrFail($productId);
-               $quantity = $request->input('quantity', 1);
+            $quantity = max(1, (int) $request->input('quantity', 1));
+
+            if ($product->stock_quantity < $quantity) {
+                return redirect()->back()->with('error', 'Requested quantity is not available in stock.');
+            }
             //$quantity = $request->quantity ?? 1;
 
             // Check if product already exists in cart
@@ -113,6 +132,11 @@ class CartController extends Controller
             if ($existingCartItem) {
                 // Update quantity
                 $existingCartItem->quantity += $quantity;
+
+                if ($product->stock_quantity < $existingCartItem->quantity) {
+                    return redirect()->back()->with('error', 'Requested quantity exceeds available stock.');
+                }
+
                 $existingCartItem->total_price = $existingCartItem->quantity * $existingCartItem->price;
                 $existingCartItem->save();
                 $message = 'Product quantity updated in cart.';
@@ -149,11 +173,13 @@ public function updateCart(Request $request, $cartId)
     }
 
     try {
-        $cartItem = Cart::where('user_id', Auth::id())->findOrFail($cartId);
+        $cartItem = Cart::where('user_id', Auth::id())
+            ->with('product')
+            ->findOrFail($cartId);
 
         if ($request->quantity <= 0) {
             $cartItem->delete();
-            
+
             // Recalculate totals
             $cartItems = Cart::where('user_id', Auth::id())->get();
             $subtotal = $cartItems->sum('total_price');
@@ -167,6 +193,13 @@ public function updateCart(Request $request, $cartId)
                 'cart_count' => $this->getCartCount()
             ]);
         } else {
+            if ($cartItem->product && $request->quantity > $cartItem->product->stock_quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Requested quantity exceeds available stock.'
+                ], 422);
+            }
+
             $cartItem->quantity = $request->quantity;
             $cartItem->total_price = $cartItem->quantity * $cartItem->price;
             $cartItem->save();
@@ -265,11 +298,16 @@ public function checkout()
     $cartItems = Cart::with('product')
         ->where('user_id', Auth::id())
         ->get();
+
+    if ($cartItems->isEmpty()) {
+        return redirect()->route('cart')->with('error', 'Your cart is empty. Add items before checkout.');
+    }
+
       $subtotal = $cartItems->sum('total_price');
-    
+
     // Total calculate (ekhane subtotal same, jodi tax/discount thake tahole add korben)
     $total = $subtotal;
-    
+
     return view('checkout', compact('cartItems', 'subtotal', 'total'));
 }
     private function getCartCountInternal()
