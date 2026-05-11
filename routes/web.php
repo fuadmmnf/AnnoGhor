@@ -183,7 +183,7 @@ Route::post('/admin/social-links/update', [SettingController::class, 'updateSoci
     Route::delete('/admin/users/{id}/delete', [AdminUserController::class, 'destroy'])
         ->name('admin.all-user.delete');
 
-    //Currency-Settings    
+    //Currency-Settings
     Route::get('/admin/currency-settings', [App\Http\Controllers\Admin\CurrencySettingController::class, 'index'])
         ->name('admin.currency-settings.index');
     Route::post('/admin/currency-settings/store', [App\Http\Controllers\Admin\CurrencySettingController::class, 'store'])
@@ -201,7 +201,7 @@ Route::post('/admin/social-links/update', [SettingController::class, 'updateSoci
     Route::post('/admin/banner/store', [BannerController::class, 'store'])->name('admin.banners.store');
     Route::delete('/admin/banner/{id}/delete', [BannerController::class, 'destroy'])->name('admin.banners.destroy');
 
-    
+
 });
 
 
@@ -306,6 +306,11 @@ Route::post('/change-currency', function (\Illuminate\Http\Request $request) {
 // Admin User Management Routes
 Route::get('/run-cmd', function () {
     \Illuminate\Support\Facades\Artisan::call('storage:link');
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+    return 'Storage linked and cache cleared successfully!';
+});
+
+Route::get('/optimize-clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
     return 'Storage linked and cache cleared successfully!';
 });
