@@ -1,10 +1,6 @@
 <div class="product-item style-one mb-40">
     <div class="product-thumbnail">
-        <a href="{{ route('product-details', [
-            'cat_slug' => optional($product->category)->slug ?? 'no-category',
-            'subcat_slug' => optional($product->subcategory)->slug ?? 'no-subcategory',
-            'prod_slug' => $product->slug ?? 'no-slug',
-        ]) }}">
+        <a href="{{ $product->details_url }}">
             @if ($product->thumbnail)
                 <img src="{{ asset('storage/' . $product->thumbnail) }}"
                     alt="{{ $product->name }}"
@@ -28,11 +24,7 @@
 
         <div class="hover-content">
             {{-- Eye Button --}}
-            <a href="{{ route('product-details', [
-                'cat_slug' => optional($product->category)->slug ?? 'no-category',
-                'subcat_slug' => optional($product->subcategory)->slug ?? 'no-subcategory',
-                'prod_slug' => $product->slug ?? 'no-slug',
-            ]) }}" class="icon-btn">
+            <a href="{{ $product->details_url }}" class="icon-btn">
                 <i class="fa fa-eye"></i>
             </a>
 
@@ -46,11 +38,7 @@
     <div class="product-info-wrap text-center">
         <div class="product-info">
             <h2 class="product-title">
-                <a href="{{ route('product-details', [
-                    'cat_slug' => optional($product->category)->slug ?? 'no-category',
-                    'subcat_slug' => optional($product->subcategory)->slug ?? 'no-subcategory',
-                    'prod_slug' => $product->slug ?? 'no-slug'
-                ]) }}">
+                <a href="{{ $product->details_url }}">
                     {{ \Illuminate\Support\Str::limit($product->name, 40) }}
                 </a>
             </h2>

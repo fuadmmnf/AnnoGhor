@@ -75,12 +75,7 @@
                                         data-aos-duration="{{ 400 + $loop->index * 200 }}">
 
                                         <div class="product-thumbnail">
-                                            <a
-                                                href="{{ route('product-details', [
-                                                    'cat_slug' => optional($product->category)->slug ?? 'no-category',
-                                                    'subcat_slug' => optional($product->subcategory)->slug ?? 'no-subcategory',
-                                                    'prod_slug' => $product->slug ?? 'no-slug',
-                                                ]) }}">
+                                            <a href="{{ $product->details_url }}">
                                                 {{ \Illuminate\Support\Str::limit($product->name, 40) }}
 
                                                 @if ($product->thumbnail)
@@ -107,11 +102,7 @@
                                             @endif
 
                                             <div class="hover-content">
-                                                <a href="{{ route('product-details', [
-                                                    'cat_slug' => optional($product->category)->slug ?? 'no-category',
-                                                    'subcat_slug' => optional($product->subcategory)->slug ?? 'no-subcategory',
-                                                    'prod_slug' => $product->slug ?? 'no-slug',
-                                                ]) }}"
+                                                <a href="{{ $product->details_url }}"
                                                     class=" icon-btn mt-3">
                                                     <i class="fa fa-eye"></i>
                                                 </a>
@@ -126,12 +117,7 @@
                                         </div>
                                         <div class="product-info-wrap text-center">
                                             <h6 class="product-title ">
-                                                <a
-                                                    href="{{ route('product-details', [
-                                                        'cat_slug' => optional($product->category)->slug ?? 'no-category',
-                                                        'subcat_slug' => optional($product->subcategory)->slug ?? 'no-subcategory',
-                                                        'prod_slug' => $product->slug ?? 'no-slug',
-                                                    ]) }}">
+                                                <a href="{{ $product->details_url }}">
                                                     {{ \Illuminate\Support\Str::limit($product->name, 40) }}
                                                 </a>
                                             </h6>

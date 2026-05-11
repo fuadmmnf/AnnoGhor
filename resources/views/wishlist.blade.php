@@ -30,32 +30,32 @@
                         <div class="product-item style-one mb-40">
                             <div class="product-thumbnail">
                                 @if($item->product->thumbnail)
-                                    <img src="{{ asset('storage/' . $item->product->thumbnail) }}" 
+                                    <img src="{{ asset('storage/' . $item->product->thumbnail) }}"
                                          alt="{{ $item->product->name }}"
                                          style="width: 100%; height: 400px; object-fit: cover;">
                                 @else
-                                    <img src="{{ asset('assets/images/products/feature-product-1.png') }}" 
+                                    <img src="{{ asset('assets/images/products/feature-product-1.png') }}"
                                          alt="{{ $item->product->name }}"
                                          style="width: 100%; height: 400px; object-fit: cover;">
                                 @endif
-                                
+
                                 @if($item->product->discount_price)
                                     @php
                                         $discountPercentage = round((($item->product->regular_price - $item->product->discount_price) / $item->product->regular_price) * 100);
                                     @endphp
                                     <div class="discount">{{ $discountPercentage }}% Off</div>
                                 @endif
-                                
+
                                 <!-- Remove Button -->
                                 <div class="remove-wishlist-btn">
-                                    <button class="btn btn-danger btn-sm remove-from-wishlist" 
+                                    <button class="btn btn-danger btn-sm remove-from-wishlist"
                                             data-product-id="{{ $item->product->id }}">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
 
                                 <div class="hover-content">
-                                    <a href="{{ route('product-details', ['id' => $item->product->id]) }}" class="icon-btn">
+                                    <a href="{{ $item->product->details_url }}" class="icon-btn">
                                         <i class="fa fa-eye"></i>
                                     </a>
                                 </div>
@@ -65,7 +65,7 @@
                                        data-product-id="{{ $item->product->id }}"
                                        data-product-name="{{ $item->product->name }}"
                                        data-product-price="{{ $item->product->discount_price ?? $item->product->regular_price }}">
-                                        <i class="far fa-shopping-basket"></i> 
+                                        <i class="far fa-shopping-basket"></i>
                                         <span class="text">Add To Cart</span>
                                     </a>
                                 </div> --}}
@@ -73,7 +73,7 @@
 
                             <div class="product-info-wrap text-center">
                                 <h4 class="product-title">
-                                    <a href="{{ route('product-details', ['id' => $item->product->id]) }}">
+                                    <a href="{{ $item->product->details_url }}">
                                         {{ \Illuminate\Support\Str::limit($item->product->name, 40) }}
                                     </a>
                                 </h4>
@@ -139,16 +139,16 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
- 
+
     // Remove from wishlist
     $('.remove-from-wishlist').click(function(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
-        
+
         const productId = $(this).data('product-id');
         const $btn = $(this);
         const $productCard = $(`#wishlist-item-${productId}`);
-        
+
         if (!confirm('Remove this product from wishlist?')) {
             return;
         }
@@ -165,12 +165,12 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             success: function(response) {
                 console.log('Remove response:', response);
-                
+
                 if (response.success) {
                     // Remove product card with animation
                     $productCard.fadeOut(300, function() {
                         $(this).remove();
-                        
+
                         // Check if wishlist is empty
                         if ($('.product-item').length === 0) {
                             location.reload();
@@ -180,12 +180,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             $('.section-title p').text(remainingItems + ' item(s) in your wishlist');
                         }
                     });
-                    
+
                     // Update wishlist count in header
                     if (response.wishlist_count !== undefined) {
                         $('.wishlist-count, .pro-count.wishlist-count').text(response.wishlist_count);
                     }
-                    
+
                     showNotification(response.message, 'success');
                 } else {
                     showNotification(response.message || 'Failed to remove item', 'danger');
@@ -195,11 +195,11 @@ document.addEventListener('DOMContentLoaded', function () {
             error: function(xhr) {
                 console.error('Remove error:', xhr);
                 let errorMsg = 'Error removing from wishlist';
-                
+
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     errorMsg = xhr.responseJSON.message;
                 }
-                
+
                 showNotification(errorMsg, 'danger');
                 $btn.prop('disabled', false).html('<i class="fas fa-times"></i>');
             }
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function showNotification(message, type = 'success') {
         // Remove existing notifications
         $('.custom-notification').remove();
-        
+
         const notification = $('<div>', {
             class: `custom-notification alert alert-${type} alert-dismissible fade show`,
             html: `
@@ -217,9 +217,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `
         });
-        
+
         $('body').prepend(notification);
-        
+
         setTimeout(function() {
             notification.fadeOut(300, function() {
                 $(this).remove();

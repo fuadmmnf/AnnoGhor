@@ -274,6 +274,7 @@ Route::post('/contact/submit', [ContactController::class, 'store'])->name('conta
 
 
 Route::get('/shops', [ProductController::class, 'shop'])->name('shops');
+Route::get('/product/{product}', [ProductController::class, 'showDetailsById'])->name('product-details.legacy');
 //Route::get('/product/{id}', [ProductController::class, 'showDetails'])->name('product-details');
 Route::get('/{cat_slug}/{subcat_slug}/{prod_slug}', [ProductController::class, 'showDetails'])->name('product-details');
 

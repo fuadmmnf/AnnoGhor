@@ -5,6 +5,7 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Subcategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
 
@@ -108,6 +109,39 @@ it('uses the shop category filter URL for featured category links on home', func
     $this->get(route('home'))
         ->assertOk()
         ->assertSee(route('shops', ['category' => $category->id]), false);
+});
+
+it('opens product details through legacy id route when slug data is missing', function () {
+    $categoryId = DB::table('categories')->insertGetId([
+        'name' => 'Legacy Category',
+        'slug' => null,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    $subcategoryId = DB::table('subcategories')->insertGetId([
+        'name' => 'Legacy Subcategory',
+        'slug' => null,
+        'category_id' => $categoryId,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    $productId = DB::table('products')->insertGetId([
+        'name' => 'Legacy Product',
+        'slug' => null,
+        'product_code' => 'P-LEGACY-1',
+        'regular_price' => 123,
+        'discount_price' => null,
+        'category_id' => $categoryId,
+        'subcategory_id' => $subcategoryId,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    $this->get(route('product-details.legacy', ['product' => $productId]))
+        ->assertOk()
+        ->assertSeeText('Legacy Product');
 });
 
 

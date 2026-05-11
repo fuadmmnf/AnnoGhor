@@ -11,9 +11,9 @@
                 <div class="col-xl-3 col-lg-4 col-sm-6">
                     <div class="product-item style-one mb-40">
                         <div class="product-thumbnail">
-    <a href="{{ route('product-details', $product->id) }}">
-        <img src="{{ $product->thumbnail 
-            ? asset('storage/' . $product->thumbnail) 
+    <a href="{{ $product->details_url }}">
+        <img src="{{ $product->thumbnail
+            ? asset('storage/' . $product->thumbnail)
             : asset('assets/images/products/feature-product-1.png') }}"
             style="width:100%; height:400px; object-fit:cover;"
             alt="{{ $product->name }}">
@@ -22,7 +22,7 @@
     <div class="discount">Trending</div>
 
     <div class="hover-content">
-        <a href="{{ route('product-details', $product->id) }}" class="icon-btn">
+        <a href="{{ $product->details_url }}" class="icon-btn">
             <i class="fa fa-eye"></i>
         </a>
 
@@ -36,7 +36,7 @@
 
                         <div class="product-info-wrap text-center">
                             <h4 class="product-title">
-                                <a href="{{ route('product-details', $product->id) }}">
+                                <a href="{{ $product->details_url }}">
                                     {{ Str::limit($product->name, 40) }}
                                 </a>
                             </h4>

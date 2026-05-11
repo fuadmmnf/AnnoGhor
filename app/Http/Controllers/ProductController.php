@@ -6,39 +6,64 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\Subcategory;
+use Illuminate\Http\RedirectResponse;
 
 class ProductController extends Controller
 {
     /**
      * Display product details for users
      */
-    public function showDetails($cat_slug, $subcat_slug, $prod_slug)
-{
-    // স্লাগ অনুযায়ী প্রোডাক্ট খুঁজে বের করা
-    $product = Product::with(['category', 'subcategory', 'images'])
-        ->where('slug', $prod_slug)
-        ->firstOrFail();
+    public function showDetails(string $cat_slug, string $subcat_slug, string $prod_slug)
+    {
+        $product = Product::with(['category', 'subcategory', 'images'])
+            ->where('slug', $prod_slug)
+            ->firstOrFail();
 
-    // সিকিউরিটি চেক: ক্যাটাগরি ও সাবক্যাটাগরি স্লাগ ঠিক আছে কি না যাচাই করা (ঐচ্ছিক কিন্তু ভালো)
-    if ($product->category->slug !== $cat_slug || $product->subcategory->slug !== $subcat_slug) {
-        abort(404);
+        if (!$product->category || !$product->subcategory) {
+            abort(404);
+        }
+
+        $expectedParams = $product->detailsRouteParams();
+        if ($expectedParams && (
+            $expectedParams['cat_slug'] !== $cat_slug ||
+            $expectedParams['subcat_slug'] !== $subcat_slug
+        )) {
+            return redirect()->route('product-details', $expectedParams);
+        }
+
+        $relatedProducts = Product::where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->with(['category', 'subcategory', 'images'])
+            ->limit(4)
+            ->get();
+
+        return view('product-details', compact('product', 'relatedProducts'));
     }
 
-    $relatedProducts = Product::where('category_id', $product->category_id)
-        ->where('id', '!=', $product->id)
-        ->with(['category', 'images'])
-        ->limit(4)
-        ->get();
+    public function showDetailsById(Product $product): RedirectResponse|\Illuminate\View\View
+    {
+        $product->loadMissing(['category', 'subcategory', 'images']);
 
-    return view('product-details', compact('product', 'relatedProducts'));
-}
+        $canonicalParams = $product->detailsRouteParams();
+        if ($canonicalParams) {
+            return redirect()->route('product-details', $canonicalParams);
+        }
+
+        $relatedProducts = Product::where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->with(['category', 'subcategory', 'images'])
+            ->limit(4)
+            ->get();
+
+        return view('product-details', compact('product', 'relatedProducts'));
+    }
 
     /**
      * Display all products for shop page
      */
     public function shop(Request $request)
-{
-    $query = Product::with(['category', 'subcategory', 'images']);
+    {
+        $query = Product::with(['category', 'subcategory', 'images']);
 
     // Keep backward compatibility: old URLs may still use `category_id`.
     $rawCategoryFilter = $request->input('category', $request->input('category_id'));
@@ -111,8 +136,8 @@ class ProductController extends Controller
     $categories = Category::withCount('products')->get();
 
     // ৩. এখন compact ব্যবহার করলে আর এরর দিবে না
-    return view('shops', compact('products', 'categories', 'activeSubcategories'));
-}
+        return view('shops', compact('products', 'categories', 'activeSubcategories'));
+    }
 
 
 }

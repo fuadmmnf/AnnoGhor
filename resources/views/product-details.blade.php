@@ -438,11 +438,7 @@
                                     </a>
                                 </div>
                                 <div class="cart-button">
-    <a href="{{ route('product-details', [
-        'cat_slug'    => $relatedProduct->category->slug, 
-        'subcat_slug' => $relatedProduct->subcategory->slug, 
-        'prod_slug'   => $relatedProduct->slug
-    ]) }}" class="cart-btn">
+    <a href="{{ $relatedProduct->details_url }}" class="cart-btn">
         <i class="far fa-eye"></i>
         <span class="text">View Details</span>
     </a>
@@ -451,7 +447,7 @@
                             <div class="product-info-wrap">
                                 <div class="product-info">
                                     <h4 class="title">
-                                        <a href="{{ route('product-details', ['id' => $relatedProduct->id]) }}">
+                                        <a href="{{ $relatedProduct->details_url }}">
                                             {{ Str::limit($relatedProduct->name, 30) }}
                                         </a>
                                     </h4>

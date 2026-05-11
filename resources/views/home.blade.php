@@ -234,11 +234,7 @@
 
 
                                 <div class="hover-content">
-                                    <a href="{{ route('product-details', [
-                                        'cat_slug' => $product->category->slug ?? 'no-category',
-                                        'subcat_slug' => $product->subcategory->slug ?? 'no-subcategory',
-                                        'prod_slug' => $product->slug ?? 'no-slug',
-                                    ]) }}"
+                                    <a href="{{ $product->details_url }}"
                                         class="icon-btn">
                                         <i class="fa fa-eye"></i>
                                     </a>
@@ -252,12 +248,7 @@
                             <div class="product-info-wrap text-center">
                                 <div class="product-info">
                                     <h2 class="product-title">
-                                        <a
-                                            href="{{ route('product-details', [
-                                                'cat_slug' => $product->category->slug ?? 'no-category',
-                                                'subcat_slug' => $product->subcategory->slug ?? 'no-subcategory',
-                                                'prod_slug' => $product->slug ?? 'no-slug',
-                                            ]) }}">
+                                        <a href="{{ $product->details_url }}">
                                             {{ \Illuminate\Support\Str::limit($product->name, 40) }}
                                         </a>
                                     </h2>
@@ -315,12 +306,7 @@
                                 <div class="product-item style-one mb-40"
                                     style="border: 1px solid #f0f0f0; padding: 10px; border-radius: 12px;">
                                     <div class="product-thumbnail">
-                                        <a
-                                            href="{{ route('product-details', [
-                                                'cat_slug' => $product->category->slug ?? 'cat',
-                                                'subcat_slug' => $product->subcategory->slug ?? 'sub',
-                                                'prod_slug' => $product->slug ?? 'product',
-                                            ]) }}">
+                                        <a href="{{ $product->details_url }}">
                                             <img src="{{ asset('storage/' . $product->thumbnail) }}"
                                                 alt="{{ $product->name }}"
                                                 style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
@@ -330,11 +316,7 @@
                                     {{-- প্রোডাক্টের নাম এবং দাম --}}
                                     <div class="product-content mt-15">
                                         <h4 class="title" style="font-size: 16px; font-weight: 600;">
-                                            <a href="{{ route('product-details', [
-                                                'cat_slug' => $product->category->slug ?? 'cat',
-                                                'subcat_slug' => $product->subcategory->slug ?? 'sub',
-                                                'prod_slug' => $product->slug ?? 'product',
-                                            ]) }}"
+                                            <a href="{{ $product->details_url }}"
                                                 style="color: #333; text-decoration: none;">
                                                 {{ $product->name }}
                                             </a>

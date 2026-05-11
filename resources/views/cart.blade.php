@@ -55,11 +55,7 @@
                                                         </div>
                                                         <div class="product-info">
                                                             <h4 class="title">
-                                                                <a href="{{ route('product-details', [
-    'cat_slug'    => $item->product->category->slug ?? 'no-category', 
-    'subcat_slug' => $item->product->subcategory->slug ?? 'no-subcategory', 
-    'prod_slug'   => $item->product->slug ?? 'no-slug'
-]) }}">
+                                                                <a href="{{ $item->product->details_url }}">
     {{ $item->product->name }}
 </a>
                                                             </h4>
@@ -125,11 +121,7 @@
                                             </div>
                                             <div class="mobile-item-info">
                                                 <h4 class="mobile-item-name">
-                                                    <a href="{{ route('product-details', [
-    'cat_slug'    => $item->product->category->slug ?? 'no-category', 
-    'subcat_slug' => $item->product->subcategory->slug ?? 'no-subcategory', 
-    'prod_slug'   => $item->product->slug ?? 'no-slug'
-]) }}">
+                                                    <a href="{{ $item->product->details_url }}">
     {{ $item->product->name }}
 </a>
                                                 </h4>
