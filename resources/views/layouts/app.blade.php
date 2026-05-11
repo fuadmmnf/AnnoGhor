@@ -179,7 +179,7 @@
             font-weight: 600;
         }
 
-              
+
 
         /* =========================================
         PROFESSIONAL SHOP MEGA MENU (DESKTOP)
@@ -322,13 +322,13 @@
         .aarong-mega-menu {
             position: absolute;
             top: 100%;
-            left: -250px; 
-            width: 850px; 
+            left: -250px;
+            width: 850px;
             background-color: #ffffff;
             box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-            
+
             /* border-top: 2px solid #222; <--- এই লাইনটি মুছে দেওয়া হয়েছে */
-            
+
             padding: 35px 40px;
             visibility: hidden;
             opacity: 0;
@@ -432,7 +432,7 @@
         .aarong-mega-menu .aarong-subcat-list li {
             display: block !important;
             width: 100% !important;
-            float: none !important; 
+            float: none !important;
             clear: both !important;
             margin-bottom: 4px !important;
         }
@@ -454,7 +454,7 @@
         /* ৩. ক্যাটাগরি হেডিং এর ডিজাইন ফিক্স (যাতে লম্বা শব্দ না ভাঙে) */
         .aarong-mega-column .aarong-cat-heading {
             display: block !important;
-            word-break: break-word !important; 
+            word-break: break-word !important;
             white-space: normal !important;
             padding-right: 0 !important; /* থিমের ডিফল্ট প্যাডিং বাতিল */
         }
@@ -639,7 +639,7 @@
             }
         }
         /* Category name er sathe thaka extra dropdown icon remove korar jonno */
-.categori-dropdown-item ul li .category-header a::after, 
+.categori-dropdown-item ul li .category-header a::after,
 .categori-dropdown-item ul li .category-header a::before {
     display: none !important;
 }
@@ -996,13 +996,13 @@
 
                                             <div class="aarong-mega-menu">
                                                 <div class="aarong-mega-grid">
-                                                    
+
                                                     @foreach ($categories->take(5) as $category)
                                                         <div class="aarong-mega-column arong-col">
                                                             <a href="{{ route('shops', ['category' => $category->id]) }}" class="aarong-cat-heading">
                                                                 {{ $category->name }}
                                                             </a>
-                                                            
+
                                                             @if ($category->subcategories->count() > 0)
                                                                 <ul class="aarong-subcat-list">
                                                                     @foreach ($category->subcategories as $sub)
@@ -1175,7 +1175,7 @@
     <footer class="footer-main">
         <!--=== Footer Bg Wrapper  ===-->
         <div class="footer-bg-wrapper gray-bg">
-            <div class="footer-shape shape-one"><span><img src="assets/images/footer/shape-1.png"
+            <div class="footer-shape shape-one"><span><img src="{{ url('assets/images/footer/shape-1.png') }}"
                         alt="shape"></span></div>
             <svg id="footer-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 75" fill="none">
                 <path
@@ -1238,15 +1238,15 @@
                                 <div class="widget-content">
                                     <h4 class="widget-title">Customer Services</h4>
                                     <ul class="widget-menu">
-                                        <li><img src="assets/images/icon/star-3.svg" alt="star icon"><a
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a
                                                 href="#">Collections & Delivery</a></li>
-                                        <li><img src="assets/images/icon/star-3.svg" alt="star icon"><a
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a
                                                 href="#">Returns & Refunds</a></li>
-                                        <li><img src="assets/images/icon/star-3.svg" alt="star icon"><a
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a
                                                 href="#">Terms & Conditions</a></li>
-                                        <li><img src="assets/images/icon/star-3.svg" alt="star icon"><a
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a
                                                 href="#">Delivery Return</a></li>
-                                        <li><img src="assets/images/icon/star-3.svg" alt="star icon"><a
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a
                                                 href="#">Store Locations</a></li>
                                     </ul>
                                 </div>
@@ -1259,15 +1259,15 @@
                                 <div class="widget-content">
                                     <h4 class="widget-title">Quick Link</h4>
                                     <ul class="widget-menu">
-                                        <li><img src="assets/images/icon/star-3.svg" alt="star icon"><a
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a
                                                 href="#">Privacy Policy</a></li>
-                                        <li><img src="assets/images/icon/star-3.svg" alt="star icon"><a
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a
                                                 href="#">Terms Of Use</a></li>
-                                        <li><img src="assets/images/icon/star-3.svg" alt="star icon"><a
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a
                                                 href="#">FAQ</a></li>
-                                        <li><img src="assets/images/icon/star-3.svg" alt="star icon"><a
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a
                                                 href="#">Contact</a></li>
-                                        <li><img src="assets/images/icon/star-3.svg" alt="star icon"><a
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a
                                                 href="#">Login / Register</a></li>
                                     </ul>
                                 </div>
@@ -1312,7 +1312,7 @@
                         </div>
                         <div class="col-lg-6">
                             <div class="payment-method text-lg-end">
-                                <a href="#"><img src="assets/images/footer/payment-method.png"
+                                <a href="#"><img src="{{ url('assets/images/footer/payment-method.png') }}"
                                         alt="payment-method"></a>
                             </div>
                         </div>
@@ -1541,7 +1541,7 @@
         }
         });
 
-        
+
     </script>
     @stack('scripts')
 </body>
