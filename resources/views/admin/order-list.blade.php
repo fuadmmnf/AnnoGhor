@@ -101,7 +101,7 @@
 
                                             <!-- Total -->
                                             <td style="text-align: right;">
-                                                <div class="order-amount">${{ number_format($order->total_amount, 2) }}
+                                                <div class="order-amount">৳{{ number_format($order->total_amount, 2) }}
                                                 </div>
                                             </td>
 

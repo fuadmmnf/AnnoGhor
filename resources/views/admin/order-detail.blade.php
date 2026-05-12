@@ -28,12 +28,12 @@
                                 <ul class="table-title flex items-center justify-between gap20 mb-24">
                                     <li><div class="body-title">All items</div></li>
                                 </ul>
-                                
+
                                 <ul class="flex flex-column">
                                     @foreach($order->orderItems as $item)
                                         <li class="product-item gap14">
                                             <div class="image no-bg">
-                                                <img src="{{ asset('storage/' . $item->product_image) }}" 
+                                                <img src="{{ asset('storage/' . $item->product_image) }}"
                                                      alt="{{ $item->product_name }}">
                                             </div>
                                             <div class="flex items-center justify-between gap40 flex-grow">
@@ -47,7 +47,7 @@
                                                 </div>
                                                 <div class="name">
                                                     <div class="text-tiny mb-1">Price</div>
-                                                    <div class="body-title-2">${{ number_format($item->total_price, 2) }}</div>
+                                                    <div class="body-title-2">৳{{ number_format($item->total_price, 2) }}</div>
                                                 </div>
                                             </div>
                                         </li>
@@ -65,22 +65,22 @@
                                 <ul class="flex flex-column gap14">
                                     <li class="cart-totals-item">
                                         <span class="body-text">Subtotal:</span>
-                                        <span class="body-title-2">${{ number_format($order->subtotal, 2) }}</span>
+                                        <span class="body-title-2">৳{{ number_format($order->subtotal, 2) }}</span>
                                     </li>
                                     <li class="divider"></li>
                                     <li class="cart-totals-item">
                                         <span class="body-text">Shipping:</span>
-                                        <span class="body-title-2">${{ number_format($order->shipping_cost, 2) }}</span>
+                                        <span class="body-title-2">৳{{ number_format($order->shipping_cost, 2) }}</span>
                                     </li>
                                     <li class="divider"></li>
                                     <li class="cart-totals-item">
                                         <span class="body-text">Tax:</span>
-                                        <span class="body-title-2">${{ number_format($order->tax, 2) }}</span>
+                                        <span class="body-title-2">৳{{ number_format($order->tax, 2) }}</span>
                                     </li>
                                     <li class="divider"></li>
                                     <li class="cart-totals-item">
                                         <span class="body-title">Total price:</span>
-                                        <span class="body-title tf-color-1">${{ number_format($order->total_amount, 2) }}</span>
+                                        <span class="body-title tf-color-1">৳{{ number_format($order->total_amount, 2) }}</span>
                                     </li>
                                 </ul>
                             </div>
@@ -104,7 +104,7 @@
                             </div>
                             <div class="summary-item">
                                 <div class="body-text">Total</div>
-                                <div class="body-title-2 tf-color-1">${{ number_format($order->total_amount, 2) }}</div>
+                                <div class="body-title-2 tf-color-1">৳{{ number_format($order->total_amount, 2) }}</div>
                             </div>
                         </div>
 
@@ -121,7 +121,7 @@
                             <div class="body-title">Payment Method</div>
                             <div class="body-text">{{ $order->payment_method }}</div>
                             <div class="body-text mt-2">
-                                Payment Status: 
+                                Payment Status:
                                 @if($order->payment_status === 'Success')
                                     <span class="badge bg-success">Success</span>
                                 @elseif($order->payment_status === 'Pending')
@@ -145,13 +145,13 @@
                                 </select>
                                 <button type="submit" class="tf-button style-1 w-full mb-2">Update Status</button>
                             </form>
-                            
+
                             @if($order->expected_delivery_date)
                                 <div class="body-title-2 tf-color-2 mt-3">
                                     Expected Delivery: {{ $order->expected_delivery_date->format('d M Y') }}
                                 </div>
                             @endif
-                            
+
                             <a class="tf-button style-1 w-full mt-2" href="{{ route('admin.order-tracking', $order->id) }}">
                                 <i class="icon-truck"></i> Track order
                             </a>

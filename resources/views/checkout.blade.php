@@ -26,60 +26,9 @@
                                             <div class="col-lg-12">
                                                 <div class="form-group">
                                                     <label>Full Name <span>*</span></label>
-                                                    <input type="text" class="form_control" 
-                                                           value="{{ auth()->user()->name }}" 
+                                                    <input type="text" class="form_control"
+                                                           value="{{ auth()->user()->name }}"
                                                            name="name" required readonly>
-                                                </div>
-                                            </div>
-                                            
-                                            {{-- Country Dropdown (Auto-selected) --}}
-                                            <div class="col-lg-12">
-                                                <div class="form-group">
-                                                    <label>Country / Region <span>*</span></label>
-                                                    <select class="form_control" name="country" required>
-                                                        <option value="">Select Country</option>
-                                                        @php
-                                                            $countries = ['Bangladesh', 'United States', 'United Kingdom', 'Canada', 'Germany', 'Switzerland', 'Sweden', 'New Zealand'];
-                                                        @endphp
-                                                        @foreach($countries as $country)
-                                                            <option value="{{ $country }}" {{ auth()->user()->country == $country ? 'selected' : '' }}>
-                                                                {{ $country }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            {{-- Postcode (Auto-fill) --}}
-                                            <div class="col-lg-6">
-                                                <div class="form-group">
-                                                    <label>Postcode / Zip</label>
-                                                    <input type="text" class="form_control" 
-                                                           placeholder="Ex: WC2N 5DU" 
-                                                           value="{{ auth()->user()->postcode }}"
-                                                           name="postcode">
-                                                </div>
-                                            </div>
-
-                                            {{-- City (Auto-fill) --}}
-                                            <div class="col-lg-6">
-                                                <div class="form-group">
-                                                    <label>Town / City</label>
-                                                    <input type="text" class="form_control" 
-                                                           placeholder="Ex: London" 
-                                                           value="{{ auth()->user()->city }}"
-                                                           name="city">
-                                                </div>
-                                            </div>
-
-                                            {{-- Street Address (Auto-fill) --}}
-                                            <div class="col-lg-12">
-                                                <div class="form_group">
-                                                    <label>Street address</label>
-                                                    <input type="text" class="form_control" 
-                                                           placeholder="Ex: 123 Elm Street" 
-                                                           value="{{ auth()->user()->street_address }}"
-                                                           name="street_address">
                                                 </div>
                                             </div>
 
@@ -87,8 +36,8 @@
                                             <div class="col-lg-6">
                                                 <div class="form_group">
                                                     <label>Phone Number <span>*</span></label>
-                                                    <input type="text" class="form_control" 
-                                                           placeholder="Ex: +1 (555) 123-4567" 
+                                                    <input type="text" class="form_control"
+                                                           placeholder="Ex: +1 (555) 123-4567"
                                                            value="{{ auth()->user()->phone }}"
                                                            name="phone" required>
                                                 </div>
@@ -98,8 +47,8 @@
                                             <div class="col-lg-6">
                                                 <div class="form_group">
                                                     <label>Email address <span>*</span></label>
-                                                    <input type="email" class="form_control" 
-                                                           value="{{ auth()->user()->email }}" 
+                                                    <input type="email" class="form_control"
+                                                           value="{{ auth()->user()->email }}"
                                                            name="email" required readonly>
                                                 </div>
                                             </div>
@@ -107,7 +56,7 @@
                                             <div class="col-lg-12">
                                                 <div class="form_group">
                                                     <label>Order Notes (optional)</label>
-                                                    <textarea name="order_notes" class="form_control" 
+                                                    <textarea name="order_notes" class="form_control"
                                                               placeholder="e.g. special notes for delivery."></textarea>
                                                 </div>
                                             </div>
@@ -124,7 +73,7 @@
                                                 <div class="item-title">Product</div>
                                                 <div class="subtotal">Subtotal</div>
                                             </div>
-                                            
+
                                             @forelse($cartItems as $item)
                                                 <div class="product-item">
                                                     <div class="product-name">
@@ -180,17 +129,15 @@
                                                     <p>Please send a check to our store address. We will process your order once we receive the payment.</p>
                                                 </div>
                                             </li> --}}
-                                            <li class="form-check">
-                                                <input class="form-check-input" type="radio" name="payment_method" value="Cash On Delivery" id="method3">
-                                                <label class="form-check-label" for="method3" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                            <li class="form-check js-payment-option" data-method="method3">
+                                                <input class="form-check-input" type="radio" name="payment_method" value="Cash On Delivery" id="method3" checked required>
+                                                <label class="form-check-label" for="method3">
                                                     Cash On Delivery
                                                 </label>
-                                                <div id="collapse2" class="collapse" data-bs-parent="#paymentMethod">
-                                                    <p>Pay with cash upon delivery. Please have exact change ready.</p>
-                                                </div>
+                                                <p class="mt-2 mb-0">Pay with cash upon delivery. Please have exact change ready.</p>
                                             </li>
                                         </ul>
-                                        <button type="submit" class="theme-btn style-one">Place Order</button>
+                                        <button id="place-order-btn" type="submit" class="theme-btn style-one">Place Order</button>
                                     </div>
                                 </div>
                             </div>
@@ -201,3 +148,47 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var paymentRadios = document.querySelectorAll('input[name="payment_method"]');
+        var placeOrderButton = document.getElementById('place-order-btn');
+        var paymentMethodList = document.getElementById('paymentMethod');
+
+        if (!paymentRadios.length || !placeOrderButton) {
+            return;
+        }
+
+        function updatePlaceOrderState() {
+            var hasSelectedPayment = Array.prototype.some.call(paymentRadios, function (radio) {
+                return radio.checked;
+            });
+
+            placeOrderButton.disabled = !hasSelectedPayment;
+        }
+
+        paymentRadios.forEach(function (radio) {
+            radio.addEventListener('change', updatePlaceOrderState);
+        });
+
+        if (paymentMethodList) {
+            paymentMethodList.addEventListener('click', function (event) {
+                var option = event.target.closest('.js-payment-option');
+                if (!option) {
+                    return;
+                }
+
+                var radio = option.querySelector('input[type="radio"][name="payment_method"]');
+                if (radio && !radio.checked) {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+        }
+
+        updatePlaceOrderState();
+    });
+</script>
+@endpush
+

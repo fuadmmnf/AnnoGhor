@@ -88,14 +88,14 @@
                                 {{-- <div class="product-price">
                                     @if($item->product->discount_price)
                                         <span class="old-price">
-                                            ${{ number_format($item->product->regular_price, 2) }}
+                                            ৳{{ number_format($item->product->regular_price, 2) }}
                                         </span>
                                         <span class="new-price">
-                                            ${{ number_format($item->product->discount_price, 2) }}
+                                            ৳{{ number_format($item->product->discount_price, 2) }}
                                         </span>
                                     @else
                                         <span class="new-price">
-                                            ${{ number_format($item->product->regular_price, 2) }}
+                                            ৳{{ number_format($item->product->regular_price, 2) }}
                                         </span>
                                     @endif
                                 </div> --}}

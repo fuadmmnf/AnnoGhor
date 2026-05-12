@@ -47,10 +47,6 @@ function validOrderPayload(User $user): array
         'name' => $user->name,
         'phone' => '01712345678',
         'email' => $user->email,
-        'country' => 'Bangladesh',
-        'city' => 'Dhaka',
-        'postcode' => '1207',
-        'street_address' => 'House 1, Road 2',
         'payment_method' => 'Cash On Delivery',
         'order_notes' => 'Please call before delivery',
     ];
@@ -123,6 +119,59 @@ it('places order successfully and clears cart with stock update', function () {
     expect(OrderTracking::where('order_id', $order->id)->count())->toBe(1);
     expect(Cart::where('user_id', $user->id)->count())->toBe(0);
     expect($product->fresh()->stock_quantity)->toBe(8);
+
+    Mail::assertSent(OrderInvoiceMail::class, 1);
+});
+
+it('renders simplified checkout and completes full checkout flow', function () {
+    Mail::fake();
+
+    $user = User::factory()->create([
+        'role' => 'user',
+        'country' => 'Bangladesh',
+        'city' => 'Dhaka',
+        'postcode' => '1207',
+        'street_address' => 'House 1, Road 2',
+    ]);
+    $product = makeProductWithStock(5);
+
+    Cart::create([
+        'user_id' => $user->id,
+        'product_id' => $product->id,
+        'quantity' => 1,
+        'price' => 50,
+        'total_price' => 50,
+    ]);
+
+    $checkout = $this->actingAs($user)->get(route('checkout'));
+
+    $checkout->assertOk();
+    $checkout->assertDontSee('Country / Region');
+    $checkout->assertDontSee('Postcode / Zip');
+    $checkout->assertDontSee('Street address');
+    $checkout->assertDontSee('Town / City');
+    $checkout->assertSee('Cash On Delivery');
+    $checkout->assertSee('id="method3"', false);
+    $checkout->assertSee('value="Cash On Delivery" id="method3" checked required', false);
+    $checkout->assertDontSee('id="place-order-btn" type="submit" class="theme-btn style-one" disabled', false);
+
+    $response = $this->actingAs($user)
+        ->post(route('order.place'), validOrderPayload($user));
+
+    $order = Order::first();
+    expect($order)->not->toBeNull();
+
+    $response->assertRedirect(route('order.success', ['order' => $order->id]));
+
+    $this->actingAs($user)
+        ->get(route('order.success', ['order' => $order->id]))
+        ->assertOk();
+
+    expect($order->country)->toBe('Bangladesh');
+    expect($order->city)->toBe('Dhaka');
+    expect($order->postcode)->toBe('1207');
+    expect($order->street_address)->toBe('House 1, Road 2');
+    expect(Cart::where('user_id', $user->id)->count())->toBe(0);
 
     Mail::assertSent(OrderInvoiceMail::class, 1);
 });

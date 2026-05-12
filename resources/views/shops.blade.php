@@ -353,7 +353,7 @@
                         updateURLAndRedirect('price_range', range);
                     },
                     slide: function(event, ui) {
-                        $("#amount").val("$" + ui.values[0] + " - $" + ui.values[1]);
+                        $("#amount").val("৳" + ui.values[0] + " - ৳" + ui.values[1]);
                     }
                 });
             }

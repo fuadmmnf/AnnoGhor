@@ -82,9 +82,9 @@
                 <tr>
                     <td>{{ $i + 1 }}</td>
                     <td>{{ $item->product_name }}</td>
-                    <td class="text-center">${{ $item->price }}</td>
+                    <td class="text-center">৳{{ $item->price }}</td>
                     <td class="text-center">{{ $item->quantity }}</td>
-                    <td class="text-end">${{ $item->total_price }}</td>
+                    <td class="text-end">৳{{ $item->total_price }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -96,7 +96,7 @@
         <tr>
             <td><strong>Payment:</strong> {{ $order->payment_method }}</td>
             <td class="text-end">
-                <strong>Total:</strong> ${{ $order->total_amount }}
+                <strong>Total:</strong> ৳{{ $order->total_amount }}
             </td>
         </tr>
     </table>

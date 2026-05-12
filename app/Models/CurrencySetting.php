@@ -23,11 +23,11 @@ class CurrencySetting extends Model
     public static function getActive()
     {
         $setting = self::where('is_active', true)->first();
-        
+
         if (!$setting) {
             return self::getDefault();
         }
-        
+
         return $setting;
     }
 
@@ -56,7 +56,7 @@ class CurrencySetting extends Model
     public static function getCurrencySymbol($currency)
     {
         $symbols = [
-            'USD' => '$',
+            'USD' => '৳',
             'BDT' => '৳'
         ];
         return $symbols[$currency] ?? $currency;

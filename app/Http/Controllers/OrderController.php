@@ -24,16 +24,18 @@ class OrderController extends Controller
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email',
-            'country' => 'required|string',
-            'city' => 'nullable|string',
-            'postcode' => 'nullable|string',
-            'street_address' => 'nullable|string',
-            'payment_method' => 'required|string',
+            'payment_method' => 'required|string|in:Cash On Delivery',
             'order_notes' => 'nullable|string',
         ]);
 
+        $user = Auth::user();
+        $country = $user?->country ?: 'Bangladesh';
+        $city = $user?->city;
+        $postcode = $user?->postcode;
+        $streetAddress = $user?->street_address;
+
         try {
-            $order = DB::transaction(function () use ($request) {
+            $order = DB::transaction(function () use ($request, $country, $city, $postcode, $streetAddress, $user) {
                 $cartItems = Cart::where('user_id', Auth::id())
                     ->with('product')
                     ->lockForUpdate()
@@ -61,10 +63,10 @@ class OrderController extends Controller
                     'payment_status' => 'Pending',
                     'order_status' => 'Pending',
                     'order_notes' => $request->order_notes,
-                    'country' => $request->country,
-                    'city' => $request->city,
-                    'postcode' => $request->postcode,
-                    'street_address' => $request->street_address,
+                    'country' => $country,
+                    'city' => $city,
+                    'postcode' => $postcode,
+                    'street_address' => $streetAddress,
                     'phone' => $request->phone,
                     'email' => $request->email,
                     'expected_delivery_date' => $expectedDelivery,
@@ -100,17 +102,17 @@ class OrderController extends Controller
                     'order_id' => $order->id,
                     'status' => 'Receiving orders',
                     'description' => 'Your order has been received and is being processed.',
-                    'location' => trim(($request->city ?? '') . ', ' . $request->country, ', '),
+                    'location' => trim(($city ?? '') . ', ' . $country, ', '),
                     'tracking_date' => now(),
                 ]);
 
                 Cart::where('user_id', Auth::id())->delete();
 
-                Auth::user()?->update([
-                    'country' => $request->country,
-                    'city' => $request->city,
-                    'postcode' => $request->postcode,
-                    'street_address' => $request->street_address,
+                $user?->update([
+                    'country' => $country,
+                    'city' => $city,
+                    'postcode' => $postcode,
+                    'street_address' => $streetAddress,
                     'phone' => $request->phone,
                 ]);
 

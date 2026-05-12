@@ -54,7 +54,7 @@
                                 </div>
                                 <div>
                                     <div class="body-text mb-2">Total Income</div>
-                                    <h4>${{ number_format($totalIncome, 2) }}</h4>
+                                    <h4>৳{{ number_format($totalIncome, 2) }}</h4>
                                 </div>
                             </div>
                             <div class="box-icon-trending down">
@@ -244,7 +244,7 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center gap10">
-                                    <h4>${{ number_format($revenue, 2) }}</h4>
+                                    <h4>৳{{ number_format($revenue, 2) }}</h4>
 
                                     <div class="box-icon-trending up">
                                         <i class="icon-trending-up"></i>
@@ -260,7 +260,7 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center gap10">
-                                    <h4>${{ number_format($profit, 2) }}</h4>
+                                    <h4>৳{{ number_format($profit, 2) }}</h4>
 
                                     <div class="box-icon-trending up">
                                         <i class="icon-trending-up"></i>

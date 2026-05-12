@@ -157,12 +157,12 @@
                                             <td style="text-align: right;">
                                                 @if ($product->discount_price)
                                                     <div class="price-original">
-                                                        ${{ number_format($product->regular_price, 2) }}</div>
+                                                        ৳{{ number_format($product->regular_price, 2) }}</div>
                                                     <div class="price-discount">
-                                                        ${{ number_format($product->discount_price, 2) }}</div>
+                                                        ৳{{ number_format($product->discount_price, 2) }}</div>
                                                 @else
                                                     <div class="price-regular">
-                                                        ${{ number_format($product->regular_price, 2) }}</div>
+                                                        ৳{{ number_format($product->regular_price, 2) }}</div>
                                                 @endif
                                             </td>
 
