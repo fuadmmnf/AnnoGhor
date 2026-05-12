@@ -123,6 +123,38 @@ it('places order successfully and clears cart with stock update', function () {
     Mail::assertSent(OrderInvoiceMail::class, 1);
 });
 
+it('still completes checkout when invoice email sending fails', function () {
+    $user = User::factory()->create(['role' => 'user']);
+    $product = makeProductWithStock(4);
+
+    Cart::create([
+        'user_id' => $user->id,
+        'product_id' => $product->id,
+        'quantity' => 1,
+        'price' => 50,
+        'total_price' => 50,
+    ]);
+
+    Mail::shouldReceive('to')
+        ->once()
+        ->andReturn(new class {
+            public function send($m)
+            {
+                throw new \RuntimeException('Mail transport down');
+            }
+        });
+
+    $response = $this->actingAs($user)
+        ->post(route('order.place'), validOrderPayload($user));
+
+    $order = Order::first();
+
+    $response->assertRedirect(route('order.success', ['order' => $order->id]));
+    expect($order)->not->toBeNull();
+    expect(Cart::where('user_id', $user->id)->count())->toBe(0);
+    expect($product->fresh()->stock_quantity)->toBe(3);
+});
+
 it('renders simplified checkout and completes full checkout flow', function () {
     Mail::fake();
 

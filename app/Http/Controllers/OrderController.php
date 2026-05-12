@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderTracking;
-use App\Models\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Mail\OrderInvoiceMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Setting;
@@ -34,15 +34,19 @@ class OrderController extends Controller
         $postcode = $user?->postcode;
         $streetAddress = $user?->street_address;
 
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Please login to place an order.');
+        }
+
         try {
             $order = DB::transaction(function () use ($request, $country, $city, $postcode, $streetAddress, $user) {
-                $cartItems = Cart::where('user_id', Auth::id())
+                $cartItems = $user->carts()
                     ->with('product')
                     ->lockForUpdate()
                     ->get();
 
                 if ($cartItems->isEmpty()) {
-                    throw new \RuntimeException('Your cart is empty!');
+                    throw new \RuntimeException('Your cart is empty. Please add items before placing the order.');
                 }
 
                 $subtotal = $cartItems->sum('total_price');
@@ -106,7 +110,7 @@ class OrderController extends Controller
                     'tracking_date' => now(),
                 ]);
 
-                Cart::where('user_id', Auth::id())->delete();
+                $user->carts()->delete();
 
                 $user?->update([
                     'country' => $country,
@@ -122,9 +126,17 @@ class OrderController extends Controller
             $order->load(['user', 'orderItems']);
             $siteSettings = Setting::first();
 
-            // Send mail with PDF
-            Mail::to($order->email)
-                ->send(new OrderInvoiceMail($order, $siteSettings));
+            // Send mail with PDF, but don't fail a completed checkout if email delivery breaks.
+            try {
+                Mail::to($order->email)
+                    ->send(new OrderInvoiceMail($order, $siteSettings));
+            } catch (Throwable $mailException) {
+                Log::warning('Order invoice email failed to send.', [
+                    'order_id' => $order->id,
+                    'email' => $order->email,
+                    'error' => $mailException->getMessage(),
+                ]);
+            }
 
             return redirect()->route('order.success', ['order' => $order->id])
                 ->with('success', 'Order placed successfully!');

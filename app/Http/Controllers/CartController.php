@@ -295,9 +295,10 @@ public function getCartCount()
     // App\Http\Controllers\CartController.php
 public function checkout()
 {
-    $cartItems = Cart::with('product')
-        ->where('user_id', Auth::id())
-        ->get();
+    $user = Auth::user();
+    $cartItems = $user?->carts()
+        ->with('product')
+        ->get() ?? collect();
 
     if ($cartItems->isEmpty()) {
         return redirect()->route('cart')->with('error', 'Your cart is empty. Add items before checkout.');
