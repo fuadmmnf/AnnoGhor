@@ -130,11 +130,11 @@
                                                 </div>
                                             </li> --}}
                                             <li class="form-check mb-0 p-0">
-                                                <label class="js-payment-option d-block w-100 p-3 mb-0" for="method3" style="cursor: pointer;">
-                                                    <input class="form-check-input me-2" type="radio" name="payment_method" value="Cash On Delivery" id="method3" required>
+                                                <div class="d-block w-100 p-3 mb-0">
+                                                    <input type="hidden" name="payment_method" value="Cash On Delivery">
                                                     <span class="form-check-label fw-medium">Cash On Delivery</span>
                                                     <p class="mt-2 mb-0">Pay with cash upon delivery. Please have exact change ready.</p>
-                                                </label>
+                                                </div>
                                             </li>
                                         </ul>
                                         <button id="place-order-btn" type="submit" class="theme-btn style-one">Place Order</button>

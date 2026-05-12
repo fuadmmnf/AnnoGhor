@@ -183,9 +183,8 @@ it('renders simplified checkout and completes full checkout flow', function () {
     $checkout->assertDontSee('Street address');
     $checkout->assertDontSee('Town / City');
     $checkout->assertSee('Cash On Delivery');
-    $checkout->assertSee('id="method3"', false);
-    $checkout->assertSee('value="Cash On Delivery" id="method3" required', false);
-    $checkout->assertDontSee('id="method3" checked', false);
+    $checkout->assertDontSee('type="radio" name="payment_method" value="Cash On Delivery"', false);
+    $checkout->assertSee('type="hidden" name="payment_method" value="Cash On Delivery"', false);
     $checkout->assertSee('id="place-order-btn" type="submit" class="theme-btn style-one"', false);
 
     $response = $this->actingAs($user)
