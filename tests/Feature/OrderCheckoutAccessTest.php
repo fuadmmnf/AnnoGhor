@@ -184,8 +184,9 @@ it('renders simplified checkout and completes full checkout flow', function () {
     $checkout->assertDontSee('Town / City');
     $checkout->assertSee('Cash On Delivery');
     $checkout->assertSee('id="method3"', false);
-    $checkout->assertSee('value="Cash On Delivery" id="method3" checked required', false);
-    $checkout->assertDontSee('id="place-order-btn" type="submit" class="theme-btn style-one" disabled', false);
+    $checkout->assertSee('value="Cash On Delivery" id="method3" required', false);
+    $checkout->assertDontSee('id="method3" checked', false);
+    $checkout->assertSee('id="place-order-btn" type="submit" class="theme-btn style-one"', false);
 
     $response = $this->actingAs($user)
         ->post(route('order.place'), validOrderPayload($user));

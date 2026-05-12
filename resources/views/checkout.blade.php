@@ -129,12 +129,12 @@
                                                     <p>Please send a check to our store address. We will process your order once we receive the payment.</p>
                                                 </div>
                                             </li> --}}
-                                            <li class="form-check js-payment-option" data-method="method3">
-                                                <input class="form-check-input" type="radio" name="payment_method" value="Cash On Delivery" id="method3" checked required>
-                                                <label class="form-check-label" for="method3">
-                                                    Cash On Delivery
+                                            <li class="form-check mb-0 p-0">
+                                                <label class="js-payment-option d-block w-100 p-3 mb-0" for="method3" style="cursor: pointer;">
+                                                    <input class="form-check-input me-2" type="radio" name="payment_method" value="Cash On Delivery" id="method3" required>
+                                                    <span class="form-check-label fw-medium">Cash On Delivery</span>
+                                                    <p class="mt-2 mb-0">Pay with cash upon delivery. Please have exact change ready.</p>
                                                 </label>
-                                                <p class="mt-2 mb-0">Pay with cash upon delivery. Please have exact change ready.</p>
                                             </li>
                                         </ul>
                                         <button id="place-order-btn" type="submit" class="theme-btn style-one">Place Order</button>
@@ -148,47 +148,4 @@
         </div>
     </section>
 @endsection
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var paymentRadios = document.querySelectorAll('input[name="payment_method"]');
-        var placeOrderButton = document.getElementById('place-order-btn');
-        var paymentMethodList = document.getElementById('paymentMethod');
-
-        if (!paymentRadios.length || !placeOrderButton) {
-            return;
-        }
-
-        function updatePlaceOrderState() {
-            var hasSelectedPayment = Array.prototype.some.call(paymentRadios, function (radio) {
-                return radio.checked;
-            });
-
-            placeOrderButton.disabled = !hasSelectedPayment;
-        }
-
-        paymentRadios.forEach(function (radio) {
-            radio.addEventListener('change', updatePlaceOrderState);
-        });
-
-        if (paymentMethodList) {
-            paymentMethodList.addEventListener('click', function (event) {
-                var option = event.target.closest('.js-payment-option');
-                if (!option) {
-                    return;
-                }
-
-                var radio = option.querySelector('input[type="radio"][name="payment_method"]');
-                if (radio && !radio.checked) {
-                    radio.checked = true;
-                    radio.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-            });
-        }
-
-        updatePlaceOrderState();
-    });
-</script>
-@endpush
 
