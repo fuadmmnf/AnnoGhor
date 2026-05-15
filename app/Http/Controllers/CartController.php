@@ -6,22 +6,48 @@ use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class CartController extends Controller
 {
+    /**
+     * Helper Method: Get cart items for both Auth and Guest users
+     */
+    private function getCartItems()
+    {
+        if (Auth::check()) {
+            return Cart::with(['product.images', 'product.category', 'product.subcategory'])
+                ->where('user_id', Auth::id())
+                ->get();
+        }
+
+        // Guest User: Fetch from Session
+        $sessionCart = session()->get('cart', []);
+        $cartItems = collect();
+
+        foreach ($sessionCart as $productId => $details) {
+            $product = Product::with(['images', 'category', 'subcategory'])->find($productId);
+            if ($product) {
+                $cart = new Cart(); // Dummy Cart model for Blade compatibility
+                $cart->id = $productId; // Using product_id as cart_id for session manipulation
+                $cart->product_id = $productId;
+                $cart->quantity = $details['quantity'];
+                $cart->price = $details['price'];
+                $cart->total_price = $details['quantity'] * $details['price'];
+                $cart->setRelation('product', $product);
+                $cartItems->push($cart);
+            }
+        }
+
+        return $cartItems;
+    }
+
     /**
      * Display the cart page
      */
     public function index()
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please login to view your cart.');
-        }
-
-        $cartItems = Cart::with(['product.images', 'product.category', 'product.subcategory'])
-        ->where('user_id', Auth::id())
-        ->get();
-
+        $cartItems = $this->getCartItems();
         $subtotal = $cartItems->sum('total_price');
         $tax = $subtotal * 0.10; // 10% tax
         $total = $subtotal + $tax;
@@ -34,15 +60,6 @@ class CartController extends Controller
      */
     public function addToCartAjax(Request $request, $productId)
     {
-        // Check if user is authenticated
-        if (!Auth::check()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Please login to add items to cart.',
-                'redirect' => route('login')
-            ], 401);
-        }
-
         try {
             $product = Product::findOrFail($productId);
             $quantity = max(1, (int) $request->input('quantity', 1));
@@ -54,55 +71,59 @@ class CartController extends Controller
                 ], 422);
             }
 
-            //$quantity = $request->quantity ?? 1;
+            $price = $product->discount_price ?? $product->regular_price;
+            $message = '';
 
-            // Check if product already exists in cart
-            $existingCartItem = Cart::where('user_id', Auth::id())
-                ->where('product_id', $productId)
-                ->first();
+            if (Auth::check()) {
+                // Auth User Logic
+                $existingCartItem = Cart::where('user_id', Auth::id())->where('product_id', $productId)->first();
 
-            if ($existingCartItem) {
-                // Update quantity
-                $existingCartItem->quantity += $quantity;
-
-                if ($product->stock_quantity < $existingCartItem->quantity) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Requested quantity exceeds available stock.'
-                    ], 422);
+                if ($existingCartItem) {
+                    $existingCartItem->quantity += $quantity;
+                    if ($product->stock_quantity < $existingCartItem->quantity) {
+                        return response()->json(['success' => false, 'message' => 'Requested quantity exceeds stock.'], 422);
+                    }
+                    $existingCartItem->total_price = $existingCartItem->quantity * $price;
+                    $existingCartItem->save();
+                    $message = 'Product quantity updated in cart.';
+                } else {
+                    Cart::create([
+                        'user_id' => Auth::id(),
+                        'product_id' => $productId,
+                        'quantity' => $quantity,
+                        'price' => $price,
+                        'total_price' => $quantity * $price
+                    ]);
+                    $message = 'Product added to cart successfully.';
                 }
-
-                $existingCartItem->total_price = $existingCartItem->quantity * $existingCartItem->price;
-                $existingCartItem->save();
-                $message = 'Product quantity updated in cart.';
             } else {
-                // Add new item to cart
-                $price = $product->discount_price ?? $product->regular_price;
-
-                Cart::create([
-                    'user_id' => Auth::id(),
-                    'product_id' => $productId,
-                    'quantity' => $quantity,
-                    'price' => $price,
-                    'total_price' => $quantity * $price
-                ]);
-                $message = 'Product added to cart successfully.';
+                // Guest User Logic (Session)
+                $cart = session()->get('cart', []);
+                if (isset($cart[$productId])) {
+                    $newQuantity = $cart[$productId]['quantity'] + $quantity;
+                    if ($product->stock_quantity < $newQuantity) {
+                        return response()->json(['success' => false, 'message' => 'Requested quantity exceeds stock.'], 422);
+                    }
+                    $cart[$productId]['quantity'] = $newQuantity;
+                    $message = 'Product quantity updated in cart.';
+                } else {
+                    $cart[$productId] = [
+                        'quantity' => $quantity,
+                        'price' => $price
+                    ];
+                    $message = 'Product added to cart successfully.';
+                }
+                session()->put('cart', $cart);
             }
-
-            // Get updated cart count
-            $cartCount = $this->getCartCount();
 
             return response()->json([
                 'success' => true,
                 'message' => $message,
-                'cart_count' => $cartCount,
+                'cart_count' => $this->getCartCount(),
                 'redirect' => route('cart')
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error adding product to cart: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
         }
     }
 
@@ -111,10 +132,6 @@ class CartController extends Controller
      */
     public function addToCart(Request $request, $productId)
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please login to add items to cart.');
-        }
-
         try {
             $product = Product::findOrFail($productId);
             $quantity = max(1, (int) $request->input('quantity', 1));
@@ -122,39 +139,42 @@ class CartController extends Controller
             if ($product->stock_quantity < $quantity) {
                 return redirect()->back()->with('error', 'Requested quantity is not available in stock.');
             }
-            //$quantity = $request->quantity ?? 1;
 
-            // Check if product already exists in cart
-            $existingCartItem = Cart::where('user_id', Auth::id())
-                ->where('product_id', $productId)
-                ->first();
+            $price = $product->discount_price ?? $product->regular_price;
 
-            if ($existingCartItem) {
-                // Update quantity
-                $existingCartItem->quantity += $quantity;
-
-                if ($product->stock_quantity < $existingCartItem->quantity) {
-                    return redirect()->back()->with('error', 'Requested quantity exceeds available stock.');
+            if (Auth::check()) {
+                $existingCartItem = Cart::where('user_id', Auth::id())->where('product_id', $productId)->first();
+                if ($existingCartItem) {
+                    $existingCartItem->quantity += $quantity;
+                    if ($product->stock_quantity < $existingCartItem->quantity) {
+                        return redirect()->back()->with('error', 'Requested quantity exceeds available stock.');
+                    }
+                    $existingCartItem->total_price = $existingCartItem->quantity * $price;
+                    $existingCartItem->save();
+                } else {
+                    Cart::create([
+                        'user_id' => Auth::id(),
+                        'product_id' => $productId,
+                        'quantity' => $quantity,
+                        'price' => $price,
+                        'total_price' => $quantity * $price
+                    ]);
                 }
-
-                $existingCartItem->total_price = $existingCartItem->quantity * $existingCartItem->price;
-                $existingCartItem->save();
-                $message = 'Product quantity updated in cart.';
             } else {
-                // Add new item to cart
-                $price = $product->discount_price ?? $product->regular_price;
-
-                Cart::create([
-                    'user_id' => Auth::id(),
-                    'product_id' => $productId,
-                    'quantity' => $quantity,
-                    'price' => $price,
-                    'total_price' => $quantity * $price
-                ]);
-                $message = 'Product added to cart successfully.';
+                $cart = session()->get('cart', []);
+                if (isset($cart[$productId])) {
+                    $newQuantity = $cart[$productId]['quantity'] + $quantity;
+                    if ($product->stock_quantity < $newQuantity) {
+                        return redirect()->back()->with('error', 'Requested quantity exceeds available stock.');
+                    }
+                    $cart[$productId]['quantity'] = $newQuantity;
+                } else {
+                    $cart[$productId] = ['quantity' => $quantity, 'price' => $price];
+                }
+                session()->put('cart', $cart);
             }
 
-            return redirect()->route('cart')->with('success', $message);
+            return redirect()->route('cart')->with('success', 'Product added to cart.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error adding product to cart.');
         }
@@ -163,86 +183,74 @@ class CartController extends Controller
     /**
      * Update cart quantity
      */
-public function updateCart(Request $request, $cartId)
-{
-    if (!Auth::check()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Please login to update cart.'
-        ], 401);
-    }
+    public function updateCart(Request $request, $cartId)
+    {
+        try {
+            $itemTotalPrice = 0;
 
-    try {
-        $cartItem = Cart::where('user_id', Auth::id())
-            ->with('product')
-            ->findOrFail($cartId);
-
-        if ($request->quantity <= 0) {
-            $cartItem->delete();
-
-            // Recalculate totals
-            $cartItems = Cart::where('user_id', Auth::id())->get();
-            $subtotal = $cartItems->sum('total_price');
-            $total = $subtotal;
-
-            return response()->json([
-                'success' => true,
-                'subtotal' => number_format($subtotal, 2),
-                'total' => number_format($total, 2),
-                'item_total' => '0.00',
-                'cart_count' => $this->getCartCount()
-            ]);
-        } else {
-            if ($cartItem->product && $request->quantity > $cartItem->product->stock_quantity) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Requested quantity exceeds available stock.'
-                ], 422);
+            if (Auth::check()) {
+                $cartItem = Cart::where('user_id', Auth::id())->with('product')->findOrFail($cartId);
+                if ($request->quantity <= 0) {
+                    $cartItem->delete();
+                } else {
+                    if ($cartItem->product && $request->quantity > $cartItem->product->stock_quantity) {
+                        return response()->json(['success' => false, 'message' => 'Exceeds available stock.'], 422);
+                    }
+                    $cartItem->quantity = $request->quantity;
+                    $cartItem->total_price = $cartItem->quantity * $cartItem->price;
+                    $cartItem->save();
+                    $itemTotalPrice = $cartItem->total_price;
+                }
+            } else {
+                // Session Update (cartId is actually productId for guest)
+                $cart = session()->get('cart', []);
+                if (isset($cart[$cartId])) {
+                    if ($request->quantity <= 0) {
+                        unset($cart[$cartId]);
+                    } else {
+                        $product = Product::find($cartId);
+                        if ($product && $request->quantity > $product->stock_quantity) {
+                            return response()->json(['success' => false, 'message' => 'Exceeds available stock.'], 422);
+                        }
+                        $cart[$cartId]['quantity'] = $request->quantity;
+                        $itemTotalPrice = $request->quantity * $cart[$cartId]['price'];
+                    }
+                    session()->put('cart', $cart);
+                }
             }
 
-            $cartItem->quantity = $request->quantity;
-            $cartItem->total_price = $cartItem->quantity * $cartItem->price;
-            $cartItem->save();
-
-            // Recalculate totals
-            $cartItems = Cart::where('user_id', Auth::id())->get();
+            $cartItems = $this->getCartItems();
             $subtotal = $cartItems->sum('total_price');
-            $total = $subtotal;
 
             return response()->json([
                 'success' => true,
                 'subtotal' => number_format($subtotal, 2),
-                'total' => number_format($total, 2),
-                'item_total' => number_format($cartItem->total_price, 2),
+                'total' => number_format($subtotal, 2), // Add tax here if needed
+                'item_total' => number_format($itemTotalPrice, 2),
                 'cart_count' => $this->getCartCount()
             ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error updating cart.'], 500);
         }
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Error updating cart: ' . $e->getMessage()
-        ], 500);
     }
-}
 
     /**
      * Remove item from cart
      */
     public function removeFromCart($cartId)
     {
-        if (!Auth::check()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Please login to remove items from cart.'
-            ], 401);
-        }
-
         try {
-            $cartItem = Cart::where('user_id', Auth::id())->findOrFail($cartId);
-            $cartItem->delete();
+            if (Auth::check()) {
+                Cart::where('user_id', Auth::id())->where('id', $cartId)->delete();
+            } else {
+                $cart = session()->get('cart', []);
+                if (isset($cart[$cartId])) {
+                    unset($cart[$cartId]);
+                    session()->put('cart', $cart);
+                }
+            }
 
-            // Recalculate totals
-            $cartItems = Cart::where('user_id', Auth::id())->get();
+            $cartItems = $this->getCartItems();
             $subtotal = $cartItems->sum('total_price');
             $tax = $subtotal * 0.10;
             $total = $subtotal + $tax;
@@ -256,67 +264,56 @@ public function updateCart(Request $request, $cartId)
                 'cart_count' => $this->getCartCount()
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error removing item from cart.'
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Error removing item.'], 500);
         }
     }
 
     /**
-     * Get cart count (for AJAX)
+     * Get cart count
      */
-public function getCartCount()
-{
-    if (!Auth::check()) {
-        return 0;
-    }
+    public function getCartCount()
+    {
+        if (Auth::check()) {
+            return Cart::where('user_id', Auth::id())->sum('quantity');
+        }
 
-    return Cart::where('user_id', Auth::id())->sum('quantity');
-}
+        $cart = session()->get('cart', []);
+        return array_sum(array_column($cart, 'quantity'));
+    }
 
     /**
      * Clear cart
      */
     public function clearCart()
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please login to clear cart.');
+        if (Auth::check()) {
+            Cart::where('user_id', Auth::id())->delete();
+        } else {
+            session()->forget('cart');
         }
-
-        Cart::where('user_id', Auth::id())->delete();
 
         return redirect()->route('cart')->with('success', 'Cart cleared successfully.');
     }
 
     /**
-     * Get cart count (internal method)
+     * Checkout
      */
-    // App\Http\Controllers\CartController.php
-public function checkout()
-{
-    $user = Auth::user();
-    $cartItems = $user?->carts()
-        ->with('product')
-        ->get() ?? collect();
-
-    if ($cartItems->isEmpty()) {
-        return redirect()->route('cart')->with('error', 'Your cart is empty. Add items before checkout.');
-    }
-
-      $subtotal = $cartItems->sum('total_price');
-
-    // Total calculate (ekhane subtotal same, jodi tax/discount thake tahole add korben)
-    $total = $subtotal;
-
-    return view('checkout', compact('cartItems', 'subtotal', 'total'));
-}
-    private function getCartCountInternal()
+    public function checkout()
     {
+        // Checkout requires login. If not logged in, send to login page.
         if (!Auth::check()) {
-            return 0;
+            return redirect()->route('login')->with('error', 'Please login to proceed to checkout.');
         }
 
-        return Cart::where('user_id', Auth::id())->sum('quantity');
+        $cartItems = $this->getCartItems();
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart')->with('error', 'Your cart is empty. Add items before checkout.');
+        }
+
+        $subtotal = $cartItems->sum('total_price');
+        $total = $subtotal; // Add tax/discount calculation here if needed
+
+        return view('checkout', compact('cartItems', 'subtotal', 'total'));
     }
 }

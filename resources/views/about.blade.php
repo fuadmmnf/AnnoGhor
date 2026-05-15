@@ -9,84 +9,23 @@
         <div class="container">
             <div class="row">
                 <div class="col-xl-6">
-                    <!--====== Section Image Box ======-->
-                    <div class="section-image-box style-one mb-50" data-aos="fade-up" data-aos-delay="30"
-                        data-aos-duration="1000">
-                        <div class="image-one">
-                            <img src="assets/images/about/about-1.jpg" alt="About Image">
-                            <div class="img-shape"></div>
-                        </div>
-                        <div class="image-two">
-                            <img src="assets/images/about/about-2.jpg" alt="About Image">
-                            <span class="line"></span>
-                        </div>
-                        <div class="experience-box">
-                            <div class="icon">
-                                <img src="assets/images/about/star.svg" alt="Icon">
-                            </div>
-                            <div class="text">
-                                <div class="year">
-                                    25
-                                </div>
-                                <div class="duration">
-                                    Year’s <br> Experience
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-6">
-                    <!--====== Section Content Box ======-->
                     <div class="section-content-box style-one" data-aos="fade-up" data-aos-delay="50"
                         data-aos-duration="1200">
                         <div class="section-title mb-30">
                             <div class="sub-heading d-inline-flex align-items-center">
                                 <i class="flaticon-sparkler"></i>
-                                <span class="sub-title" style="color:#5a3e2b;">About us</span>
+                                <span class="sub-title" style="color:#5a3e2b;">About Annoghor</span>
                             </div>
-                            <h2>Online shopping is buying things from stores on the internet.</h2>
+                            <h2>Bringing pure, authentic groceries right to your doorstep.</h2>
                         </div>
-                        <p>There are many variations of passages of Lorem Ipsum available, but the our majority have
-                            suffered alteration in some form, by injected humour, or randomised words which don't look even
-                            slightly believable you are going to.</p>
+                        <p>Welcome to Annoghor, your trusted destination for premium and authentic daily essentials. We are committed to bridging the gap between nature's freshness and your home, ensuring that every product you receive is unadulterated, hygienic, and full of traditional goodness.</p>
                         <div class="row">
-                            <div class="col-sm-6">
+                            <div class="col-sm-12">
                                 <ul class="list mb-25">
-                                    <li><i class="flaticon-star-3"></i> We are provide 100% best products</li>
-                                    <li><i class="flaticon-star-3"></i>Flexible and affordable price</li>
-                                    <li><i class="flaticon-star-3"></i>All products is imported</li>
+                                    <li><i class="flaticon-star-3"></i> 100% pure and organic selections</li>
+                                    <li><i class="flaticon-star-3"></i> Sourced directly from trusted local farmers</li>
+                                    <li><i class="flaticon-star-3"></i> Fast, secure, and reliable home delivery</li>
                                 </ul>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="thumbnail-img mb-25">
-                                            <img src="assets/images/about/about-3.png" alt="thumbnail img">
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="thumbnail-img mb-25">
-                                            <img src="assets/images/about/about-4.png" alt="thumbnail img">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="content-wrap-box d-flex mt-25">
-                            <div class="author-item">
-                                <div class="author-thumb">
-                                    <img src="assets/images/testimonial/author-3.png" alt="author image">
-                                </div>
-                                <div class="author-info">
-                                    <h5>Thomas Alison</h5>
-                                    <span class="position">CEO at PESCO</span>
-                                </div>
-                            </div>
-                            <div class="divider">
-                                <img src="assets/images/about/divider.png" alt="divider">
-                            </div>
-                            <div class="signature">
-                                <img src="assets/images/about/signature.png" alt="divider">
                             </div>
                         </div>
                     </div>
