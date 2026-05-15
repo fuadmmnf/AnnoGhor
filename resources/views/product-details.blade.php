@@ -28,87 +28,47 @@
                     <div class="col-xl-6">
                         <!--=== Product Gallery ===-->
                         <div class="product-gallery-area mb-50" data-aos="fade-up" data-aos-duration="1200">
-                            <div class="product-big-slider mb-30">
-                                <!-- Main thumbnail -->
-                                @if ($product->thumbnail)
-                                    <div class="product-img">
-                                        <a href="{{ asset('storage/' . $product->thumbnail) }}" class="img-popup">
-                                            <img src="{{ asset('storage/' . $product->thumbnail) }}"
-                                                alt="{{ $product->name }}"
-                                                style="width: 100%; height: 500px; object-fit: cover;">
-                                        </a>
-                                    </div>
-                                @else
-                                    <div class="product-img">
-                                        <a href="{{ asset('assets/images/products/product-big-1.jpg') }}" class="img-popup">
-                                            <img src="{{ asset('assets/images/products/product-big-1.jpg') }}"
-                                                alt="{{ $product->name }}"
-                                                style="width: 100%; height: 500px; object-fit: cover;">
-                                        </a>
-                                    </div>
-                                @endif
+    
+    <div class="product-big-slider mb-30">
+        <div class="product-img">
+            @if ($product->thumbnail)
+                <a href="{{ asset('storage/' . $product->thumbnail) }}" class="img-popup">
+                    <img src="{{ asset('storage/' . $product->thumbnail) }}" alt="{{ $product->name }}" style="width: 100%; height: 500px; object-fit: cover;">
+                </a>
+            @else
+                <a href="{{ asset('assets/images/products/product-big-1.jpg') }}" class="img-popup">
+                    <img src="{{ asset('assets/images/products/product-big-1.jpg') }}" alt="{{ $product->name }}" style="width: 100%; height: 500px; object-fit: cover;">
+                </a>
+            @endif
+        </div>
 
-                                <!-- Gallery images -->
-                                @foreach ($product->images as $image)
-                                    <div class="product-img">
-                                        <a href="{{ asset('storage/' . $image->image) }}" class="img-popup">
-                                            <img src="{{ asset('storage/' . $image->image) }}" alt="{{ $product->name }}"
-                                                style="width: 100%; height: 500px; object-fit: cover;">
-                                        </a>
-                                    </div>
-                                @endforeach
+        @foreach ($product->images as $image)
+            <div class="product-img">
+                <a href="{{ asset('storage/' . $image->image) }}" class="img-popup">
+                    <img src="{{ asset('storage/' . $image->image) }}" alt="{{ $product->name }}" style="width: 100%; height: 500px; object-fit: cover;">
+                </a>
+            </div>
+        @endforeach
+    </div>
 
-                                <!-- Fallback images if no gallery -->
-                                @if ($product->images->isEmpty())
-                                    @for ($i = 2; $i <= 5; $i++)
-                                        <div class="product-img">
-                                            <a href="{{ asset('assets/images/products/product-big-' . $i . '.jpg') }}"
-                                                class="img-popup">
-                                                <img src="{{ asset('assets/images/products/product-big-' . $i . '.jpg') }}"
-                                                    alt="{{ $product->name }}"
-                                                    style="width: 100%; height: 500px; object-fit: cover;">
-                                            </a>
-                                        </div>
-                                    @endfor
-                                @endif
-                            </div>
+    @if ($product->images->isNotEmpty())
+        <div class="product-thumb-slider">
+            <div class="product-img">
+                @if ($product->thumbnail)
+                    <img src="{{ asset('storage/' . $product->thumbnail) }}" alt="{{ $product->name }}" style="width: 100px; height: 100px; object-fit: cover;">
+                @else
+                    <img src="{{ asset('assets/images/products/product-thumb-1.jpg') }}" alt="{{ $product->name }}" style="width: 100px; height: 100px; object-fit: cover;">
+                @endif
+            </div>
 
-                            <div class="product-thumb-slider">
-                                <!-- Thumbnail -->
-                                @if ($product->thumbnail)
-                                    <div class="product-img">
-                                        <img src="{{ asset('storage/' . $product->thumbnail) }}"
-                                            alt="{{ $product->name }}"
-                                            style="width: 100px; height: 100px; object-fit: cover;">
-                                    </div>
-                                @else
-                                    <div class="product-img">
-                                        <img src="{{ asset('assets/images/products/product-thumb-1.jpg') }}"
-                                            alt="{{ $product->name }}"
-                                            style="width: 100px; height: 100px; object-fit: cover;">
-                                    </div>
-                                @endif
-
-                                <!-- Gallery thumbnails -->
-                                @foreach ($product->images as $image)
-                                    <div class="product-img">
-                                        <img src="{{ asset('storage/' . $image->image) }}" alt="{{ $product->name }}"
-                                            style="width: 100px; height: 100px; object-fit: cover;">
-                                    </div>
-                                @endforeach
-
-                                <!-- Fallback thumbnails -->
-                                @if ($product->images->isEmpty())
-                                    @for ($i = 2; $i <= 5; $i++)
-                                        <div class="product-img">
-                                            <img src="{{ asset('assets/images/products/product-thumb-' . $i . '.jpg') }}"
-                                                alt="{{ $product->name }}"
-                                                style="width: 100px; height: 100px; object-fit: cover;">
-                                        </div>
-                                    @endfor
-                                @endif
-                            </div>
-                        </div>
+            @foreach ($product->images as $image)
+                <div class="product-img">
+                    <img src="{{ asset('storage/' . $image->image) }}" alt="{{ $product->name }}" style="width: 100px; height: 100px; object-fit: cover;">
+                </div>
+            @endforeach
+        </div>
+    @endif
+</div>
                     </div>
 
                     <div class="col-xl-6">

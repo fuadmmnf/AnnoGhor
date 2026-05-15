@@ -233,15 +233,17 @@ Route::post('/reset-password', [ResetPasswordController::class, 'update'])
 // Route::post('/cart/add/{productId}', [CartController::class, 'addToCartAjax'])->name('cart.add.ajax');
 Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
 
-// Cart Routes with authentication middleware
-Route::middleware(['auth.user', 'role:user'])->group(function () {
-    Route::get('/cart', [CartController::class, 'index'])->name('cart');
+ Route::get('/cart', [CartController::class, 'index'])->name('cart');
     Route::post('/cart/add-item/{productId}', [CartController::class, 'addToCart'])->name('cart.add.item');
     Route::get('/cart/add-item/{productId}', [CartController::class, 'addToCart'])->name('cart.add.item.get');
     Route::post('/cart/add-ajax/{productId}', [CartController::class, 'addToCartAjax'])->name('cart.add.ajax');
     Route::put('/cart/update/{cartId}', [CartController::class, 'updateCart'])->name('cart.update');
     Route::delete('/cart/remove/{cartId}', [CartController::class, 'removeFromCart'])->name('cart.remove');
     Route::get('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
+
+// Cart Routes with authentication middleware
+Route::middleware(['auth.user', 'role:user'])->group(function () {
+   
 
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
     Route::post('/order/place', [OrderController::class, 'placeOrder'])->name('order.place');
