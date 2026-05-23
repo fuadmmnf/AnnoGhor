@@ -10,7 +10,9 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('guest_token', 64)->nullable()->index();
+            $table->string('guest_name')->nullable();
             $table->string('order_number')->unique();
             $table->decimal('subtotal', 10, 2);
             $table->decimal('shipping_cost', 10, 2)->default(0);
@@ -20,15 +22,12 @@ return new class extends Migration
             $table->enum('payment_status', ['Pending', 'Success', 'Failed'])->default('Pending');
             $table->enum('order_status', ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'])->default('Pending');
             $table->text('order_notes')->nullable();
-            
-            // Shipping details - আলাদা আলাদা columns
             $table->string('country');
             $table->string('city')->nullable();
             $table->string('postcode')->nullable();
             $table->text('street_address')->nullable();
             $table->string('phone');
             $table->string('email');
-            
             $table->date('expected_delivery_date')->nullable();
             $table->timestamps();
         });

@@ -38,7 +38,7 @@
                             </div>
                             <div class="infor mb-10">
                                 <div class="body-text">Customer:</div>
-                                <div class="body-title-2">{{ $order->user->name }}</div>
+                                <div class="body-title-2">{{ $order->user->name ?? $order->guest_name ?? 'Guest User' }}</div>
                             </div>
                             <div class="infor mb-10">
                                 <div class="body-text">Order Placed:</div>

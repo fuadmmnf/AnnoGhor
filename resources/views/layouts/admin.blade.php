@@ -275,24 +275,29 @@
     </li>
 
     <!-- Store Settings -->
-    <li class="menu-item has-children">
-        <a href="javascript:void(0);" class="menu-item-button">
-            <div class="icon"><i class="icon-settings"></i></div>
-            <div class="text">Store Settings</div>
-        </a>
-        <ul class="sub-menu">
-            <li class="sub-menu-item">
-                <a href="{{ route('admin.settings.index') }}">
-                    <div class="text">General Settings</div>
-                </a>
-            </li>
-            <li class="sub-menu-item">
-                <a href="{{ route('admin.social-links.index') }}">
-                    <div class="text">Social Media Links</div>
-                </a>
-            </li>
-        </ul>
-    </li>
+   <li class="menu-item has-children">
+    <a href="javascript:void(0);" class="menu-item-button">
+        <div class="icon"><i class="icon-settings"></i></div>
+        <div class="text">Store Settings</div>
+    </a>
+    <ul class="sub-menu">
+        <li class="sub-menu-item">
+            <a href="{{ route('admin.settings.index') }}">
+                <div class="text">General Settings</div>
+            </a>
+        </li>
+        <li class="sub-menu-item">
+            <a href="{{ route('admin.social-links.index') }}">
+                <div class="text">Social Media Links</div>
+            </a>
+        </li>
+        <li class="sub-menu-item">
+            <a href="{{ route('admin.settings.charge') }}">
+                <div class="text">Delivery Charges</div>
+            </a>
+        </li>
+    </ul>
+</li>
 
                         </div>
                         <div class="center-item">

@@ -96,7 +96,7 @@
                             </div>
                             <div class="summary-item">
                                 <div class="body-text">Customer</div>
-                                <div class="body-title-2">{{ $order->user->name }}</div>
+                                <div class="body-title-2">{{ $order->user->name ?? $order->guest_name ?? 'Guest User' }}</div>
                             </div>
                             <div class="summary-item">
                                 <div class="body-text">Date</div>

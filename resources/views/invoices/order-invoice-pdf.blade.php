@@ -40,9 +40,10 @@
     <h1>AnnoGhor</h1>
 
     <p>
-        {{ $siteSettings->site_address }} <br>
-        {{ $siteSettings->site_phone }} <br>
-        {{ $siteSettings->site_email }}
+        {{-- ডেটা না থাকলে ক্র্যাশ না করে এই ডিফল্ট লেখাগুলো দেখাবে --}}
+        {{ $siteSettings?->site_address ?? 'AnnoGhor Shop Address' }} <br>
+        {{ $siteSettings?->site_phone ?? '+880 1XXX-XXXXXX' }} <br>
+        {{ $siteSettings?->site_email ?? 'info@annoghor.com' }}
     </p>
 
     <hr>
@@ -51,7 +52,8 @@
         <tr>
             <td>
                 <strong>Bill To:</strong><br>
-                {{ $order->user->name ?? 'Guest User' }}<br>
+                {{-- গেস্ট ইউজার এবং লগইন ইউজারের নামের ক্র্যাশ প্রোটেকশন --}}
+                {{ $order->guest_name ?? $order->user?->name ?? 'Guest User' }}<br>
                 {{ $order->full_address }}<br>
                 {{ $order->email }}<br>
                 {{ $order->phone }}

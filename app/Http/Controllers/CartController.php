@@ -6,13 +6,9 @@ use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 
 class CartController extends Controller
 {
-    /**
-     * Helper Method: Get cart items for both Auth and Guest users
-     */
     private function getCartItems()
     {
         if (Auth::check()) {
@@ -21,15 +17,14 @@ class CartController extends Controller
                 ->get();
         }
 
-        // Guest User: Fetch from Session
         $sessionCart = session()->get('cart', []);
         $cartItems = collect();
 
         foreach ($sessionCart as $productId => $details) {
             $product = Product::with(['images', 'category', 'subcategory'])->find($productId);
             if ($product) {
-                $cart = new Cart(); // Dummy Cart model for Blade compatibility
-                $cart->id = $productId; // Using product_id as cart_id for session manipulation
+                $cart = new Cart();
+                $cart->id = $productId;
                 $cart->product_id = $productId;
                 $cart->quantity = $details['quantity'];
                 $cart->price = $details['price'];
@@ -42,22 +37,16 @@ class CartController extends Controller
         return $cartItems;
     }
 
-    /**
-     * Display the cart page
-     */
     public function index()
     {
         $cartItems = $this->getCartItems();
         $subtotal = $cartItems->sum('total_price');
-        $tax = $subtotal * 0.10; // 10% tax
+        $tax = $subtotal * 0.10;
         $total = $subtotal + $tax;
 
         return view('cart', compact('cartItems', 'subtotal', 'tax', 'total'));
     }
 
-    /**
-     * Add to cart (AJAX request)
-     */
     public function addToCartAjax(Request $request, $productId)
     {
         try {
@@ -75,7 +64,6 @@ class CartController extends Controller
             $message = '';
 
             if (Auth::check()) {
-                // Auth User Logic
                 $existingCartItem = Cart::where('user_id', Auth::id())->where('product_id', $productId)->first();
 
                 if ($existingCartItem) {
@@ -88,16 +76,15 @@ class CartController extends Controller
                     $message = 'Product quantity updated in cart.';
                 } else {
                     Cart::create([
-                        'user_id' => Auth::id(),
-                        'product_id' => $productId,
-                        'quantity' => $quantity,
-                        'price' => $price,
-                        'total_price' => $quantity * $price
+                        'user_id'     => Auth::id(),
+                        'product_id'  => $productId,
+                        'quantity'    => $quantity,
+                        'price'       => $price,
+                        'total_price' => $quantity * $price,
                     ]);
                     $message = 'Product added to cart successfully.';
                 }
             } else {
-                // Guest User Logic (Session)
                 $cart = session()->get('cart', []);
                 if (isset($cart[$productId])) {
                     $newQuantity = $cart[$productId]['quantity'] + $quantity;
@@ -107,29 +94,23 @@ class CartController extends Controller
                     $cart[$productId]['quantity'] = $newQuantity;
                     $message = 'Product quantity updated in cart.';
                 } else {
-                    $cart[$productId] = [
-                        'quantity' => $quantity,
-                        'price' => $price
-                    ];
+                    $cart[$productId] = ['quantity' => $quantity, 'price' => $price];
                     $message = 'Product added to cart successfully.';
                 }
                 session()->put('cart', $cart);
             }
 
             return response()->json([
-                'success' => true,
-                'message' => $message,
+                'success'    => true,
+                'message'    => $message,
                 'cart_count' => $this->getCartCount(),
-                'redirect' => route('cart')
+                'redirect'   => route('cart'),
             ]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
         }
     }
 
-    /**
-     * Add to cart (non-AJAX request)
-     */
     public function addToCart(Request $request, $productId)
     {
         try {
@@ -153,11 +134,11 @@ class CartController extends Controller
                     $existingCartItem->save();
                 } else {
                     Cart::create([
-                        'user_id' => Auth::id(),
-                        'product_id' => $productId,
-                        'quantity' => $quantity,
-                        'price' => $price,
-                        'total_price' => $quantity * $price
+                        'user_id'     => Auth::id(),
+                        'product_id'  => $productId,
+                        'quantity'    => $quantity,
+                        'price'       => $price,
+                        'total_price' => $quantity * $price,
                     ]);
                 }
             } else {
@@ -180,9 +161,6 @@ class CartController extends Controller
         }
     }
 
-    /**
-     * Update cart quantity
-     */
     public function updateCart(Request $request, $cartId)
     {
         try {
@@ -196,13 +174,12 @@ class CartController extends Controller
                     if ($cartItem->product && $request->quantity > $cartItem->product->stock_quantity) {
                         return response()->json(['success' => false, 'message' => 'Exceeds available stock.'], 422);
                     }
-                    $cartItem->quantity = $request->quantity;
+                    $cartItem->quantity    = $request->quantity;
                     $cartItem->total_price = $cartItem->quantity * $cartItem->price;
                     $cartItem->save();
                     $itemTotalPrice = $cartItem->total_price;
                 }
             } else {
-                // Session Update (cartId is actually productId for guest)
                 $cart = session()->get('cart', []);
                 if (isset($cart[$cartId])) {
                     if ($request->quantity <= 0) {
@@ -220,23 +197,20 @@ class CartController extends Controller
             }
 
             $cartItems = $this->getCartItems();
-            $subtotal = $cartItems->sum('total_price');
+            $subtotal  = $cartItems->sum('total_price');
 
             return response()->json([
-                'success' => true,
-                'subtotal' => number_format($subtotal, 2),
-                'total' => number_format($subtotal, 2), // Add tax here if needed
+                'success'    => true,
+                'subtotal'   => number_format($subtotal, 2),
+                'total'      => number_format($subtotal, 2),
                 'item_total' => number_format($itemTotalPrice, 2),
-                'cart_count' => $this->getCartCount()
+                'cart_count' => $this->getCartCount(),
             ]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error updating cart.'], 500);
         }
     }
 
-    /**
-     * Remove item from cart
-     */
     public function removeFromCart($cartId)
     {
         try {
@@ -251,26 +225,23 @@ class CartController extends Controller
             }
 
             $cartItems = $this->getCartItems();
-            $subtotal = $cartItems->sum('total_price');
-            $tax = $subtotal * 0.10;
-            $total = $subtotal + $tax;
+            $subtotal  = $cartItems->sum('total_price');
+            $tax       = $subtotal * 0.10;
+            $total     = $subtotal + $tax;
 
             return response()->json([
-                'success' => true,
-                'message' => 'Item removed from cart.',
-                'subtotal' => number_format($subtotal, 2),
-                'tax' => number_format($tax, 2),
-                'total' => number_format($total, 2),
-                'cart_count' => $this->getCartCount()
+                'success'    => true,
+                'message'    => 'Item removed from cart.',
+                'subtotal'   => number_format($subtotal, 2),
+                'tax'        => number_format($tax, 2),
+                'total'      => number_format($total, 2),
+                'cart_count' => $this->getCartCount(),
             ]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error removing item.'], 500);
         }
     }
 
-    /**
-     * Get cart count
-     */
     public function getCartCount()
     {
         if (Auth::check()) {
@@ -281,9 +252,6 @@ class CartController extends Controller
         return array_sum(array_column($cart, 'quantity'));
     }
 
-    /**
-     * Clear cart
-     */
     public function clearCart()
     {
         if (Auth::check()) {
@@ -295,16 +263,8 @@ class CartController extends Controller
         return redirect()->route('cart')->with('success', 'Cart cleared successfully.');
     }
 
-    /**
-     * Checkout
-     */
     public function checkout()
     {
-        // Checkout requires login. If not logged in, send to login page.
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please login to proceed to checkout.');
-        }
-
         $cartItems = $this->getCartItems();
 
         if ($cartItems->isEmpty()) {
@@ -312,7 +272,7 @@ class CartController extends Controller
         }
 
         $subtotal = $cartItems->sum('total_price');
-        $total = $subtotal; // Add tax/discount calculation here if needed
+        $total    = $subtotal;
 
         return view('checkout', compact('cartItems', 'subtotal', 'total'));
     }
