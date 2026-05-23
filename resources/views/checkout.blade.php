@@ -5,12 +5,27 @@
 @section('content')
     <section class="checkout-section pt-50 pb-80">
         <div class="container">
+
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     {{ session('error') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
+
+            @guest
+                <div class="alert d-flex align-items-center justify-content-between flex-wrap gap-2 mb-30"
+                     style="background:#fff8e1; border:1px solid #E2B718; border-radius:10px; padding:14px 20px;">
+                    <span style="color:#7a6000; font-weight:500;">
+                        <i class="fas fa-info-circle me-2" style="color:#E2B718;"></i>
+                        Have an account? Login for faster checkout and order history.
+                    </span>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('login') }}" class="btn btn-sm btn-outline-warning fw-semibold">Login</a>
+                        <a href="{{ route('register') }}" class="btn btn-sm btn-warning fw-semibold text-white">Register</a>
+                    </div>
+                </div>
+            @endguest
 
             <div class="row">
                 <div class="col-xl-12">
@@ -22,49 +37,165 @@
                                     <div class="billing-wrapper">
                                         <h3 class="title">Billing details</h3>
                                         <div class="row">
-                                            {{-- Name (Readonly) --}}
+
+                                            {{-- Name --}}
                                             <div class="col-lg-12">
                                                 <div class="form-group">
-                                                    <label>Full Name <span>*</span></label>
-                                                    <input type="text" class="form_control"
-                                                           value="{{ auth()->user()->name }}"
-                                                           name="name" required readonly>
+                                                    <label>Full Name</label>
+                                                    @auth
+                                                        <input type="text" class="form_control"
+                                                               value="{{ auth()->user()->name }}"
+                                                               name="name" required readonly>
+                                                    @else
+                                                        <input type="text" class="form_control"
+                                                               placeholder="Your full name"
+                                                               name="name" required
+                                                               value="{{ old('name') }}">
+                                                    @endauth
                                                 </div>
                                             </div>
 
-                                            {{-- Phone (Auto-fill) --}}
+                                            {{-- Phone --}}
                                             <div class="col-lg-6">
                                                 <div class="form_group">
-                                                    <label>Phone Number <span>*</span></label>
-                                                    <input type="text" class="form_control"
-                                                           placeholder="Ex: +1 (555) 123-4567"
-                                                           value="{{ auth()->user()->phone }}"
-                                                           name="phone" required>
+                                                    <label>Phone Number</label>
+                                                    @auth
+                                                        <input type="text" class="form_control"
+                                                               placeholder="Ex: +880 1XXX-XXXXXX"
+                                                               value="{{ auth()->user()->phone }}"
+                                                               name="phone" required>
+                                                    @else
+                                                        <input type="text" class="form_control"
+                                                               placeholder="Ex: +880 1XXX-XXXXXX"
+                                                               name="phone" required
+                                                               value="{{ old('phone') }}">
+                                                    @endauth
                                                 </div>
                                             </div>
 
-                                            {{-- Email (Readonly) --}}
+                                            {{-- Email --}}
                                             <div class="col-lg-6">
                                                 <div class="form_group">
-                                                    <label>Email address <span>*</span></label>
-                                                    <input type="email" class="form_control"
-                                                           value="{{ auth()->user()->email }}"
-                                                           name="email" required readonly>
+                                                    <label>Email address</label>
+                                                    @auth
+                                                        <input type="email" class="form_control"
+                                                               value="{{ auth()->user()->email }}"
+                                                               name="email" required readonly>
+                                                    @else
+                                                        <input type="email" class="form_control"
+                                                               placeholder="your@email.com"
+                                                               name="email" required
+                                                               value="{{ old('email') }}">
+                                                    @endauth
                                                 </div>
                                             </div>
 
+                                            {{-- Country --}}
+                                            <div class="col-lg-6">
+                                                <div class="form_group">
+                                                    <label>Country</label>
+                                                    @auth
+                                                        <input type="text" class="form_control"
+                                                               value="{{ auth()->user()->country ?? 'Bangladesh' }}"
+                                                               name="country" required>
+                                                    @else
+                                                        <input type="text" class="form_control"
+                                                               placeholder="Country"
+                                                               name="country" required
+                                                               value="{{ old('country', 'Bangladesh') }}">
+                                                    @endauth
+                                                </div>
+                                            </div>
+
+                                            {{-- City --}}
+                                            <div class="col-lg-6">
+                                                <div class="form_group">
+                                                    <label>City / District</label>
+                                                    @auth
+                                                        <input type="text" class="form_control"
+                                                               value="{{ auth()->user()->city }}"
+                                                               name="city">
+                                                    @else
+                                                        <input type="text" class="form_control"
+                                                               placeholder="City / District"
+                                                               name="city"
+                                                               value="{{ old('city') }}">
+                                                    @endauth
+                                                </div>
+                                            </div>
+
+                                            {{-- Postcode --}}
+                                            <div class="col-lg-6">
+                                                <div class="form_group">
+                                                    <label>Postcode</label>
+                                                    @auth
+                                                        <input type="text" class="form_control"
+                                                               value="{{ auth()->user()->postcode }}"
+                                                               name="postcode">
+                                                    @else
+                                                        <input type="text" class="form_control"
+                                                               placeholder="Postcode"
+                                                               name="postcode"
+                                                               value="{{ old('postcode') }}">
+                                                    @endauth
+                                                </div>
+                                            </div>
+
+                                            {{-- Street Address --}}
+                                            <div class="col-lg-6">
+                                                <div class="form_group">
+                                                    <label>Street Address</label>
+                                                    @auth
+                                                        <input type="text" class="form_control"
+                                                               value="{{ auth()->user()->street_address }}"
+                                                               name="street_address">
+                                                    @else
+                                                        <input type="text" class="form_control"
+                                                               placeholder="House no / Street / Area"
+                                                               name="street_address"
+                                                               value="{{ old('street_address') }}">
+                                                    @endauth
+                                                </div>
+                                            </div>
+
+                                            {{-- 🚚 ডাইনামিক চেকমার্ক (Radio Card) সেকশন --}}
+                                            <div class="col-lg-12 mt-3 mb-3">
+                                                <label class="fw-semibold mb-2" style="color: #333; font-size: 15px;">Select Shipping Method</label>
+                                                <div class="shipping-methods-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                                                    
+                                                    <label class="shipping-card" style="border: 2px solid #eceff8; padding: 15px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.3s ease; background: #fff;">
+                                                        <input type="radio" name="delivery_area" value="inside" class="delivery-radio" onchange="calculateLiveTotal(this)" required style="width: 18px; height: 18px; accent-color: #f15922;">
+                                                        <div>
+                                                            <span style="display: block; font-weight: 600; color: #333;">Inside Dhaka</span>
+                                                            <small style="color: #666;" id="inside-cost-text">Connecting...</small>
+                                                        </div>
+                                                    </label>
+
+                                                    <label class="shipping-card" style="border: 2px solid #eceff8; padding: 15px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.3s ease; background: #fff;">
+                                                        <input type="radio" name="delivery_area" value="outside" class="delivery-radio" onchange="calculateLiveTotal(this)" required style="width: 18px; height: 18px; accent-color: #f15922;">
+                                                        <div>
+                                                            <span style="display: block; font-weight: 600; color: #333;">Outside Dhaka</span>
+                                                            <small style="color: #666;" id="outside-cost-text">Connecting...</small>
+                                                        </div>
+                                                    </label>
+
+                                                </div>
+                                            </div>
+
+                                            {{-- Order Notes --}}
                                             <div class="col-lg-12">
                                                 <div class="form_group">
                                                     <label>Order Notes (optional)</label>
                                                     <textarea name="order_notes" class="form_control"
-                                                              placeholder="e.g. special notes for delivery."></textarea>
+                                                              placeholder="e.g. special notes for delivery.">{{ old('order_notes') }}</textarea>
                                                 </div>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
 
-                                {{-- Order Summary & Payment Method (Keep as it is) --}}
+                                {{-- Order Summary & Payment --}}
                                 <div class="col-xl-5">
                                     <div class="order-summary-wrapper mb-30">
                                         <h3 class="title">Order Summary</h3>
@@ -92,17 +223,19 @@
                                             <div class="list-item">
                                                 <div class="subtotal">Subtotal</div>
                                                 <div class="product-total">
-                                                    {{ \App\Helpers\CurrencyHelper::formatPrice($subtotal) }}
+                                                    <span id="subtotal-display" data-subtotal="{{ $subtotal }}">{{ \App\Helpers\CurrencyHelper::formatPrice($subtotal) }}</span>
                                                 </div>
                                             </div>
+                                            
                                             <div class="list-item">
                                                 <div class="shipping">Shipping</div>
-                                                <div class="shipping-total">Free</div>
+                                                <div class="shipping-total" id="shipping-cost-display" style="font-weight: 500; color: #666;">Select area</div>
                                             </div>
+                                            
                                             <div class="list-item">
                                                 <div class="total">Total</div>
-                                                <div class="product-total">
-                                                    {{ \App\Helpers\CurrencyHelper::formatPrice($total) }}
+                                                <div class="product-total" style="font-weight: 700; color: #f15922;">
+                                                    <span id="grand-total-display">{{ \App\Helpers\CurrencyHelper::formatPrice($subtotal) }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -111,35 +244,18 @@
                                     <div class="payment-method-wrapper">
                                         <h4 class="title mb-20">Payment Method</h4>
                                         <ul id="paymentMethod" class="mb-20">
-                                            {{-- <li class="form-check">
-                                                <input class="form-check-input" type="radio" name="payment_method" value="Direct bank transfer" id="method1" checked required>
-                                                <label class="form-check-label" for="method1" data-bs-toggle="collapse" data-bs-target="#collapse0">
-                                                    Direct bank transfer
-                                                </label>
-                                                <div id="collapse0" class="collapse show" data-bs-parent="#paymentMethod">
-                                                    <p>Make your payment directly into our bank account. Please use your Order ID as the payment reference.</p>
-                                                </div>
-                                            </li>
-                                            <li class="form-check">
-                                                <input class="form-check-input" type="radio" name="payment_method" value="Check payments" id="method2">
-                                                <label class="form-check-label" for="method2" data-bs-toggle="collapse" data-bs-target="#collapse1">
-                                                    Check payments
-                                                </label>
-                                                <div id="collapse1" class="collapse" data-bs-parent="#paymentMethod">
-                                                    <p>Please send a check to our store address. We will process your order once we receive the payment.</p>
-                                                </div>
-                                            </li> --}}
                                             <li class="form-check mb-0 p-0">
                                                 <div class="d-block w-100 p-3 mb-0">
                                                     <input type="hidden" name="payment_method" value="Cash On Delivery">
                                                     <span class="form-check-label fw-medium">Cash On Delivery</span>
-                                                    <p class="mt-2 mb-0">Pay with cash upon delivery. Please have exact change ready.</p>
+                                                    <p class="mt-2 mb-0">Pay with cash upon delivery.</p>
                                                 </div>
                                             </li>
                                         </ul>
                                         <button id="place-order-btn" type="submit" class="theme-btn style-one">Place Order</button>
                                     </div>
                                 </div>
+
                             </div>
                         </form>
                     </div>
@@ -149,3 +265,79 @@
     </section>
 @endsection
 
+@push('scripts')
+    <script>
+        var insideDhakaCharge = 0;
+        var outsideDhakaCharge = 0;
+        var isChargesApiReady = false;
+
+        // ১. ন্যাটিভ ভ্যানিলা জেএস দিয়ে এপিআই কল (যাতে কনসোলে অন্য এরর থাকলেও এটি ব্যাকগ্রাউন্ডে কাজ সম্পন্ন করতে পারে)
+        function fetchDynamicCharges() {
+            fetch('{{ route("api.delivery-charges") }}')
+                .then(function(res) {
+                    return res.json();
+                })
+                .then(function(data) {
+                    insideDhakaCharge = parseFloat(data.inside_dhaka) || 60;
+                    outsideDhakaCharge = parseFloat(data.outside_dhaka) || 120;
+                    isChargesApiReady = true;
+
+                    // রেডিও বক্সের লোডিং টেক্সট লাইভ আপডেট
+                    document.getElementById('inside-cost-text').innerText = '৳' + insideDhakaCharge.toFixed(2);
+                    document.getElementById('outside-cost-text').innerText = '৳' + outsideDhakaCharge.toFixed(2);
+
+                    // ইউজার যদি এপিআই লোড শেষ হওয়ার আগেই রেডিও সিলেক্ট করে ফেলে, তবে দাম অটোমেটিক আপডেট হবে
+                    var checkedInput = document.querySelector('.delivery-radio:checked');
+                    if (checkedInput) {
+                        calculateLiveTotal(checkedInput);
+                    }
+                })
+                .catch(function(err) {
+                    // ফলব্যাক সেফটি রেট (যদি কোনো কারণে এপিআই ব্লক হয়)
+                    insideDhakaCharge = 60;
+                    outsideDhakaCharge = 120;
+                    isChargesApiReady = true;
+                    document.getElementById('inside-cost-text').innerText = '৳60.00';
+                    document.getElementById('outside-cost-text').innerText = '৳120.00';
+                });
+        }
+
+        // পেজ লোড হওয়ার সাথে সাথেই এপিআই থেকে রিয়েল প্রাইস নিয়ে আসবে
+        window.addEventListener('DOMContentLoaded', fetchDynamicCharges);
+
+        // ২. লাইভ গ্র্যান্ড টোটাল ও শিপিং কস্ট রেন্ডারিং মেকানিজম
+        function calculateLiveTotal(radioElement) {
+            // কার্ডের হাইলাইট বর্ডার রেন্ডারিং
+            var cards = document.querySelectorAll('.shipping-card');
+            cards.forEach(function(card) {
+                card.style.borderColor = '#eceff8';
+                card.style.background = '#fff';
+            });
+            
+            var targetCard = radioElement.closest('.shipping-card');
+            if (targetCard) {
+                targetCard.style.borderColor = '#f15922';
+                targetCard.style.background = '#fffbf9';
+            }
+
+            // যদি এপিআই ডেটা লোড হতে কয়েক মিলি সেকেন্ড দেরি হয়
+            if (!isChargesApiReady) {
+                document.getElementById('shipping-cost-display').innerText = 'Calculating...';
+                return;
+            }
+
+            // ক্যালকুলেশন জোন
+            var subtotalSpan = document.getElementById('subtotal-display');
+            var subtotal = parseFloat(subtotalSpan.getAttribute('data-subtotal')) || 0;
+            
+            var selectedZone = radioElement.value;
+            var currentCharge = (selectedZone === 'inside') ? insideDhakaCharge : outsideDhakaCharge;
+            var finalTotal = subtotal + currentCharge;
+
+            // ডান পাশের উইন্ডোতে লাইভ রেন্ডারিং
+            document.getElementById('shipping-cost-display').innerText = '৳' + currentCharge.toFixed(2);
+            document.getElementById('shipping-cost-display').style.color = '#333';
+            document.getElementById('grand-total-display').innerText = '৳' + finalTotal.toFixed(2);
+        }
+    </script>
+@endpush

@@ -3,11 +3,39 @@
 @section('title', 'Edit Product')
 
 @section('content')
-    <!-- main-content -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+
+    <style>
+        .custom-form-input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px; /* নিখুঁত রাউন্ডেড কর্নার */
+            font-size: 15px;
+            color: #334155;
+            background-color: #ffffff;
+            transition: all 0.3s ease;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .custom-form-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .custom-form-input::placeholder {
+            color: #94a3b8;
+        }
+        .form-label {
+            font-size: 15px;
+            color: #64748b;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 400;
+        }
+    </style>
+
     <div class="main-content">
-        <!-- main-content-wrap -->
         <div class="main-content-inner">
-            <!-- main-content-wrap -->
             <div class="main-content-wrap">
                 <div class="flex items-center flex-wrap justify-between gap20 mb-27">
                     <h3>Edit Product</h3>
@@ -34,7 +62,6 @@
                     </ul>
                 </div>
 
-                <!-- Success/Error Messages -->
                 @if (session('success'))
                     <div class="alert alert-success mb-4"
                         style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
@@ -60,11 +87,10 @@
                     </div>
                 @endif
 
-                <!-- form-edit-product -->
                 <form action="{{ route('admin.product.update', $product->id) }}" method="POST"
                     enctype="multipart/form-data" class="tf-section-2 form-add-product">
                     @csrf
-                    @method('POST')
+                    @method('POST') 
 
                     <div class="wg-box">
                         <fieldset class="name">
@@ -109,73 +135,65 @@
 
                         <div class="gap22 cols">
                             <fieldset class="brand">
-                                <div class="body-title mb-10">Regular Price <span class="tf-color-1">*</span></div>
-                                <input class="mb-10" type="number" step="0.01" placeholder="Enter regular price"
+                                <div class="body-title mb-10">Regular Price (Per KG) <span class="tf-color-1">*</span></div>
+                                <input class="mb-10" type="number" step="0.01" placeholder="Enter regular price per kg"
                                     name="regular_price" tabindex="0"
                                     value="{{ old('regular_price', $product->regular_price) }}" aria-required="true"
                                     required>
                             </fieldset>
                             <fieldset class="brand">
-                                <div class="body-title mb-10">Discount Price</div>
-                                <input class="mb-10" type="number" step="0.01" placeholder="Enter discount price"
+                                <div class="body-title mb-10">Discount Price (Per KG)</div>
+                                <input class="mb-10" type="number" step="0.01" placeholder="Enter discount price per kg"
                                     name="discount_price" tabindex="0"
                                     value="{{ old('discount_price', $product->discount_price) }}">
                             </fieldset>
                         </div>
 
-                        <!-- Stock & Delivery Section -->
                         <div class="gap22 cols">
                             <fieldset class="stock">
-                                <div class="body-title mb-10">Stock Quantity <span class="tf-color-1">*</span></div>
-                                <input class="mb-10" type="number" min="0" placeholder="Enter stock quantity"
+                                <div class="body-title mb-10">Stock Quantity (in KG) <span class="tf-color-1">*</span></div>
+                                <input class="mb-10" type="number" step="0.01" min="0" placeholder="e.g., 50.50"
                                     name="stock_quantity" tabindex="0"
                                     value="{{ old('stock_quantity', $product->stock_quantity ?? 0) }}" aria-required="true"
                                     required>
-                                <div class="text-tiny">Enter available stock quantity</div>
+                                <div class="text-tiny">Enter available stock weight in Kilograms (KG)</div>
                             </fieldset>
                             <fieldset class="delivery">
                                 <div class="body-title mb-10">Delivery Days</div>
-                                <input class="mb-10" type="number" min="1" placeholder="e.g., 3-5 days"
+                                <input class="mb-10" type="number" min="1" placeholder="e.g., 3"
                                     name="delivery_days" tabindex="0"
                                     value="{{ old('delivery_days', $product->delivery_days) }}">
                                 <div class="text-tiny">Expected delivery time in days (optional)</div>
                             </fieldset>
                         </div>
 
-                        <!-- Featured Product Checkbox -->
                         <fieldset class="featured">
-                            <div class="body-title mb-10">Featured Product</div>
                             <div class="flex items-center gap10">
                                 <input type="checkbox" name="is_featured" id="is_featured" value="1"
                                     {{ old('is_featured', $product->is_featured) ? 'checked' : '' }}>
-                                <label for="is_featured" class="body-text">
-                                    Mark this product as featured (will appear in featured sections)
-                                </label>
+                                <label for="is_featured" class="body-text">Featured Product</label>
                             </div>
                         </fieldset>
 
-                        <fieldset class="trending mt-3">
-                            <div class="body-title mb-10">Trending Product</div>
+                        <fieldset class="trending">
                             <div class="flex items-center gap10">
                                 <input type="checkbox" name="is_trending" id="is_trending" value="1"
                                     {{ old('is_trending', $product->is_trending) ? 'checked' : '' }}>
-                                <label for="is_trending" class="body-text">
-                                    Mark this product as trending (will appear in trending sections)
-                                </label>
+                                <label for="is_trending" class="body-text">Trending Product</label>
                             </div>
                         </fieldset>
 
                         <fieldset class="banner">
                             <div class="flex items-center gap10">
                                 <input type="checkbox" name="is_banner" id="is_banner" value="1"
-                                    {{ isset($product) && $product->is_banner ? 'checked' : (old('is_banner') ? 'checked' : '') }}>
+                                    {{ old('is_banner', $product->is_banner) ? 'checked' : '' }}>
                                 <label for="is_banner" class="body-text">Show in Home Banner Slider</label>
                             </div>
                         </fieldset>
+                        
                         <fieldset class="description">
                             <div class="body-title mb-10">Description <span class="tf-color-1">*</span></div>
-                            <textarea class="mb-10" name="description" placeholder="Description" tabindex="0" aria-required="true" required>{{ old('description', $product->description) }}</textarea>
-                            <div class="text-tiny">Do not exceed 100 characters when entering the product name.</div>
+                            <textarea id="summernote-add" name="description" placeholder="Description" aria-required="true" required>{{ old('description', $product->description) }}</textarea>
                         </fieldset>
                     </div>
 
@@ -185,69 +203,68 @@
                             @if ($product->thumbnail)
                                 <div class="mb-10">
                                     <img src="{{ asset('storage/' . $product->thumbnail) }}" alt="Current Thumbnail"
-                                        style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px;">
+                                        style="width: 100px; height: 100px; object-fit: cover; border-radius: 12px; border: 1px solid #e2e8f0;">
                                 </div>
                             @endif
 
                             <div class="body-title mb-10">Upload new thumbnail (Optional)</div>
                             <div class="upload-image mb-16">
-                                <!-- Thumbnail preview -->
-                                <div class="item">
+                                <div class="item up-load">
                                     <img id="thumbnailPreview"
-                                        src="{{ $product->thumbnail ? asset('storage/' . $product->thumbnail) : asset('images/upload/upload-1.png') }}"
-                                        alt="Thumbnail Preview">
-                                    <input type="file" name="thumbnail" id="thumbnail" hidden accept="image/*">
+                                        src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/><circle cx='8.5' cy='8.5' r='1.5'/><path d='M21 15l-5-5L5 21'/></svg>"
+                                        alt="Thumbnail Preview" style="width: 100%; height: 100px; object-fit: contain;">
+                                    <label class="uploadfile" for="thumbnail">
+                                        <span class="icon">
+                                            <i class="icon-upload-cloud"></i>
+                                        </span>
+                                        <span class="text-tiny">
+                                            Upload a product thumbnail or
+                                            <span class="tf-color">click to browse</span>
+                                        </span>
+                                        <input type="file" name="thumbnail" id="thumbnail" hidden accept="image/*">
+                                    </label>
                                 </div>
                             </div>
 
-                            <!-- Current Gallery Images - with delete option -->
                             <div class="body-title mb-10">Current Gallery Images</div>
                             <div class="mb-10">
                                 @if ($product->images->count() > 0)
-                                    <div class="flex flex-wrap gap-10" id="existingImagesContainer">
+                                    <div class="flex flex-wrap gap-10" id="existingImagesContainer" style="display: flex; flex-wrap: wrap; gap: 15px;">
                                         @foreach ($product->images as $image)
-                                            <div class="existing-image-card relative group"
-                                                data-image-id="{{ $image->id }}">
+                                            <div class="existing-image-card relative group" data-image-id="{{ $image->id }}" style="position: relative;">
                                                 <img src="{{ asset('storage/' . $image->image) }}" alt="Gallery Image"
-                                                    style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px; border: 2px solid #e5e7eb;">
+                                                    style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid #e5e7eb;">
 
-                                                <!-- Delete button overlay -->
                                                 <button type="button"
-                                                    class="delete-existing-image absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                                    class="delete-existing-image"
                                                     data-image-id="{{ $image->id }}"
-                                                    style="transform: translate(30%, -30%); cursor: pointer;"
+                                                    style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15);"
                                                     title="Delete this image">
                                                     ×
                                                 </button>
 
-                                                <!-- Image info -->
                                                 <div class="text-center mt-2">
-                                                    <div class="text-xs text-gray-500">
+                                                    <div class="text-xs text-gray-500" style="font-size: 11px; text-align: center; color: #6b7280; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                                         @php
                                                             $filename = basename($image->image);
-                                                            echo strlen($filename) > 15
-                                                                ? substr($filename, 0, 12) . '...'
-                                                                : $filename;
+                                                            echo strlen($filename) > 12 ? substr($filename, 0, 9) . '...' : $filename;
                                                         @endphp
                                                     </div>
                                                 </div>
                                             </div>
                                         @endforeach
                                     </div>
-                                    <div class="mt-3 text-sm text-gray-600">
-                                        <strong>Note:</strong> Click the × button on any image to delete it. Deleted images
-                                        cannot be recovered.
+                                    <div class="mt-3 text-sm text-gray-600" style="font-size: 12px; color: #4b5563; margin-top: 10px;">
+                                        <strong>Note:</strong> Click the × button on any image to delete it from the gallery immediately.
                                     </div>
                                 @else
-                                    <div class="body-text text-gray-500">No gallery images uploaded.</div>
+                                    <div class="body-text text-gray-500" style="color: #9ca3af;">No gallery images uploaded.</div>
                                 @endif
                             </div>
 
-                            <!-- Add More Images (Optional) -->
-                            <div class="body-title mb-10">Add More Images (Optional)</div>
+                            <div class="body-title mb-10" style="margin-top: 20px;">Add More Images (Optional)</div>
                             <div class="mb-10">
                                 <div class="upload-image mb-16">
-                                    <!-- Upload trigger -->
                                     <div class="item up-load">
                                         <label class="uploadfile" for="gallery">
                                             <span class="icon">
@@ -257,178 +274,203 @@
                                                 Drop your images here or select
                                                 <span class="tf-color">click to browse</span>
                                                 <br>
-                                                <small style="color: #ef4444; font-size: 11px;">Maximum 4 images
-                                                    allowed</small>
+                                                <small style="color: #ef4444; font-size: 11px;">Maximum 4 images allowed in total</small>
                                             </span>
-                                            <input type="file" id="gallery" name="images[]" multiple
-                                                accept="image/*" max="4">
+                                            <input type="file" id="gallery" name="images[]" multiple accept="image/*" hidden>
                                         </label>
                                     </div>
                                 </div>
 
                                 <div id="selectedImages" style="display: none;"></div>
 
-                                <div class="body-text text-gray-600 mb-5">
-                                    You can select maximum 4 images at once.
-                                    <span style="color: #ef4445; font-weight: bold;">Total images cannot exceed 4.</span>
-                                </div>
-
-                                <!-- Current Count Display -->
-                                <div id="imageCountInfo"
-                                    style="margin-bottom: 10px; padding: 8px; background: #f0f9ff; border-radius: 5px;">
-                                    <div style="font-size: 14px;">
-                                        <strong>Current Status:</strong>
-                                        <span id="existingCount">{{ $product->images->count() }}</span> existing images +
-                                        <span id="newCount">0</span> new images =
-                                        <span id="totalCount">{{ $product->images->count() }}</span> total images
-                                        <span id="limitWarning" style="color: #ef4444; font-weight: bold; display: none;">
-                                            (Limit reached! Maximum 4 images allowed)
+                                <div id="imageCountInfo" style="margin-bottom: 15px; padding: 10px; background: #f0f9ff; border-radius: 8px; border: 1px solid #bae6fd; color: #0369a1;">
+                                    <div style="font-size: 13px; font-weight: 500;">
+                                        <strong>Gallery Status:</strong>
+                                        <span id="existingCount">{{ $product->images->count() }}</span> existing image(s) +
+                                        <span id="newCount">0</span> newly selected =
+                                        <span id="totalCount">{{ $product->images->count() }}</span> / 4 Total
+                                        <span id="limitWarning" style="color: #ef4444; font-weight: bold; display: none; margin-left: 5px;">
+                                            (Limit reached! Total cannot exceed 4)
                                         </span>
                                     </div>
                                 </div>
                             </div>
+                        </fieldset>
 
-                            <div class="cols gap22">
-                                <fieldset class="dimensions">
-                                    <div class="body-title mb-10">Dimensions (Optional)</div>
+                        <div class="cols gap22" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; align-items: start;">
+                           
 
-                                    <!-- Height -->
-                                    <div class="mb-15">
-                                        <label class="body-text mb-5 block text-gray-600">Height (cm)</label>
-                                        <input type="number" step="0.1" min="0" class="form-input flex-1"
-                                            placeholder="e.g., 10.5" name="height"
-                                            value="{{ old('height', $product->height) }}">
+                            <fieldset class="product-code">
+                                <div class="body-title mb-10" style="font-weight: 700; font-size: 16px; color: #000;">Product Inventory Code</div>
+
+                                <div style="margin-bottom: 15px;">
+                                    <label class="form-label">Product Code / SKU <span class="tf-color-1">*</span></label>
+                                    <input type="text" class="custom-form-input"
+                                        placeholder="e.g., PROD-2023-001 or SKU-12345" name="product_code"
+                                        value="{{ old('product_code', $product->product_code) }}" required>
+                                    <div class="text-tiny text-gray-500 mt-5">
+                                        Enter a unique product code or SKU for inventory tracking
                                     </div>
+                                </div>
+                            </fieldset>
+                        </div>
 
-                                    <!-- Width -->
-                                    <div class="mb-15">
-                                        <label class="body-text mb-5 block text-gray-600">Width (cm)</label>
-                                        <input type="number" step="0.1" min="0" class="form-input flex-1"
-                                            placeholder="e.g., 8.2" name="width"
-                                            value="{{ old('width', $product->width) }}">
-                                    </div>
-
-                                    <!-- Length -->
-                                    <div class="mb-15">
-                                        <label class="body-text mb-5 block text-gray-600">Length (cm)</label>
-                                        <input type="number" step="0.1" min="0" class="form-input flex-1"
-                                            placeholder="e.g., 15.0" name="length"
-                                            value="{{ old('length', $product->length) }}">
-                                    </div>
-
-                                    <!-- Note -->
-                                    <div class="text-tiny text-gray-500 italic">
-                                        Optional: Enter product dimensions for shipping calculations
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="product-code">
-                                    <div class="body-title mb-10">Product Code <span class="tf-color-1">*</span></div>
-
-                                    <!-- Product Code Input -->
-                                    <div class="mb-15">
-                                        <input type="text" class="form-input w-full"
-                                            placeholder="e.g., PROD-2023-001 or SKU-12345" name="product_code"
-                                            value="{{ old('product_code', $product->product_code) }}" required>
-                                        <div class="text-tiny text-gray-500 mt-5">
-                                            Enter a unique product code or SKU for inventory tracking
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
-
-                            <div class="cols gap10">
-                                <button class="tf-button w-full" type="submit">Update product</button>
-                                <a href="{{ route('admin.product-list') }}" class="tf-button style-2 w-full">Cancel</a>
-                            </div>
+                        <div class="cols gap10" style="margin-top: 20px;">
+                            <button class="tf-button w-full" type="submit">Update product</button>
+                            <a href="{{ route('admin.product-list') }}" class="tf-button style-2 w-full">Cancel</a>
+                        </div>
                     </div>
                 </form>
-                <!-- /form-edit-product -->
             </div>
-            <!-- /main-content-wrap -->
         </div>
-        <!-- /main-content-wrap -->
-        <!-- bottom-page -->
         <div class="bottom-page">
-            <div class="body-text">Copyright © 2026 Earth Craft. All
-                rights
-                reserved. Designed and Developed </div>
-            {{-- <i class="icon-heart"></i> --}}
+            <div class="body-text">Copyright © 2026 Earth Craft. All rights reserved. Designed and Developed </div>
             <div class="body-text">by <a href="https://innovatechbd.net/">Innovatech</a></div>
         </div>
-        <!-- /bottom-page -->
     </div>
-    <!-- /main-content -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let selectedFiles = []; // Store newly selected files
-            let galleryInput = document.getElementById('gallery');
+        function initializeScripts() {
+            if (window.jQuery && $.fn.summernote) {
+                // Summernote অ্যাক্টিভেশন
+                $('#summernote-add').summernote({
+                    placeholder: 'Write a detailed product description here...',
+                    tabsize: 2,
+                    height: 200,
+                    toolbar: [
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['font', ['strikethrough']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['insert', ['link']],
+                        ['view', ['fullscreen', 'codeview']]
+                    ]
+                });
 
-            // Thumbnail click handler
+                // ক্যাটাগরি এবং সাবক্যাটাগরি ইভেন্ট হ্যান্ডলার
+                $('#category_id').on('change', function() {
+                    const categoryId = this.value;
+                    const subcategorySelect = document.getElementById('subcategory_id');
+
+                    if (categoryId) {
+                        fetch(`/admin/categories/${categoryId}/subcategories`)
+                            .then(response => {
+                                if (!response.ok) throw new Error('Network response error');
+                                return response.json();
+                            })
+                            .then(data => {
+                                subcategorySelect.innerHTML = '<option value="">Choose Subcategory</option>';
+                                data.forEach(subcategory => {
+                                    const option = document.createElement('option');
+                                    option.value = subcategory.id;
+                                    option.textContent = subcategory.name;
+                                    subcategorySelect.appendChild(option);
+                                });
+
+                                // রিডাইরেক্ট ওল্ড ভ্যালু চেক
+                                const currentSubcategoryId = "{{ old('subcategory_id', $product->subcategory_id) }}";
+                                if (currentSubcategoryId) {
+                                    subcategorySelect.value = currentSubcategoryId;
+                                }
+
+                                if ($.fn.niceSelect) {
+                                    $(subcategorySelect).niceSelect('update');
+                                }
+                            })
+                            .catch(error => console.error('Subcategory load error:', error));
+                    } else {
+                        subcategorySelect.innerHTML = '<option value="">Choose Subcategory</option>';
+                        if ($.fn.niceSelect) $(subcategorySelect).niceSelect('update');
+                    }
+                });
+
+                // কাস্টম থিমের NiceSelect কনফ্লিক্ট বাইপাসার
+                $(document).on('click', '.select .list li, .nice-select .list li', function() {
+                    setTimeout(() => {
+                        $('#category_id').trigger('change');
+                    }, 100);
+                });
+
+            } else {
+                setTimeout(initializeScripts, 50);
+            }
+        }
+
+        // রান করানো হলো
+        initializeScripts();
+
+        // ইমেজ ম্যানেজমেন্ট হ্যান্ডলার (ভ্যানিলা জাভাস্ক্রিপ্ট)
+        document.addEventListener('DOMContentLoaded', function() {
+            let selectedFiles = []; 
+            let galleryInput = document.getElementById('gallery');
+            let maxAllowedTotal = 4;
+
+            // Thumbnail trigger
             document.getElementById('thumbnailPreview').addEventListener('click', function() {
                 document.getElementById('thumbnail').click();
             });
 
-            // Thumbnail preview
             document.getElementById('thumbnail').addEventListener('change', function(e) {
                 if (e.target.files.length > 0) {
                     const file = e.target.files[0];
                     const reader = new FileReader();
-
                     reader.onload = function(e) {
-                        document.getElementById('thumbnailPreview').src = e.target.result;
-                        document.getElementById('thumbnailPreview').style.objectFit = 'cover';
+                        const previewImg = document.getElementById('thumbnailPreview');
+                        previewImg.src = e.target.result;
+                        previewImg.style.objectFit = 'cover';
                     }
-
                     reader.readAsDataURL(file);
                 }
             });
 
-            // FIXED: Store and preview multiple files without replacing
+            // Multi gallery changer
             galleryInput.addEventListener('change', function(e) {
                 const newFiles = Array.from(e.target.files);
+                let currentExistingCount = document.querySelectorAll('.existing-image-card').length;
 
-                // Add new files to existing files (avoid duplicates)
                 newFiles.forEach(newFile => {
-                    // Check if file already exists (by name and size)
                     const exists = selectedFiles.some(existingFile =>
-                        existingFile.name === newFile.name &&
-                        existingFile.size === newFile.size
+                        existingFile.name === newFile.name && existingFile.size === newFile.size
                     );
-
-                    if (!exists) {
+                    
+                    if (!exists && (currentExistingCount + selectedFiles.length < maxAllowedTotal)) {
                         selectedFiles.push(newFile);
                     }
                 });
 
-                // Update the input files
                 updateFileInput();
-
-                // Display preview
                 displaySelectedImages();
+                updateCounts();
             });
 
-            // Function to update the actual file input
             function updateFileInput() {
                 const dataTransfer = new DataTransfer();
-
-                selectedFiles.forEach(file => {
-                    dataTransfer.items.add(file);
-                });
-
+                selectedFiles.forEach(file => { dataTransfer.items.add(file); });
                 galleryInput.files = dataTransfer.files;
             }
 
-            // Function to display selected images
+            function updateCounts() {
+                let existingCount = document.querySelectorAll('.existing-image-card').length;
+                let newCount = selectedFiles.length;
+                let total = existingCount + newCount;
+
+                document.getElementById('existingCount').textContent = existingCount;
+                document.getElementById('newCount').textContent = newCount;
+                document.getElementById('totalCount').textContent = total;
+
+                if (total >= maxAllowedTotal) {
+                    document.getElementById('limitWarning').style.display = 'inline';
+                } else {
+                    document.getElementById('limitWarning').style.display = 'none';
+                }
+            }
+
             function displaySelectedImages() {
                 const container = document.getElementById('selectedImages');
                 container.innerHTML = '';
-
-                if (selectedFiles.length === 0) {
-                    container.style.display = 'none';
-                    return;
-                }
+                if (selectedFiles.length === 0) { container.style.display = 'none'; return; }
 
                 container.style.display = 'block';
                 container.style.padding = '15px';
@@ -437,7 +479,6 @@
                 container.style.marginTop = '15px';
                 container.style.marginBottom = '15px';
 
-                // Header with remove all button
                 const headerDiv = document.createElement('div');
                 headerDiv.style.display = 'flex';
                 headerDiv.style.justifyContent = 'space-between';
@@ -447,11 +488,11 @@
                 const countInfo = document.createElement('div');
                 countInfo.style.fontWeight = 'bold';
                 countInfo.style.color = '#1e40af';
-                countInfo.textContent = `New images selected: ${selectedFiles.length}`;
+                countInfo.textContent = `Newly Selected: ${selectedFiles.length} image(s)`;
 
                 const removeAllBtn = document.createElement('button');
                 removeAllBtn.type = 'button';
-                removeAllBtn.innerHTML = '× Remove All New Images';
+                removeAllBtn.innerHTML = '× Clear New';
                 removeAllBtn.style.backgroundColor = '#ef4444';
                 removeAllBtn.style.color = 'white';
                 removeAllBtn.style.border = 'none';
@@ -463,186 +504,70 @@
                     selectedFiles = [];
                     updateFileInput();
                     displaySelectedImages();
+                    updateCounts();
                 });
 
                 headerDiv.appendChild(countInfo);
-                if (selectedFiles.length > 0) {
-                    headerDiv.appendChild(removeAllBtn);
-                }
+                headerDiv.appendChild(removeAllBtn);
                 container.appendChild(headerDiv);
 
-                // Images grid
                 const imagesGrid = document.createElement('div');
                 imagesGrid.style.display = 'grid';
                 imagesGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(120px, 1fr))';
                 imagesGrid.style.gap = '15px';
 
-                // Display each file
                 selectedFiles.forEach((file, index) => {
                     const imageCard = document.createElement('div');
-                    imageCard.style.position = 'relative';
-                    imageCard.style.border = '1px solid #e5e7eb';
-                    imageCard.style.borderRadius = '8px';
-                    imageCard.style.overflow = 'hidden';
-                    imageCard.style.backgroundColor = 'white';
+                    imageCard.style.cssText = 'position:relative; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; background:white;';
 
-                    // Remove button for newly selected images
                     const removeBtn = document.createElement('button');
                     removeBtn.type = 'button';
                     removeBtn.innerHTML = '×';
-                    removeBtn.style.position = 'absolute';
-                    removeBtn.style.top = '5px';
-                    removeBtn.style.right = '5px';
-                    removeBtn.style.backgroundColor = '#ef4444';
-                    removeBtn.style.color = 'white';
-                    removeBtn.style.border = 'none';
-                    removeBtn.style.borderRadius = '50%';
-                    removeBtn.style.width = '24px';
-                    removeBtn.style.height = '24px';
-                    removeBtn.style.fontSize = '14px';
-                    removeBtn.style.cursor = 'pointer';
-                    removeBtn.style.zIndex = '10';
-                    removeBtn.style.display = 'flex';
-                    removeBtn.style.alignItems = 'center';
-                    removeBtn.style.justifyContent = 'center';
-
+                    removeBtn.style.cssText = 'position:absolute; top:5px; right:5px; background:#ef4444; color:white; border:none; border-radius:50%; width:22px; height:22px; cursor:pointer; display:flex; align-items:center; justify-content:center;';
                     removeBtn.addEventListener('click', function() {
                         selectedFiles.splice(index, 1);
                         updateFileInput();
                         displaySelectedImages();
+                        updateCounts();
                     });
 
-                    // Image preview
                     if (file.type.startsWith('image/')) {
                         const reader = new FileReader();
                         reader.onload = function(e) {
                             const img = document.createElement('img');
                             img.src = e.target.result;
-                            img.style.width = '100%';
-                            img.style.height = '100px';
-                            img.style.objectFit = 'cover';
-
+                            img.style.cssText = 'width:100%; height:100px; object-fit:cover;';
                             imageCard.appendChild(img);
                         };
                         reader.readAsDataURL(file);
-                    } else {
-                        const fileIcon = document.createElement('div');
-                        fileIcon.style.width = '100%';
-                        fileIcon.style.height = '100px';
-                        fileIcon.style.display = 'flex';
-                        fileIcon.style.alignItems = 'center';
-                        fileIcon.style.justifyContent = 'center';
-                        fileIcon.style.backgroundColor = '#f3f4f6';
-                        fileIcon.innerHTML =
-                            '<i class="icon-file" style="font-size: 24px; color: #6b7280;"></i>';
-                        imageCard.appendChild(fileIcon);
                     }
 
-                    // File info
                     const infoDiv = document.createElement('div');
                     infoDiv.style.padding = '8px';
-
                     const fileName = document.createElement('div');
-                    fileName.textContent = file.name.length > 15 ?
-                        file.name.substring(0, 15) + '...' :
-                        file.name;
-                    fileName.style.fontSize = '12px';
-                    fileName.style.fontWeight = '500';
-                    fileName.style.marginBottom = '3px';
+                    fileName.textContent = file.name.length > 15 ? file.name.substring(0, 9) + '...' : file.name;
+                    fileName.style.fontSize = '11px';
                     fileName.style.overflow = 'hidden';
                     fileName.style.textOverflow = 'ellipsis';
                     fileName.style.whiteSpace = 'nowrap';
 
-                    const fileSize = document.createElement('div');
-                    const sizeInKB = Math.round(file.size / 1024);
-                    fileSize.textContent = `${sizeInKB} KB`;
-                    fileSize.style.fontSize = '11px';
-                    fileSize.style.color = '#6b7280';
-
                     infoDiv.appendChild(fileName);
-                    infoDiv.appendChild(fileSize);
                     imageCard.appendChild(infoDiv);
                     imageCard.appendChild(removeBtn);
-
                     imagesGrid.appendChild(imageCard);
                 });
 
                 container.appendChild(imagesGrid);
-
-                // Instructions
-                const instructionDiv = document.createElement('div');
-                instructionDiv.style.marginTop = '15px';
-                instructionDiv.style.padding = '10px';
-                instructionDiv.style.backgroundColor = '#f0f9ff';
-                instructionDiv.style.borderRadius = '6px';
-                instructionDiv.style.fontSize = '13px';
-                instructionDiv.style.color = '#0369a1';
-                instructionDiv.innerHTML = `
-            <strong>Note:</strong> You can select multiple images at once or add more images later. 
-            Click "click to browse" again to add more images. 
-            Click the × button on any image to remove it.
-        `;
-
-                container.appendChild(instructionDiv);
             }
 
-            // Initial display
-            displaySelectedImages();
-
-            // Load subcategories when category changes
-            document.getElementById('category_id').addEventListener('change', function() {
-                const categoryId = this.value;
-                const subcategorySelect = document.getElementById('subcategory_id');
-
-                if (categoryId) {
-                    fetch(`/admin/categories/${categoryId}/subcategories`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            subcategorySelect.innerHTML =
-                                '<option value="">Choose Subcategory</option>';
-                            data.forEach(subcategory => {
-                                const option = document.createElement('option');
-                                option.value = subcategory.id;
-                                option.textContent = subcategory.name;
-                                subcategorySelect.appendChild(option);
-                            });
-
-                            // Select the current subcategory after loading
-                            const currentSubcategoryId =
-                                "{{ old('subcategory_id', $product->subcategory_id) }}";
-                            if (currentSubcategoryId) {
-                                subcategorySelect.value = currentSubcategoryId;
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error loading subcategories:', error);
-                            subcategorySelect.innerHTML =
-                                '<option value="">Error loading subcategories</option>';
-                        });
-                } else {
-                    subcategorySelect.innerHTML = '<option value="">Choose Subcategory</option>';
-                }
-            });
-
-            // Trigger change event on page load if category is selected
-            const currentCategoryId = document.getElementById('category_id').value;
-            if (currentCategoryId) {
-                document.getElementById('category_id').dispatchEvent(new Event('change'));
-            }
-
-            // AJAX request to delete existing images
+            // AJAX request to delete existing gallery images
             document.querySelectorAll('.delete-existing-image').forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
                     const imageId = this.getAttribute('data-image-id');
                     const imageCard = this.closest('.existing-image-card');
 
-                    if (confirm('Are you sure you want to delete this image?')) {
+                    if (confirm('Are you sure you want to delete this image from server?')) {
                         fetch(`/admin/product-image/${imageId}`, {
                                 method: 'DELETE',
                                 headers: {
@@ -655,11 +580,10 @@
                             .then(data => {
                                 if (data.success) {
                                     imageCard.remove();
-                                    // Show success message
+                                    updateCounts();
                                     showAlert('Image deleted successfully!', 'success');
                                 } else {
-                                    showAlert('Failed to delete image: ' + data.message,
-                                        'error');
+                                    showAlert('Failed to delete image: ' + data.message, 'error');
                                 }
                             })
                             .catch(error => {
@@ -671,19 +595,10 @@
             });
 
             function showAlert(message, type) {
-                // Remove existing alerts
                 document.querySelectorAll('.custom-alert').forEach(alert => alert.remove());
-
                 const alertDiv = document.createElement('div');
                 alertDiv.className = 'custom-alert';
-                alertDiv.style.position = 'fixed';
-                alertDiv.style.top = '20px';
-                alertDiv.style.right = '20px';
-                alertDiv.style.padding = '15px 20px';
-                alertDiv.style.borderRadius = '5px';
-                alertDiv.style.zIndex = '9999';
-                alertDiv.style.fontWeight = '500';
-                alertDiv.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                alertDiv.style.cssText = 'position:fixed; top:20px; right:20px; padding:15px 20px; border-radius:8px; z-index:9999; font-weight:500; box-shadow:0 4px 12px rgba(0,0,0,0.15);';
 
                 if (type === 'success') {
                     alertDiv.style.backgroundColor = '#d4edda';
@@ -697,13 +612,8 @@
 
                 alertDiv.textContent = message;
                 document.body.appendChild(alertDiv);
-
-                // Auto remove after 3 seconds
-                setTimeout(() => {
-                    alertDiv.remove();
-                }, 3000);
+                setTimeout(() => { alertDiv.remove(); }, 3000);
             }
         });
     </script>
-
 @endsection

@@ -11,6 +11,8 @@ class Order extends Model
 
     protected $fillable = [
         'user_id',
+        'guest_token',
+        'guest_name',
         'order_number',
         'subtotal',
         'shipping_cost',
@@ -33,7 +35,6 @@ class Order extends Model
         'expected_delivery_date' => 'date',
     ];
 
-    // Relationships
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -49,25 +50,23 @@ class Order extends Model
         return $this->hasMany(OrderTracking::class);
     }
 
-    
-    public function order()
-    {
-        return $this->belongsTo(Order::class);
-    }
-
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
 
-    // Helper method to get full shipping address
     public function getFullAddressAttribute()
     {
         return trim(implode(', ', array_filter([
             $this->street_address,
             $this->city,
             $this->postcode,
-            $this->country
+            $this->country,
         ])));
+    }
+
+    public function isGuestOrder(): bool
+    {
+        return is_null($this->user_id) && !is_null($this->guest_token);
     }
 }

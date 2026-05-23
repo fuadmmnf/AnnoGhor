@@ -103,44 +103,63 @@
         </div>
 
         <div class="bottom-page">
-            <div class="body-text">Copyright © 2026 Earth Craft. All
-                rights
-                reserved. Designed and Developed </div>
-            {{-- <i class="icon-heart"></i> --}}
+            <div class="body-text">Copyright © 2026 Earth Craft. All rights reserved. Designed and Developed </div>
             <div class="body-text">by <a href="https://innovatechbd.net/">Innovatech</a></div>
         </div>
     </div>
 
-    {{-- jQuery and AJAX for Dependent Dropdown --}}
+    {{-- jQuery and AJAX with Custom Nice-Select Refresh Sync --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Load Subcategories when Category changes
+            
+            // ১. ক্যাটাগরি পরিবর্তন হলে সাব-ক্যাটাগরি লোড করার মেকানিজম
             $('#category_id').on('change', function() {
                 var categoryId = $(this).val();
+                
                 $('#subcategory_id').html('<option value="">Loading...</option>');
                 $('#product_id').html('<option value="">Choose Product</option>');
+                
+                // থিম যদি nice-select প্লাগইন ব্যবহার করে তবে সেটিকে লাইভ আপডেট করার ট্রিগার
+                if($.fn.niceSelect) {
+                    $('#subcategory_id').niceSelect('update');
+                    $('#product_id').niceSelect('update');
+                }
 
                 if (categoryId) {
                     $.ajax({
                         url: '/admin/categories/' + categoryId + '/subcategories',
                         type: "GET",
                         success: function(data) {
-                            $('#subcategory_id').html(
-                                '<option value="">Choose Subcategory</option>');
+                            $('#subcategory_id').html('<option value="">Choose Subcategory</option>');
                             $.each(data, function(key, value) {
-                                $('#subcategory_id').append('<option value="' + value
-                                    .id + '">' + value.name + '</option>');
+                                $('#subcategory_id').append('<option value="' + value.id + '">' + value.name + '</option>');
                             });
+                            
+                            // এজ্যাক্স ডাটা ইনজেকশনের পর nice-select রিফ্রেশ
+                            if($.fn.niceSelect) {
+                                $('#subcategory_id').niceSelect('update');
+                            }
+                        },
+                        error: function() {
+                            $('#subcategory_id').html('<option value="">Choose Subcategory</option>');
+                            if($.fn.niceSelect) $('#subcategory_id').niceSelect('update');
                         }
                     });
+                } else {
+                    $('#subcategory_id').html('<option value="">Choose Subcategory</option>');
+                    if($.fn.niceSelect) $('#subcategory_id').niceSelect('update');
                 }
             });
 
-            // Load Products when Subcategory changes
+            // ২. সাব-ক্যাটাগরি পরিবর্তন হলে প্রোডাক্ট লোড করার ফিক্সড মেকানিজম
             $('#subcategory_id').on('change', function() {
                 var subcategoryId = $(this).val();
+                
                 $('#product_id').html('<option value="">Loading...</option>');
+                if($.fn.niceSelect) {
+                    $('#product_id').niceSelect('update');
+                }
 
                 if (subcategoryId) {
                     $.ajax({
@@ -149,15 +168,23 @@
                         success: function(data) {
                             $('#product_id').html('<option value="">Choose Product</option>');
                             $.each(data, function(key, value) {
-                                // Showing Current Stock for better admin experience
-                                var stockText = value.stock_quantity !== null ?
-                                    ' (Stock: ' + value.stock_quantity + ')' :
-                                    ' (Stock: 0)';
-                                $('#product_id').append('<option value="' + value.id +
-                                    '">' + value.name + stockText + '</option>');
+                                var stockText = value.stock_quantity !== null ? ' (Stock: ' + value.stock_quantity + ')' : ' (Stock: 0)';
+                                $('#product_id').append('<option value="' + value.id + '">' + value.name + stockText + '</option>');
                             });
+                            
+                            // 🔥 ম্যাজিক লাইন: ডাটা আসার পর nice-select প্লাগইনকে আপডেট সিগন্যাল পাঠানো হলো
+                            if($.fn.niceSelect) {
+                                $('#product_id').niceSelect('update');
+                            }
+                        },
+                        error: function() {
+                            $('#product_id').html('<option value="">Choose Product</option>');
+                            if($.fn.niceSelect) $('#product_id').niceSelect('update');
                         }
                     });
+                } else {
+                    $('#product_id').html('<option value="">Choose Product</option>');
+                    if($.fn.niceSelect) $('#product_id').niceSelect('update');
                 }
             });
         });

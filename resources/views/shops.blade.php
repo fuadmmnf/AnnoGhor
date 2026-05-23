@@ -4,18 +4,312 @@
 
 @section('content')
 
-    <!--====== Start Shop page Section ======-->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 🌐 গ্লোবাল টাইপোগ্রাফি ও লেআউট থিম */
+        .shop-page-section {
+            font-family: 'DM Sans', 'Hind Siliguri', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        /* 📋 ফিল্টার টপ বার স্টাইল */
+        .shop-filter {
+            background: #ffffff;
+            padding: 16px 24px;
+            border-radius: 16px;
+            border: 1px solid #edf2f7;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
+        }
+
+        .show-text p {
+            font-size: 15px;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .show-text p span {
+            color: #0f172a;
+            font-weight: 500;
+        }
+
+        /* 🎯 প্রিমিয়াম প্রোডাক্ট কার্ড ডিজাইন */
+        .product-card-modern {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #edf2f7;
+            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+        }
+
+        .product-card-modern:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+            border-color: #e2e8f0;
+        }
+
+        .thumbnail-container {
+            position: relative;
+            overflow: hidden;
+            background-color: #f8fafc;
+            width: 100%;
+            height: 300px;
+        }
+
+        .thumbnail-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card-modern:hover .thumbnail-container img {
+            transform: scale(1.04);
+        }
+
+        /* 🏷️ অফার ও ট্রেন্ডিং ডিসকাউন্ট ব্যাজ */
+        .discount-badge {
+            background: #ef4444;
+            color: #ffffff;
+            padding: 4px 10px;
+            border-radius: 30px;
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            font-size: 12px;
+            font-weight: 700;
+            z-index: 2;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+        }
+
+        /* ⚡ হোভার অ্যাকশন বাটন প্যানেল */
+        .action-overlay {
+            position: absolute;
+            top: 14px;
+            right: -50px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            z-index: 3;
+        }
+
+        .product-card-modern:hover .action-overlay {
+            right: 14px;
+        }
+
+        .action-btn-custom {
+            width: 38px;
+            height: 38px;
+            background: #ffffff;
+            color: #475569;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        .action-btn-custom:hover {
+            background: #f15922;
+            color: #ffffff !important;
+        }
+
+        /* 🛒 অ্যাড টু কার্ট ইনলাইন কাস্টম বাটন */
+        .cart-trigger-box {
+            position: absolute;
+            bottom: -50px;
+            left: 0;
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            z-index: 3;
+        }
+
+        .product-card-modern:hover .cart-trigger-box {
+            bottom: 0;
+        }
+
+        .btn-cart-modern {
+            width: 100%;
+            background: #0f172a;
+            color: #ffffff !important;
+            border: none;
+            padding: 8px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-cart-modern:hover {
+            background: #f15922;
+        }
+
+        /* 📝 Produkt Content Area */
+        .info-container {
+            padding: 18px 16px;
+        }
+
+        .product-title-link {
+            font-family: 'Hind Siliguri', 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+            text-decoration: none;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 42px;
+            margin-bottom: 8px;
+            transition: color 0.2s ease;
+        }
+
+        .product-title-link:hover {
+            color: #f15922;
+        }
+
+        .price-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .price-new {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .price-old {
+            font-size: 14px;
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+
+        /* 🗂️ সাইডবার উইজেট ডিজাইন */
+        .sidebar-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #edf2f7;
+            padding: 24px;
+        }
+
+        .widget-title-modern {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f5f9;
+            position: relative;
+        }
+
+        .widget-title-modern::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 35px;
+            height: 2px;
+            background: #f15922;
+        }
+
+        .filter-list-item {
+            padding: 6px 0;
+        }
+
+        .filter-checkbox-label {
+            font-family: 'Hind Siliguri', 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: #475569;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .filter-checkbox-label span {
+            font-family: 'DM Sans', sans-serif;
+            float: right;
+            color: #94a3b8;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        /* 🔢 প্রিমিয়াম পেজিনেটর */
+        .custom-pagination-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .custom-pagination-wrap ul {
+            display: flex;
+            gap: 6px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .custom-pagination-wrap ul li a,
+        .custom-pagination-wrap ul li span {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            color: #475569;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .custom-pagination-wrap ul li.active span {
+            background: #f15922;
+            color: #ffffff;
+            border-color: #f15922;
+        }
+
+        .custom-pagination-wrap ul li a:hover {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+        }
+
+        .custom-toast {
+            position: fixed; top: 25px; right: 25px; background: #ffffff;
+            padding: 16px 28px; border-radius: 12px; font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            z-index: 99999; opacity: 0; transform: translateX(400px); transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .custom-toast.show { opacity: 1; transform: translateX(0); }
+        .custom-toast-success { border-left: 4px solid #10b981; }
+    </style>
+
     <section class="shop-page-section pt-40 pb-80">
         <div class="container">
             <div class="row">
                 <div class="col-xl-9">
-                    <!--=== Shop Page Wrapper ===-->
                     <div class="shop-page-wrapper">
-                        <!--=== Shop Filter ===-->
-                        <div class="shop-filter mb-60" data-aos="fade-up" data-aos-delay="20" data-aos-duration="1000">
+                        
+                        <div class="shop-filter mb-40" data-aos="fade-up" data-aos-delay="20" data-aos-duration="1000">
                             <form method="GET" action="{{ route('shops') }}" id="sortForm">
                                 <div class="row align-items-center">
-                                    <div class="col-sm-5 col-12">
+                                    <div class="col-sm-5 col-12 mb-3 mb-sm-0">
                                         <div class="show-text">
                                             <p>
                                                 <span>Showing</span>
@@ -24,31 +318,21 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <div class="col-sm-2 col-4">
+                                    <div class="col-sm-2 col-4 d-none d-sm-block">
                                         <div class="filter-grid-list text-center">
-                                            <a href="#"><i class="far fa-th"></i></a>
-                                            <a href="#"><i class="far fa-list"></i></a>
+                                            <a href="#" class="me-2 text-dark"><i class="far fa-th-large"></i></a>
+                                            <a href="#" class="text-muted"><i class="far fa-list"></i></a>
                                         </div>
                                     </div>
-                                    <div class="col-sm-5 col-8">
-                                        <div class="filter-product-category d-flex align-items-center">
-                                            <select id="sortProducts" name="sort" class="wide" onchange="this.form.submit()">
-                                                <option value="latest"
-                                                    {{ request('sort') == 'latest' || !request('sort') ? 'selected' : '' }}>
-                                                    Default (Latest)</option>
-                                                <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>
-                                                    Sort by Newness</option>
-                                                <option value="price_high"
-                                                    {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to
-                                                    Low</option>
-                                                <option value="price_low"
-                                                    {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to
-                                                    High</option>
-                                                <option value="name_asc"
-                                                    {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name: A-Z</option>
-                                                <option value="name_desc"
-                                                    {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name: Z-A
-                                                </option>
+                                    <div class="col-sm-5 col-12">
+                                        <div class="filter-product-category d-flex align-items-center justify-content-sm-end">
+                                            <select id="sortProducts" name="sort" class="wide">
+                                                <option value="latest" {{ request('sort') == 'latest' || !request('sort') ? 'selected' : '' }}>Default Sorting (Latest)</option>
+                                                <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Sort by Newness</option>
+                                                <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                                                <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
+                                                <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name: A to Z</option>
+                                                <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name: Z to A</option>
                                             </select>
                                             @foreach (request()->except(['sort', 'page']) as $name => $value)
                                                 @if (is_array($value))
@@ -65,76 +349,56 @@
                             </form>
                         </div>
 
-                        <!--=== Products Grid ===-->
-                        <div class="row">
+                        <div class="row g-4">
                             @forelse($products as $product)
-                                <div class="col-xl-4 col-md-6 col-sm-12">
-                                    <!--=== Product Item ===-->
-                                    <div class="product-item style-one mb-40" data-aos="fade-up"
-                                        data-aos-delay="{{ $loop->index * 5 + 25 }}"
-                                        data-aos-duration="{{ 400 + $loop->index * 200 }}">
+                                <div class="col-xl-4 col-md-6 col-sm-6">
+                                    <div class="product-card-modern">
+                                        
+                                        @if ($product->discount_price)
+                                            @php
+                                                $discountPercentage = round((($product->regular_price - $product->discount_price) / $product->regular_price) * 100);
+                                            @endphp
+                                            <div class="discount-badge">{{ $discountPercentage }}% Off</div>
+                                        @endif
 
-                                        <div class="product-thumbnail">
+                                        <div class="action-overlay">
+                                            <a href="{{ $product->details_url }}" class="action-btn-custom" title="View Product">
+                                                <i class="far fa-eye"></i>
+                                            </a>
+                                            <a href="javascript:void(0)" class="action-btn-custom toggle-wishlist" data-product-id="{{ $product->id }}" title="Wishlist">
+                                                <i class="far fa-heart"></i>
+                                            </a>
+                                        </div>
+
+                                        <div class="thumbnail-container">
                                             <a href="{{ $product->details_url }}">
-                                                {{ \Illuminate\Support\Str::limit($product->name, 40) }}
-
                                                 @if ($product->thumbnail)
-                                                    <img src="{{ asset('storage/' . $product->thumbnail) }}"
-                                                        alt="{{ $product->name }}"
-                                                        style="width: 100%; height: 400px; object-fit: cover;">
+                                                    <img src="{{ asset('storage/' . $product->thumbnail) }}" alt="{{ $product->name }}">
                                                 @else
-                                                    <img src="{{ asset('assets/images/products/feature-product-' . (($loop->index % 5) + 1) . '.png') }}"
-                                                        alt="{{ $product->name }}"
-                                                        style="width: 100%; height: 400px; object-fit: cover;">
+                                                    <img src="{{ asset('assets/images/products/feature-product-' . (($loop->index % 5) + 1) . '.png') }}" alt="{{ $product->name }}">
                                                 @endif
                                             </a>
-
-
-                                            @if ($product->discount_price)
-                                                @php
-                                                    $discountPercentage = round(
-                                                        (($product->regular_price - $product->discount_price) /
-                                                            $product->regular_price) *
-                                                            100,
-                                                    );
-                                                @endphp
-                                                <div class="discount">{{ $discountPercentage }}% Off</div>
-                                            @endif
-
-                                            <div class="hover-content">
-                                                <a href="{{ $product->details_url }}"
-                                                    class=" icon-btn mt-3">
-                                                    <i class="fa fa-eye"></i>
-                                                </a>
-
-                                                <a href="javascript:void(0)" class="icon-btn toggle-wishlist"
-                                                    data-product-id="{{ $product->id }}">
-                                                    <i class="fa fa-heart"></i>
-                                                </a>
-                                            </div>
-                                            <div class="cart-button">
-                                            </div>
+                                            
+                                          
                                         </div>
-                                        <div class="product-info-wrap text-center">
-                                            <h6 class="product-title ">
-                                                <a href="{{ $product->details_url }}">
-                                                    {{ \Illuminate\Support\Str::limit($product->name, 40) }}
+
+                                        <div class="info-container">
+                                            <h6>
+                                                <a href="{{ $product->details_url }}" class="product-title-link">
+                                                    {{ \Illuminate\Support\Str::limit($product->name, 45) }}
                                                 </a>
                                             </h6>
 
-
-                                            <div class="product-price">
+                                            <div class="price-container">
                                                 @if ($product->discount_price)
-                                                    <span class="old-price" style="color:#000; font-size:16px;">
-                                                        {{ \App\Helpers\CurrencyHelper::formatPrice($product->regular_price) }}
-                                                    </span>
-                                                    <span class="new-price"
-                                                        style="color:#000; font-size:16px; font-weight:600;">
+                                                    <span class="price-new">
                                                         {{ \App\Helpers\CurrencyHelper::formatPrice($product->discount_price) }}
                                                     </span>
+                                                    <span class="price-old">
+                                                        {{ \App\Helpers\CurrencyHelper::formatPrice($product->regular_price) }}
+                                                    </span>
                                                 @else
-                                                    <span class="new-price"
-                                                        style="color:#000; font-size:16px; font-weight:500;">
+                                                    <span class="price-new">
                                                         {{ \App\Helpers\CurrencyHelper::formatPrice($product->regular_price) }}
                                                     </span>
                                                 @endif
@@ -145,32 +409,26 @@
                                 </div>
                             @empty
                                 <div class="col-12">
-                                    <div class="alert alert-info text-center">
-                                        <h4>No products found</h4>
-                                        <p>Please check back later or add products from admin panel.</p>
-                                        <a href="{{ route('shops') }}" class="theme-btn style-one">Refresh</a>
+                                    <div class="alert alert-custom text-center py-5" style="background: #fff; border-radius: 16px; border: 1px dashed #cbd5e1;">
+                                        <h4 class="fw-bold text-dark mb-2">No products found</h4>
+                                        <p class="text-muted mb-4">Please check back later or modify your filters.</p>
+                                        <a href="{{ route('shops') }}" class="btn btn-primary px-4 rounded-pill" style="background: #f15922; border: none;">Reload Shop</a>
                                     </div>
                                 </div>
                             @endforelse
                         </div>
 
-                        <!--=== Pagination ===-->
                         @if ($products->hasPages())
-                            <div class="row">
+                            <div class="row mt-5">
                                 <div class="col-lg-12">
-                                    <div class="pesco-pagination mb-40" data-aos="fade-up" data-aos-delay="70"
-                                        data-aos-duration="2200">
+                                    <div class="custom-pagination-wrap">
                                         <ul>
-                                            {{-- Previous Page Link --}}
                                             @if ($products->onFirstPage())
                                                 <li class="disabled"><span><i class="far fa-angle-left"></i></span></li>
                                             @else
-                                                <li><a href="{{ $products->previousPageUrl() }}"><i
-                                                            class="far fa-angle-left"></i></a>
-                                                </li>
+                                                <li><a href="{{ $products->previousPageUrl() }}"><i class="far fa-angle-left"></i></a></li>
                                             @endif
 
-                                            {{-- Pagination Elements --}}
                                             @php
                                                 $current = $products->currentPage();
                                                 $last = $products->lastPage();
@@ -181,36 +439,27 @@
                                             @if ($start > 1)
                                                 <li><a href="{{ $products->url(1) }}">01</a></li>
                                                 @if ($start > 2)
-                                                    <li><span>....</span></li>
+                                                    <li><span class="border-0">...</span></li>
                                                 @endif
                                             @endif
 
                                             @for ($page = $start; $page <= $end; $page++)
                                                 @if ($page == $current)
-                                                    <li class="active">
-                                                        <span>{{ str_pad($page, 2, '0', STR_PAD_LEFT) }}</span>
-                                                    </li>
+                                                    <li class="active"><span>{{ str_pad($page, 2, '0', STR_PAD_LEFT) }}</span></li>
                                                 @else
-                                                    <li><a
-                                                            href="{{ $products->url($page) }}">{{ str_pad($page, 2, '0', STR_PAD_LEFT) }}</a>
-                                                    </li>
+                                                    <li><a href="{{ $products->url($page) }}">{{ str_pad($page, 2, '0', STR_PAD_LEFT) }}</a></li>
                                                 @endif
                                             @endfor
 
                                             @if ($end < $last)
                                                 @if ($end < $last - 1)
-                                                    <li><span>....</span></li>
+                                                    <li><span class="border-0">...</span></li>
                                                 @endif
-                                                <li><a
-                                                        href="{{ $products->url($last) }}">{{ str_pad($last, 2, '0', STR_PAD_LEFT) }}</a>
-                                                </li>
+                                                <li><a href="{{ $products->url($last) }}">{{ str_pad($last, 2, '0', STR_PAD_LEFT) }}</a></li>
                                             @endif
 
-                                            {{-- Next Page Link --}}
                                             @if ($products->hasMorePages())
-                                                <li><a href="{{ $products->nextPageUrl() }}"><i
-                                                            class="far fa-angle-right"></i></a>
-                                                </li>
+                                                <li><a href="{{ $products->nextPageUrl() }}"><i class="far fa-angle-right"></i></a></li>
                                             @else
                                                 <li class="disabled"><span><i class="far fa-angle-right"></i></span></li>
                                             @endif
@@ -219,83 +468,72 @@
                                 </div>
                             </div>
                         @endif
+
                     </div>
                 </div>
 
-                <!--=== Sidebar Area ===-->
+                <div class="col-xl-3 mt-5 mt-xl-0">
+                    <div class="shop-sidebar-area d-flex flex-column gap-4">
+                        
+                        <div class="sidebar-card">
+                            <h4 class="widget-title-modern">Product Categories</h4>
+                            <ul class="categories-list list-unstyled mb-0 d-flex flex-column gap-2">
+                                @php
+                                    $selectedCategories = explode(',', request('category', request('category_id', '')));
+                                @endphp
 
-                <div class="col-xl-3">
-                    <div class="shop-sidebar-area">
-                        <div class="product-widget product-categories-widget mb-40" data-aos="fade-up"
-                            data-aos-delay="20" data-aos-duration="1000">
-                            <div class="widget-content">
-                                <h4 class="widget-title">Product Categories</h4>
-                                <ul class="categories-list">
-                                    @php
-                                        $selectedCategories = explode(',', request('category', request('category_id', '')));
-                                    @endphp
-
-                                    @forelse($categories as $category)
-                                        <li>
-                                            <div class="form-check">
-                                                <input class="form-check-input category-filter" type="checkbox"
-                                                    value="{{ $category->id }}" id="category_{{ $category->id }}"
-                                                    {{ in_array((string) $category->id, $selectedCategories, true) ? 'checked' : '' }}>
-
-                                                <label class="form-check-label" for="category_{{ $category->id }}">
-                                                    {{ $category->name }}
-                                                    <span>({{ $category->products_count }})</span>
-                                                </label>
-                                            </div>
-                                        </li>
-                                    @empty
-                                        <li class="text-muted">No categories found</li>
-                                    @endforelse
-                                </ul>
-                            </div>
+                                @forelse($categories as $category)
+                                    <div class="filter-list-item">
+                                        <div class="form-check mb-0">
+                                            <input class="form-check-input category-filter" type="checkbox"
+                                                value="{{ $category->id }}" id="category_{{ $category->id }}"
+                                                {{ in_array((string) $category->id, $selectedCategories, true) ? 'checked' : '' }}
+                                                style="cursor: pointer; accent-color: #f15922;">
+                                            <label class="form-check-label filter-checkbox-label" for="category_{{ $category->id }}">
+                                                {{ $category->name }}
+                                                <span>({{ $category->products_count }})</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <li class="text-muted small">No categories found</li>
+                                @endforelse
+                            </ul>
                         </div>
 
                         @if (isset($activeSubcategories) && $activeSubcategories->count() > 0)
-                            <div class="product-widget product-categories-widget mb-40" data-aos="fade-up"
-                                data-aos-delay="30" data-aos-duration="1000">
-                                <div class="widget-content">
-                                    <h4 class="widget-title">Filter by Sub Category</h4>
-                                    <ul class="categories-list">
-                                        @foreach ($activeSubcategories as $sub)
-                                            <li>
-                                                <div class="form-check">
-                                                    {{-- সাব-ক্যাটাগরির জন্য আলাদা কুয়েরি প্যারামিটার --}}
-                                                    <a href="{{ request()->fullUrlWithQuery(['subcategory' => $sub->id]) }}"
-                                                        style="{{ request('subcategory') == $sub->id ? 'color: #ff8b13; font-weight: bold;' : 'color: #666;' }}">
-                                                        <i class="fa fa-angle-right mr-2"></i> {{ $sub->name }}
-                                                    </a>
-                                                </div>
-                                            </li>
-                                        @endforeach
+                            <div class="sidebar-card">
+                                <h4 class="widget-title-modern">Sub Categories</h4>
+                                <ul class="categories-list list-unstyled mb-0 d-flex flex-column gap-2">
+                                    @foreach ($activeSubcategories as $sub)
+                                        <li class="filter-list-item">
+                                            <a href="{{ request()->fullUrlWithQuery(['subcategory' => $sub->id]) }}"
+                                               style="text-decoration: none; font-size: 14px; transition: all 0.2s; {{ request('subcategory') == $sub->id ? 'color: #f15922; font-weight: 700;' : 'color: #475569;' }}">
+                                                <i class="far fa-angle-right me-2" style="font-size: 12px;"></i>{{ $sub->name }}
+                                            </a>
+                                        </li>
+                                    @endforeach
 
-                                        @if (request()->has('subcategory'))
-                                            <li class="mt-10">
-                                                <a href="{{ request()->fullUrlWithQuery(['subcategory' => null]) }}"
-                                                    class="text-danger" style="font-size: 13px;">
-                                                    <i class="fa fa-times-circle"></i> Clear Sub-filter
-                                                </a>
-                                            </li>
-                                        @endif
-                                    </ul>
-                                </div>
+                                    @if (request()->has('subcategory'))
+                                        <li class="mt-3 pt-2 border-top">
+                                            <a href="{{ request()->fullUrlWithQuery(['subcategory' => null]) }}"
+                                               class="text-danger fw-bold small style-none text-decoration: none;" style="text-decoration: none;">
+                                                <i class="far fa-times-circle me-1"></i> Clear Sub-filter
+                                            </a>
+                                        </li>
+                                    @endif
+                                </ul>
                             </div>
                         @endif
 
-                        <div class="sidebar-banner-widget mb-40" data-aos="fade-up" data-aos-delay="50"
-                            data-aos-duration="1200">
-                            {{-- আপনার ব্যানারের কোড... --}}
-                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
-    </section><!--====== End Shop page Section ======-->
+    </section>
 
+    <div class="custom-toast custom-toast-success" id="shopCartToast">Added to cart!</div>
 @endsection
 
 @push('scripts')
@@ -310,11 +548,7 @@
                 } else {
                     params.delete(key);
                 }
-
-                // ফিল্টার চেঞ্জ হলে পেজ নম্বর ১ এ নিয়ে যাওয়া স্ট্যান্ডার্ড
                 params.delete('page');
-
-                // ব্রাউজার রিফ্রেশ এবং নতুন ডাটা লোড
                 window.location.href = url.pathname + '?' + params.toString();
             }
 
@@ -331,7 +565,6 @@
                     params.delete('category');
                 }
 
-                // Category বদলালে old subcategory filter stale হয়ে যেতে পারে
                 params.delete('subcategory');
                 params.delete('page');
 
@@ -342,135 +575,62 @@
                 updateURLAndRedirect('sort', $(this).val());
             });
 
-            if ($('#slider-range').length && $.fn.slider) {
-                $("#slider-range").slider({
-                    range: true,
-                    min: 0,
-                    max: 1000,
-                    values: [0, 1000],
-                    stop: function(event, ui) {
-                        const range = ui.values[0] + '-' + ui.values[1];
-                        updateURLAndRedirect('price_range', range);
-                    },
-                    slide: function(event, ui) {
-                        $("#amount").val("৳" + ui.values[0] + " - ৳" + ui.values[1]);
-                    }
-                });
+            // 🎯 কাস্টম টোস্ট ফায়ারার ফাংশন
+            function triggerShopToast(msg) {
+                const toast = document.getElementById('shopCartToast');
+                if(toast) {
+                    toast.className = "custom-toast custom-toast-success show";
+                    toast.innerText = msg;
+                    setTimeout(() => { toast.classList.remove('show'); }, 2500);
+                }
             }
 
-            $(document).on('click', '.add-to-cart', function(e) {
+            // 🛒 লাইভ হেড কাউন্ট রি-রেন্ডারার সহ কার্ট অ্যাকশন লজিক
+            $(document).on('click', '.add-to-cart-sync', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
+                
                 const $this = $(this);
+                
                 const product = {
-                    id: $this.data('product-id'),
-                    name: $this.data('product-name'),
-                    price: $this.data('product-price'),
-                    image: $this.data('product-image'),
+                    id: $this.attr('data-id'),
+                    name: $this.attr('data-name'),
+                    price: $this.attr('data-price'),
+                    image: $this.attr('data-image'),
                     quantity: 1
                 };
 
+                if(!product.id || !product.name) return;
+
                 let cart = JSON.parse(localStorage.getItem('cart')) || [];
-                const existingItem = cart.find(item => item.id === product.id);
+                
+                const existingItem = cart.find(item => parseInt(item.id) === parseInt(product.id));
 
                 if (existingItem) {
-                    existingItem.quantity += 1;
+                    existingItem.quantity = parseInt(existingItem.quantity) + 1;
                 } else {
                     cart.push(product);
                 }
 
                 localStorage.setItem('cart', JSON.stringify(cart));
 
-                if (typeof showNotification === "function") {
-                    showNotification(`${product.name} added to cart!`, 'success');
-                } else {
-                    alert(`${product.name} has been added to cart!`);
+                // টোস্ট নোটিফিকেশন অ্যালার্ট রান
+                triggerShopToast(`${product.name} added to cart!`);
+
+                // ⚡ লোকাল স্টোরেজ থেকে লাইভ হিসাব করে হেডারের ব্যাগ কাউন্টার ১ সেকেন্ডে আপডেট
+                let totalItemsCount = 0;
+                cart.forEach(function(item) {
+                    totalItemsCount += parseInt(item.quantity) || 1;
+                });
+
+                // আপনার থিমের হেডারের সব কার্ট ক্লাসে লাইভ ভ্যালু পুশ করা হচ্ছে (পেজ রিফ্রেশ ছাড়াই)
+                $('.cart-count, .pro-count, .cart-count-badge').text(totalItemsCount);
+
+                // হেডার বাস্কেট কাউন্টার রেন্ডারার ফাংশন কল
+                if(typeof updateCartCount === "function") {
+                    updateCartCount();
                 }
-
-                updateCartCount();
             });
-
         });
     </script>
-
-
-
-    <style>
-        .product-title {
-            font-size: 16px;
-        }
-
-        .color1 {
-            background-color: #000;
-        }
-
-        .color2 {
-            background-color: #dc3545;
-        }
-
-        .color3 {
-            background-color: #007bff;
-        }
-
-        .color4 {
-            background-color: #28a745;
-        }
-
-        .color5 {
-            background-color: #ffc107;
-        }
-
-        .color6 {
-            background-color: #6f42c1;
-        }
-
-        .color7 {
-            background-color: #e83e8c;
-        }
-
-        .color8 {
-            background-color: #6c757d;
-        }
-
-        .color1,
-        .color2,
-        .color3,
-        .color4,
-        .color5,
-        .color6,
-        .color7,
-        .color8 {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 2px solid #ddd;
-            cursor: pointer;
-        }
-
-        .form-check-label span {
-            float: right;
-            color: #666;
-        }
-
-        .product-category {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-
-        .discount {
-            background: #dc3545;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 3px;
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .hover-content .icon-btn.active i {
-            color: #dc3545;
-        }
-    </style>
 @endpush

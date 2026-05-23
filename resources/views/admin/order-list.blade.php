@@ -83,9 +83,14 @@
                                                 <div class="customer-cell">
                                                     <a href="{{ route('admin.order-detail', $order->id) }}"
                                                         class="customer-name">
-                                                        {{ $order->user->name }}
+                                                        {{-- ✅ FIX: guest order হলে guest_name, otherwise user->name --}}
+                                                        {{ $order->user->name ?? $order->guest_name ?? 'Guest' }}
                                                     </a>
                                                     <div class="customer-email">{{ $order->email }}</div>
+                                                    {{-- Guest badge --}}
+                                                    @if($order->isGuestOrder())
+                                                        <span style="font-size:10px; background:#fff3cd; color:#856404; padding:2px 6px; border-radius:3px; display:inline-block; margin-top:3px;">Guest</span>
+                                                    @endif
                                                 </div>
                                             </td>
 
@@ -101,8 +106,7 @@
 
                                             <!-- Total -->
                                             <td style="text-align: right;">
-                                                <div class="order-amount">৳{{ number_format($order->total_amount, 2) }}
-                                                </div>
+                                                <div class="order-amount">৳{{ number_format($order->total_amount, 2) }}</div>
                                             </td>
 
                                             <!-- Items -->
@@ -189,10 +193,7 @@
         </div>
 
         <div class="bottom-page">
-            <div class="body-text">Copyright © 2026 Earth Craft. All
-                rights
-                reserved. Designed and Developed </div>
-            {{-- <i class="icon-heart"></i> --}}
+            <div class="body-text">Copyright © 2026 Earth Craft. All rights reserved. Designed and Developed</div>
             <div class="body-text">by <a href="https://innovatechbd.net/">Innovatech</a></div>
         </div>
     </div>
@@ -221,7 +222,6 @@
             }
         }
 
-        // Auto-hide alerts
         document.addEventListener('DOMContentLoaded', function() {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(alert => {
@@ -235,7 +235,6 @@
     </script>
 
     <style>
-        /* Alert Styles */
         .alert {
             padding: 12px 20px;
             border-radius: 8px;
@@ -264,7 +263,6 @@
             color: inherit;
         }
 
-        /* Order Table Styles */
         .order-table-wrapper {
             width: 100%;
             margin: 20px 0;
@@ -313,7 +311,6 @@
             overflow: hidden;
         }
 
-        /* Customer Cell - FIXED FOR OVERLAP */
         .customer-cell {
             min-width: 200px;
             max-width: 100%;
@@ -348,7 +345,6 @@
             width: 100%;
         }
 
-        /* Order ID */
         .order-id {
             background: #e8f5e9;
             color: #2e7d32;
@@ -363,20 +359,9 @@
             max-width: 100%;
         }
 
-        /* Order Date */
-        .order-date {
-            color: #666;
-            white-space: nowrap;
-        }
+        .order-date { color: #666; white-space: nowrap; }
+        .order-amount { font-weight: 600; color: #333; white-space: nowrap; }
 
-        /* Order Amount */
-        .order-amount {
-            font-weight: 600;
-            color: #333;
-            white-space: nowrap;
-        }
-
-        /* Order Items Count */
         .order-items-count {
             background: #e3f2fd;
             color: #1976d2;
@@ -388,7 +373,6 @@
             white-space: nowrap;
         }
 
-        /* Payment Badge */
         .payment-badge {
             padding: 6px 12px;
             border-radius: 4px;
@@ -396,27 +380,12 @@
             font-weight: 500;
             display: inline-block;
             white-space: nowrap;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
-        .payment-badge.success {
-            background: #d4edda;
-            color: #155724;
-        }
+        .payment-badge.success { background: #d4edda; color: #155724; }
+        .payment-badge.pending { background: #fff3cd; color: #856404; }
+        .payment-badge.failed  { background: #f8d7da; color: #721c24; }
 
-        .payment-badge.pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .payment-badge.failed {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        /* Status Badge */
         .status-badge {
             padding: 6px 12px;
             border-radius: 4px;
@@ -424,37 +393,14 @@
             font-weight: 500;
             display: inline-block;
             white-space: nowrap;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
-        .status-badge.delivered {
-            background: #d4edda;
-            color: #155724;
-        }
+        .status-badge.delivered  { background: #d4edda; color: #155724; }
+        .status-badge.shipped    { background: #d1ecf1; color: #0c5460; }
+        .status-badge.processing { background: #cce5ff; color: #004085; }
+        .status-badge.pending    { background: #fff3cd; color: #856404; }
+        .status-badge.cancelled  { background: #f8d7da; color: #721c24; }
 
-        .status-badge.shipped {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .status-badge.processing {
-            background: #cce5ff;
-            color: #004085;
-        }
-
-        .status-badge.pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-badge.cancelled {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        /* Action Buttons */
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -478,306 +424,48 @@
             flex-shrink: 0;
         }
 
-        .btn-action.view {
-            color: #007bff;
-            background: #e3f2fd;
-        }
+        .btn-action.view  { color: #007bff; background: #e3f2fd; }
+        .btn-action.view:hover  { background: #007bff; color: white; transform: scale(1.1); }
+        .btn-action.track { color: #17a2b8; background: #d1ecf1; }
+        .btn-action.track:hover { background: #17a2b8; color: white; transform: scale(1.1); }
+        .btn-action.delete { color: #dc3545; background: #f8d7da; }
+        .btn-action.delete:hover { background: #dc3545; color: white; transform: scale(1.1); }
 
-        .btn-action.view:hover {
-            background: #007bff;
-            color: white;
-            transform: scale(1.1);
-        }
+        .form-search { display: flex; align-items: center; gap: 12px; }
+        .form-search > div { display: flex; align-items: center; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden; min-width: 280px; }
+        .form-search input[type="text"] { border: none; outline: none; padding: 10px 12px; flex: 1; font-size: 14px; }
+        .form-search button[type="submit"] { border: none; padding: 0 14px; background: none; cursor: pointer; color: #666; }
+        .form-search button[type="submit"]:hover { color: #007bff; }
 
-        .btn-action.track {
-            color: #17a2b8;
-            background: #d1ecf1;
-        }
+        .tf-button.style-1 { padding: 10px 20px; background: #6c757d; color: white; border-radius: 6px; text-decoration: none; font-size: 14px; transition: background 0.3s; border: none; cursor: pointer; }
+        .tf-button.style-1:hover { background: #5a6268; }
 
-        .btn-action.track:hover {
-            background: #17a2b8;
-            color: white;
-            transform: scale(1.1);
-        }
-
-        .btn-action.delete {
-            color: #dc3545;
-            background: #f8d7da;
-        }
-
-        .btn-action.delete:hover {
-            background: #dc3545;
-            color: white;
-            transform: scale(1.1);
-        }
-
-        /* Search Form - KEPT ORIGINAL FUNCTIONALITY */
-        .form-search {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .form-search>div {
-            display: flex;
-            align-items: center;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            overflow: hidden;
-            min-width: 280px;
-        }
-
-        .form-search input[type="text"] {
-            border: none;
-            outline: none;
-            padding: 10px 12px;
-            flex: 1;
-            font-size: 14px;
-        }
-
-        .form-search button[type="submit"] {
-            border: none;
-            padding: 0 14px;
-            background: none;
-            cursor: pointer;
-            color: #666;
-            transition: color 0.2s;
-        }
-
-        .form-search button[type="submit"]:hover {
-            color: #007bff;
-        }
-
-        .tf-button.style-1 {
-            padding: 10px 20px;
-            background: #6c757d;
-            color: white;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 14px;
-            transition: background 0.3s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .tf-button.style-1:hover {
-            background: #5a6268;
-        }
-
-        /* No Data Message */
-        .text-center {
-            text-align: center;
-        }
-
-        .py-8 {
-            padding-top: 32px;
-            padding-bottom: 32px;
-        }
+        .text-center { text-align: center; }
+        .py-8 { padding-top: 32px; padding-bottom: 32px; }
 
         @keyframes slideInDown {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(-20px); opacity: 0; }
+            to   { transform: translateY(0);     opacity: 1; }
         }
 
-        /* Mobile Responsive Styles */
         @media (max-width: 768px) {
-            .order-table {
-                table-layout: auto;
-                min-width: 1000px;
-            }
-
-            .main-content-inner {
-                padding: 15px;
-            }
-
-            .main-content-wrap {
-                padding: 15px;
-            }
-
-            .wg-box {
-                padding: 15px;
-                margin: 0 -15px;
-                width: calc(100% + 30px);
-            }
-
-            .order-table-wrapper {
-                margin: 15px -15px;
-                width: calc(100% + 30px);
-            }
-
-            .table-responsive {
-                margin: 0 -15px;
-                padding: 0 15px;
-            }
-
-            /* Mobile search form adjustments */
-            .form-search {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
-                width: 100%;
-            }
-
-            .form-search>div {
-                min-width: 100% !important;
-                width: 100% !important;
-            }
-
-            .tf-button.style-1 {
-                width: 100%;
-                text-align: center;
-            }
-
-            .flex.items-center.justify-between.gap10.mb-20 {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
-            }
-
-            .wg-filter.flex-grow {
-                width: 100%;
-            }
-
-            .breadcrumbs {
-                flex-wrap: wrap;
-                margin-top: 10px;
-            }
-
-            .flex.items-center.flex-wrap.justify-between.gap20.mb-27 {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .flex.items-center.justify-between.flex-wrap.gap10 {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
-            }
-
-            .pagination {
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-
-            .pagination .page-item .page-link {
-                padding: 8px 12px;
-                font-size: 14px;
-            }
-
-            .action-buttons {
-                gap: 5px;
-            }
-
-            .btn-action {
-                width: 28px;
-                height: 28px;
-                font-size: 14px;
-            }
-
-            .customer-email {
-                max-width: 180px;
-            }
+            .order-table { table-layout: auto; min-width: 1000px; }
+            .form-search { flex-direction: column; align-items: stretch; gap: 15px; width: 100%; }
+            .form-search > div { min-width: 100% !important; width: 100% !important; }
+            .tf-button.style-1 { width: 100%; text-align: center; }
+            .flex.items-center.justify-between.gap10.mb-20 { flex-direction: column; align-items: stretch; gap: 15px; }
+            .wg-filter.flex-grow { width: 100%; }
+            .action-buttons { gap: 5px; }
+            .btn-action { width: 28px; height: 28px; font-size: 14px; }
+            .customer-email { max-width: 180px; }
         }
 
         @media (max-width: 480px) {
-            .customer-email {
-                max-width: 150px;
-                font-size: 11px;
-            }
-
-            .order-id {
-                max-width: 120px;
-                font-size: 11px;
-            }
-
-            .main-content-inner {
-                padding: 10px;
-            }
-
-            .main-content-wrap {
-                padding: 10px;
-            }
-
-            .wg-box {
-                padding: 10px;
-                margin: 0 -10px;
-                width: calc(100% + 20px);
-            }
-
-            .order-table-wrapper {
-                margin: 10px -10px;
-                width: calc(100% + 20px);
-            }
-
-            .table-responsive {
-                margin: 0 -10px;
-                padding: 0 10px;
-            }
-
-            .order-table {
-                min-width: 1000px;
-            }
-
-            .order-table th,
-            .order-table td {
-                padding: 10px 8px;
-                font-size: 13px;
-            }
-
-            .customer-name {
-                font-size: 13px;
-            }
-
-            .customer-email {
-                font-size: 11px;
-            }
-
-            .order-id,
-            .order-items-count,
-            .payment-badge,
-            .status-badge {
-                font-size: 11px;
-                padding: 3px 8px;
-            }
-
-            .order-amount {
-                font-size: 13px;
-            }
-
-            .btn-action {
-                width: 26px;
-                height: 26px;
-                font-size: 13px;
-            }
-
-            .alert {
-                padding: 10px 15px;
-                font-size: 14px;
-            }
-
-            .body-title {
-                font-size: 16px;
-            }
-
-            .body-text {
-                font-size: 14px;
-            }
-
-            .text-tiny {
-                font-size: 12px;
-            }
-
-            h3 {
-                font-size: 20px;
-            }
+            .order-table { min-width: 1000px; }
+            .order-table th, .order-table td { padding: 10px 8px; font-size: 13px; }
+            .customer-email { max-width: 150px; font-size: 11px; }
+            .order-id, .order-items-count, .payment-badge, .status-badge { font-size: 11px; padding: 3px 8px; }
+            .btn-action { width: 26px; height: 26px; font-size: 13px; }
         }
     </style>
 @endsection
