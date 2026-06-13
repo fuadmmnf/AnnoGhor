@@ -38,7 +38,7 @@
                 @endif
 
                 <div class="wg-box">
-                    <div class="flex items-center justify-between gap10 mb-20">
+                    <div class="flex items-center justify-between gap10 mb-20" style="flex-wrap: wrap;">
                         <div class="wg-filter flex-grow">
                             <form class="form-search" method="GET" style="display:flex; align-items:center; gap:12px;">
                                 <div
@@ -46,7 +46,7 @@
                                     <input type="text" name="name" value="{{ request('name') }}"
                                         placeholder="Search by order ID, email, name..."
                                         style="border:none; outline:none; padding:10px 12px; flex:1;">
-                                    <button type="submit" style="border:none; padding:0 14px;">
+                                    <button type="submit" style="border:none; padding:0 14px; background: none;">
                                         <i class="icon-search"></i>
                                     </button>
                                 </div>
@@ -58,6 +58,17 @@
                                 @endif
                             </form>
                         </div>
+
+                        @if(request()->routeIs('admin.orders.pending') || request()->segment(3) === 'pending' || (!request()->segment(3) && $orders->where('order_status', 'Pending')->count() > 0))
+                            <div class="wg-bulk-courier">
+                                <form action="{{ route('admin.orders.sendBulk') }}" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত যে সমস্ত পেন্ডিং অর্ডার একসাথে স্টেডফাস্ট কুরিয়ারে পাঠাতে চান?')">
+                                    @csrf
+                                    <button type="submit" class="tf-button style-1" style="padding: 10px 20px; background-color: #10b981; color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: background 0.2s;">
+                                        <i class="icon-paper-plane"></i> Send All Pending to Steadfast
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
                     </div>
 
                     <div class="order-table-wrapper">
@@ -78,12 +89,10 @@
                                 <tbody>
                                     @forelse($orders as $order)
                                         <tr>
-                                            <!-- Customer -->
                                             <td>
                                                 <div class="customer-cell">
                                                     <a href="{{ route('admin.order-detail', $order->id) }}"
                                                         class="customer-name">
-                                                        {{-- ✅ FIX: guest order হলে guest_name, otherwise user->name --}}
                                                         {{ $order->user->name ?? $order->guest_name ?? 'Guest' }}
                                                     </a>
                                                     <div class="customer-email">{{ $order->email }}</div>
@@ -94,27 +103,22 @@
                                                 </div>
                                             </td>
 
-                                            <!-- Order ID -->
                                             <td>
                                                 <span class="order-id">{{ $order->order_number }}</span>
                                             </td>
 
-                                            <!-- Date -->
                                             <td>
                                                 <span class="order-date">{{ $order->created_at->format('d M Y') }}</span>
                                             </td>
 
-                                            <!-- Total -->
                                             <td style="text-align: right;">
                                                 <div class="order-amount">৳{{ number_format($order->total_amount, 2) }}</div>
                                             </td>
 
-                                            <!-- Items -->
                                             <td style="text-align: center;">
                                                 <div class="order-items-count">{{ $order->orderItems->count() }}</div>
                                             </td>
 
-                                            <!-- Payment -->
                                             <td>
                                                 @if ($order->payment_status === 'Success')
                                                     <div class="payment-badge success">Success</div>
@@ -125,7 +129,6 @@
                                                 @endif
                                             </td>
 
-                                            <!-- Status -->
                                             <td>
                                                 @if ($order->order_status === 'Delivered')
                                                     <div class="status-badge delivered">Delivered</div>
@@ -140,7 +143,6 @@
                                                 @endif
                                             </td>
 
-                                            <!-- Actions -->
                                             <td style="text-align: center;">
                                                 <div class="action-buttons">
                                                     <a href="{{ route('admin.order-detail', $order->id) }}"
@@ -458,6 +460,7 @@
             .action-buttons { gap: 5px; }
             .btn-action { width: 28px; height: 28px; font-size: 14px; }
             .customer-email { max-width: 180px; }
+            .wg-bulk-courier, .wg-bulk-courier form, .wg-bulk-courier button { width: 100%; }
         }
 
         @media (max-width: 480px) {

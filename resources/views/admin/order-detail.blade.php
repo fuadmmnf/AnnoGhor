@@ -20,6 +20,9 @@
                 @if(session('success'))
                     <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
+                @if(session('error'))
+                    <div class="alert alert-danger">{{ session('error') }}</div>
+                @endif
 
                 <div class="wg-order-detail">
                     <div class="left flex-grow">
@@ -33,8 +36,7 @@
                                     @foreach($order->orderItems as $item)
                                         <li class="product-item gap14">
                                             <div class="image no-bg">
-                                                <img src="{{ asset('storage/' . $item->product_image) }}"
-                                                     alt="{{ $item->product_name }}">
+                                                <img src="{{ asset('storage/' . $item->product_image) }}" alt="{{ $item->product_name }}">
                                             </div>
                                             <div class="flex items-center justify-between gap40 flex-grow">
                                                 <div class="name">
@@ -66,7 +68,7 @@
                                     <li class="cart-totals-item">
                                         <span class="body-text">Subtotal:</span>
                                         <span class="body-title-2">৳{{ number_format($order->subtotal, 2) }}</span>
-                                    </li>
+                                    </li >
                                     <li class="divider"></li>
                                     <li class="cart-totals-item">
                                         <span class="body-text">Shipping:</span>
@@ -110,7 +112,7 @@
 
                         <div class="wg-box mb-20 gap10">
                             <div class="body-title">Shipping Address</div>
-                            <div class="body-text">{{ $order->full_address }}</div>
+                            <div class="body-text">{{ $order->address ?? $order->full_address }}</div>
                             <div class="body-text mt-2">
                                 <strong>Phone:</strong> {{ $order->phone }}<br>
                                 <strong>Email:</strong> {{ $order->email }}
@@ -132,6 +134,54 @@
                             </div>
                         </div>
 
+                        {{-- 📦 🚚 STEADFAST COURIER CONTROL BOX --}}
+                        <div class="wg-box mb-20 gap10" style="border: 1px solid #e1e8ed; background-color: #f8fafc;">
+                            <div class="body-title flex items-center gap10">
+                                <i class="icon-truck" style="color: #2563eb;"></i> Steadfast Courier 
+                            </div>
+
+                            @if($order->tracking_code)
+                                <div class="body-text mt-2">
+                                    <strong>Tracking Code:</strong> <span class="text-primary font-bold">{{ $order->tracking_code }}</span>
+                                </div>
+                                <div class="mt-2 flex flex-column gap10">
+                                    {{-- ১. লাইভ স্ট্যাটাস সিঙ্ক বাটন --}}
+                                    <a href="{{ route('admin.orders.syncStatus', $order->id) }}" class="tf-button style-1 w-full" style="background-color: #0ea5e9; border-color: #0ea5e9;">
+                                        <i class="icon-refresh"></i> Sync Live Status
+                                    </a>
+
+                                    {{-- 🌟 ২. [পুনরায় পাঠানোর ম্যাজিক বাটন]: যদি পার্সেলটি কোন কারণে Cancelled হয়ে থাকে --}}
+                                    @if($order->order_status === 'Cancelled')
+                                        <form action="{{ route('admin.orders.sendSingle', $order->id) }}" method="POST" class="w-full">
+                                            @csrf
+                                            <button type="submit" class="tf-button style-1 w-full" style="background-color: #f59e0b; border-color: #f59e0b;">
+                                                <i class="icon-paper-plane"></i> Resend to Steadfast
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            @else
+                                {{-- ৩. একদম প্রথমবার কুরিয়ারে পাঠানোর বাটন (যদি ট্র্যাকিং কোড জেনারেট না থাকে) --}}
+                                @if($order->order_status === 'Pending')
+                                    <div class="body-text text-warning mt-1" style="font-size: 13px;">
+                                        ⚠️ অর্ডারটি এখনো স্টেডফাস্ট কুরিয়ারে পাঠানো হয়নি।
+                                    </div>
+                                    <div class="mt-2">
+                                        <form action="{{ route('admin.orders.sendSingle', $order->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="tf-button style-1 w-full" style="background-color: #10b981; border-color: #10b981;">
+                                                <i class="icon-paper-plane"></i> Send to Steadfast
+                                            </button>
+                                        </form>
+                                    </div>
+                                @else
+                                    <div class="body-text text-muted mt-1" style="font-size: 13px;">
+                                        অর্ডার স্ট্যাটাস 'Pending' না থাকায় ম্যানুয়ালি কুরিয়ারে পাঠানো লকড।
+                                    </div>
+                                @endif
+                            @endif
+                        </div>
+
                         <div class="wg-box gap10">
                             <div class="body-title">Order Status</div>
                             <form action="{{ route('admin.order.update-status', $order->id) }}" method="POST">
@@ -144,11 +194,11 @@
                                     <option value="Cancelled" {{ $order->order_status === 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
                                 </select>
                                 <button type="submit" class="tf-button style-1 w-full mb-2">Update Status</button>
-                            </form>
+                            </</form>
 
                             @if($order->expected_delivery_date)
                                 <div class="body-title-2 tf-color-2 mt-3">
-                                    Expected Delivery: {{ $order->expected_delivery_date->format('d M Y') }}
+                                    Expected Delivery: {{ \Carbon\Carbon::parse($order->expected_delivery_date)->format('d M Y') }}
                                 </div>
                             @endif
 
@@ -162,10 +212,7 @@
         </div>
 
         <div class="bottom-page">
-            <div class="body-text">Copyright © 2026 Earth Craft. All
-                rights
-                reserved. Designed and Developed </div>
-            {{-- <i class="icon-heart"></i> --}}
+            <div class="body-text">Copyright © 2026 Earth Craft. All rights reserved. Designed and Developed </div>
             <div class="body-text">by <a href="https://innovatechbd.net/">Innovatech</a></div>
         </div>
     </div>

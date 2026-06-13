@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\FaqController as AdminFaqController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
-use App\Http\Controllers\Admin\SettingController; 
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ContactController;
@@ -79,6 +79,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/order/{id}/update-status', [AdminOrderController::class, 'updateStatus'])->name('admin.order.update-status');
     Route::delete('/admin/orders/{id}/delete', [AdminOrderController::class, 'destroy'])->name('admin.order.delete');
     Route::post('/admin/order/{id}/add-tracking', [AdminOrderController::class, 'addTracking'])->name('admin.order.add-tracking');
+    
+    // 🚚 [NEW] STEADFAST COURIER ROUTES (এই ৩টি রাউট নতুন যুক্ত করা হয়েছে)
+    Route::post('/admin/orders/{id}/send-to-steadfast', [AdminOrderController::class, 'sendSingleToSteadfast'])->name('admin.orders.sendSingle');
+    Route::post('/admin/orders/send-bulk-to-steadfast', [AdminOrderController::class, 'sendBulkToSteadfast'])->name('admin.orders.sendBulk');
+    Route::get('/admin/orders/{id}/sync-steadfast', [AdminOrderController::class, 'syncSteadfastStatus'])->name('admin.orders.syncStatus');
 
     // Review Routes
     Route::get('/admin/review-list', [ReviewController::class, 'index'])->name('admin.review-list');
@@ -104,8 +109,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/settings/update', [SettingController::class, 'update'])->name('admin.settings.update');
     Route::get('/admin/social-links', [SettingController::class, 'socialLinks'])->name('admin.social-links.index');
     Route::post('/admin/social-links/update', [SettingController::class, 'updateSocialLinks'])->name('admin.social-links.update');
-    
-    // 🚚 ফিক্সড ২: আপনার নতুন charge.blade.php থেকে সাবমিট করা ডাটা প্রসেস করার রাউট
+
+    // Delivery Settings Update Route
     Route::post('/admin/delivery-settings/update', [SettingController::class, 'updateDeliveryCharge'])->name('admin.delivery-settings.update');
 
     // Contact Messages Routes
@@ -149,21 +154,24 @@ Route::post('/forgot-password', [ForgotPasswordController::class, 'send'])->midd
 Route::get('/reset-password/{token}', [ResetPasswordController::class, 'show'])->middleware('guest')->name('password.reset');
 Route::post('/reset-password', [ResetPasswordController::class, 'update'])->middleware('guest')->name('password.update');
 
-// ===== Cart Routes (Public) =====
-Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
+// ===== 🛒 Cart Routes =====
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
+Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
+
+// Product Details Page form submit (Add to Cart / Buy Now)
 Route::post('/cart/add-item/{productId}', [CartController::class, 'addToCart'])->name('cart.add.item');
-Route::get('/cart/add-item/{productId}', [CartController::class, 'addToCart'])->name('cart.add.item.get');
-Route::post('/cart/add-ajax/{productId}', [CartController::class, 'addToCartAjax'])->name('cart.add.ajax');
+
+// Home Page AJAX Cart (btn-ajax-add-cart button)
+Route::post('/cart/ajax/{productId}', [CartController::class, 'addToCartAjax'])->name('cart.add.ajax');
+
 Route::put('/cart/update/{cartId}', [CartController::class, 'updateCart'])->name('cart.update');
 Route::delete('/cart/remove/{cartId}', [CartController::class, 'removeFromCart'])->name('cart.remove');
 Route::get('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
 
-// ===== Checkout & Order Routes (Guest + Auth) =====
+// ===== Checkout & Order Routes =====
 Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
 Route::post('/order/place', [OrderController::class, 'placeOrder'])->name('order.place');
 Route::get('/order/success/{order}', [OrderController::class, 'orderSuccess'])->name('order.success');
-Route::get('/api/delivery-charges', [OrderController::class, 'getCharges'])->name('api.delivery-charges');
 
 // ===== Auth Only Routes =====
 Route::middleware(['auth.user', 'role:user'])->group(function () {
@@ -176,6 +184,10 @@ Route::middleware(['auth.user', 'role:user'])->group(function () {
     Route::get('/wishlist/product-ids', [App\Http\Controllers\WishlistController::class, 'getProductIds'])->name('wishlist.product-ids');
 });
 
+// Wishlist check & toggle (guest accessible — product details page এ দরকার)
+Route::get('/wishlist/check/{productId}', [App\Http\Controllers\WishlistController::class, 'check'])->name('wishlist.check');
+Route::post('/wishlist/toggle/{productId}', [App\Http\Controllers\WishlistController::class, 'toggleById'])->name('wishlist.toggle.byid');
+
 // ===== Public Pages =====
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -184,7 +196,6 @@ Route::get('/profile', function () {
 })->name('profile');
 
 Route::put('/profile/update', [HomeController::class, 'updateProfile'])->name('profile.update');
-// password ফিক্স
 Route::post('/profile/update-password', [HomeController::class, 'updatePassword'])->name('profile.update-password');
 
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
@@ -198,7 +209,7 @@ Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 Route::get('/new-arrivals', [App\Http\Controllers\HomeController::class, 'newArrivals'])->name('new-arrivals');
 
-// 🌐 ফিক্সড ৩: চেকআউট পেজের জাভাস্ক্রিপ্ট এর জন্য লাইভ ডেলিভারি চার্জ রেট গেট (Get) করার API রাউট
+// Checkout page delivery charge API
 Route::get('/api/delivery-charges', [OrderController::class, 'getCharges'])->name('api.delivery-charges');
 
 // Currency Routes

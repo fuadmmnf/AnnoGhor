@@ -100,11 +100,11 @@ class CartController extends Controller
                 session()->put('cart', $cart);
             }
 
+            // 🎯 জাভাস্ক্রিপ্ট ক্লায়েন্টের নোটিফিকেশন সিস্টেমের সাথে রেসপন্স সিঙ্ক করা হলো
             return response()->json([
                 'success'    => true,
                 'message'    => $message,
-                'cart_count' => $this->getCartCount(),
-                'redirect'   => route('cart'),
+                'cart_count' => $this->getCartCount()
             ]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()], 500);

@@ -73,90 +73,26 @@
                                                 </div>
                                             </div>
 
-                                            {{-- Email --}}
+
+
+                                            {{-- Address --}}
                                             <div class="col-lg-6">
                                                 <div class="form_group">
-                                                    <label>Email address</label>
+                                                    <label>Address</label>
                                                     @auth
-                                                        <input type="email" class="form_control"
-                                                               value="{{ auth()->user()->email }}"
-                                                               name="email" required readonly>
+                                                        <input type="text" class="form_control"
+                                                               value="{{ auth()->user()->address }}"
+                                                               name="address">
                                                     @else
-                                                        <input type="email" class="form_control"
-                                                               placeholder="your@email.com"
-                                                               name="email" required
-                                                               value="{{ old('email') }}">
+                                                        <input type="text" class="form_control"
+                                                               placeholder="Address"
+                                                               name="address"
+                                                               value="{{ old('address') }}">
                                                     @endauth
                                                 </div>
                                             </div>
 
-                                            {{-- Country --}}
-                                            <div class="col-lg-6">
-                                                <div class="form_group">
-                                                    <label>Country</label>
-                                                    @auth
-                                                        <input type="text" class="form_control"
-                                                               value="{{ auth()->user()->country ?? 'Bangladesh' }}"
-                                                               name="country" required>
-                                                    @else
-                                                        <input type="text" class="form_control"
-                                                               placeholder="Country"
-                                                               name="country" required
-                                                               value="{{ old('country', 'Bangladesh') }}">
-                                                    @endauth
-                                                </div>
-                                            </div>
-
-                                            {{-- City --}}
-                                            <div class="col-lg-6">
-                                                <div class="form_group">
-                                                    <label>City / District</label>
-                                                    @auth
-                                                        <input type="text" class="form_control"
-                                                               value="{{ auth()->user()->city }}"
-                                                               name="city">
-                                                    @else
-                                                        <input type="text" class="form_control"
-                                                               placeholder="City / District"
-                                                               name="city"
-                                                               value="{{ old('city') }}">
-                                                    @endauth
-                                                </div>
-                                            </div>
-
-                                            {{-- Postcode --}}
-                                            <div class="col-lg-6">
-                                                <div class="form_group">
-                                                    <label>Postcode</label>
-                                                    @auth
-                                                        <input type="text" class="form_control"
-                                                               value="{{ auth()->user()->postcode }}"
-                                                               name="postcode">
-                                                    @else
-                                                        <input type="text" class="form_control"
-                                                               placeholder="Postcode"
-                                                               name="postcode"
-                                                               value="{{ old('postcode') }}">
-                                                    @endauth
-                                                </div>
-                                            </div>
-
-                                            {{-- Street Address --}}
-                                            <div class="col-lg-6">
-                                                <div class="form_group">
-                                                    <label>Street Address</label>
-                                                    @auth
-                                                        <input type="text" class="form_control"
-                                                               value="{{ auth()->user()->street_address }}"
-                                                               name="street_address">
-                                                    @else
-                                                        <input type="text" class="form_control"
-                                                               placeholder="House no / Street / Area"
-                                                               name="street_address"
-                                                               value="{{ old('street_address') }}">
-                                                    @endauth
-                                                </div>
-                                            </div>
+                                            
 
                                             {{-- 🚚 ডাইনামিক চেকমার্ক (Radio Card) সেকশন --}}
                                             <div class="col-lg-12 mt-3 mb-3">
@@ -267,6 +203,11 @@
 
 @push('scripts')
     <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fbq('track', 'InitiateCheckout');
+        });
+        
         var insideDhakaCharge = 0;
         var outsideDhakaCharge = 0;
         var isChargesApiReady = false;

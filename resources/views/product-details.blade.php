@@ -287,13 +287,30 @@
             }
             /* ⚡ বাটনগুলোকে মোবাইলে এক লাইনে ১টি করে সাজানো হলো */
             .action-buttons-grid {
-                grid-template-columns: 1fr !important;
+                grid-template-columns: repeat(2, fr);
                 gap: 12px;
             }
             .custom-grid-btn {
                 height: 52px;
                 font-size: 16px;
             }
+
+             .custom-grid-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 35px;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1px;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            text-decoration: none !important;
+            border: none;
+            width: 100%;
+        }
         }
     </style>
 
@@ -318,7 +335,7 @@
                 <div class="row g-5">
                     
                     <div class="col-xl-6">
-                        <div class="product-gallery-area mb-50" data-aos="fade-up" data-aos-duration="1200">
+                        <div class="product-gallery-area mb-lg-20 mb-0" data-aos="fade-up" data-aos-duration="1200">
                             <div class="product-big-slider mb-3">
                                 <div class="product-img">
                                     @if ($product->thumbnail)
@@ -443,7 +460,7 @@
 
                 </div>
 
-                <div class="additional-information-wrapper mt-5 pt-4" data-aos="fade-up" data-aos-delay="30" data-aos-duration="1000">
+                <div class="additional-information-wrapper mt-0 pt-0" data-aos="fade-up" data-aos-delay="30" data-aos-duration="1000">
                     <div class="row g-5">
                         <div class="col-lg-5">
                             <div class="sidebar-card">
@@ -586,6 +603,34 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            
+            // 🌟 Meta Pixel: AddToCart Tracking
+            const addToCartBtn = document.querySelector('.add-cart-btn');
+            if(addToCartBtn) {
+                addToCartBtn.addEventListener('click', function() {
+                    fbq('track', 'AddToCart', {
+                        content_name: '{!! addslashes($product->name) !!}', 
+                        content_ids: ['{{ $product->id }}'],
+                        value: {{ $product->discount_price ? $product->discount_price : $product->regular_price }}, 
+                        currency: 'BDT'
+                    });
+                });
+            }
+
+            // 🌟 Meta Pixel: Buy Now Tracking (ঐচ্ছিক, তবে ভালো)
+            const buyNowBtn = document.querySelector('.buy-now-btn');
+            if(buyNowBtn) {
+                buyNowBtn.addEventListener('click', function() {
+                    fbq('track', 'AddToCart', { // Buy Now করলেও AddToCart হিসেবেই কাউন্ট হবে
+                        content_name: '{!! addslashes($product->name) !!}', 
+                        content_ids: ['{{ $product->id }}'],
+                        value: {{ $product->discount_price ? $product->discount_price : $product->regular_price }}, 
+                        currency: 'BDT'
+                    });
+                });
+            }
+
+            // --- আপনার আগের কোডগুলো নিচে যেমন ছিল তেমনই থাকবে ---
             const quantityInput = document.getElementById('quantity');
             const minusBtn = document.querySelector('.quantity-down');
             const plusBtn = document.querySelector('.quantity-up');

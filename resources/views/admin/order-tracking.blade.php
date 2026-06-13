@@ -20,8 +20,10 @@
                 @if(session('success'))
                     <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
+                @if(session('error'))
+                    <div class="alert alert-danger">{{ session('error') }}</div>
+                @endif
 
-                <!-- Order Track Summary -->
                 <div class="wg-box mb-20">
                     <div class="order-track">
                         @if($order->orderItems->first())
@@ -40,6 +42,14 @@
                                 <div class="body-text">Customer:</div>
                                 <div class="body-title-2">{{ $order->user->name ?? $order->guest_name ?? 'Guest User' }}</div>
                             </div>
+                            
+                            @if($order->tracking_code)
+                                <div class="infor mb-10" style="background-color: #f0fdf4; padding: 6px 10px; border-radius: 6px; border: 1px solid #bbf7d0;">
+                                    <div class="body-text" style="color: #166534; font-weight: 600;">Steadfast Tracking:</div>
+                                    <div class="body-title-2" style="color: #166534; font-weight: bold;">{{ $order->tracking_code }}</div>
+                                </div>
+                            @endif
+
                             <div class="infor mb-10">
                                 <div class="body-text">Order Placed:</div>
                                 <div class="body-title-2">{{ $order->created_at->format('d M Y') }}</div>
@@ -56,26 +66,31 @@
                     </div>
                 </div>
 
-                <!-- Order Status Detail -->
                 <div class="wg-box mb-20">
-                    <div>
-                        <h6 class="mb-10">Current Status: {{ $order->order_status }}</h6>
-                        <div class="body-text">
-                            @if($order->order_status === 'Pending')
-                                Your order is pending confirmation.
-                            @elseif($order->order_status === 'Processing')
-                                Your order is being processed. It will be shipped soon.
-                            @elseif($order->order_status === 'Shipped')
-                                Your order has been shipped and is on the way.
-                            @elseif($order->order_status === 'Delivered')
-                                Your order has been delivered successfully!
-                            @elseif($order->order_status === 'Cancelled')
-                                This order has been cancelled.
-                            @endif
-                        </div>
+                    <div class="flex items-center justify-between flex-wrap gap10 mb-10">
+                        <h6>Current Status: {{ $order->order_status }}</h6>
+                        
+                        @if($order->tracking_code)
+                            <a href="{{ route('admin.orders.syncStatus', $order->id) }}" class="tf-button style-1" style="padding: 6px 14px; font-size: 12px; background-color: #0ea5e9; border: none; height: auto; line-height: normal;">
+                                <i class="icon-refresh"></i> Sync Courier Live Status
+                            </a>
+                        @endif
+                    </div>
+                    
+                    <div class="body-text mb-20">
+                        @if($order->order_status === 'Pending')
+                            Your order is pending confirmation.
+                        @elseif($order->order_status === 'Processing')
+                            Your order is being processed. It will be shipped soon.
+                        @elseif($order->order_status === 'Shipped')
+                            Your order has been shipped and is on the way.
+                        @elseif($order->order_status === 'Delivered')
+                            Your order has been delivered successfully!
+                        @elseif($order->order_status === 'Cancelled')
+                            This order has been cancelled.
+                        @endif
                     </div>
 
-                    <!-- Road Map -->
                     <div class="road-map">
                         <div class="road-map-item {{ in_array($order->order_status, ['Pending', 'Processing', 'Shipped', 'Delivered']) ? 'active' : '' }}">
                             <div class="icon"><i class="icon-check"></i></div>
@@ -121,7 +136,6 @@
                     </div>
                 </div>
 
-                <!-- Add Manual Tracking Entry (Admin Only) -->
                 <div class="wg-box mb-20">
                     <h6 class="mb-10">Add Tracking Entry</h6>
                     <form action="{{ route('admin.order.add-tracking', $order->id) }}" method="POST">
@@ -149,7 +163,6 @@
                     </form>
                 </div>
 
-                <!-- Tracking History Table -->
                 <div class="wg-box">
                     <div class="wg-table table-order-track">
                         <ul class="table-title flex mb-24 gap20">
@@ -163,8 +176,12 @@
                         <ul class="flex flex-column gap14">
                             @forelse($order->trackings as $tracking)
                                 <li class="cart-totals-item">
-                                    <div class="body-text">{{ $tracking->tracking_date->format('d M Y') }}</div>
-                                    <div class="body-text">{{ $tracking->tracking_date->format('h:i A') }}</div>
+                                    <div class="body-text">
+                                        {{ $tracking->tracking_date instanceof \Carbon\Carbon ? $tracking->tracking_date->format('d M Y') : \Carbon\Carbon::parse($tracking->tracking_date)->format('d M Y') }}
+                                    </div>
+                                    <div class="body-text">
+                                        {{ $tracking->tracking_date instanceof \Carbon\Carbon ? $tracking->tracking_date->format('h:i A') : \Carbon\Carbon::parse($tracking->tracking_date)->format('h:i A') }}
+                                    </div>
                                     <div class="body-text"><strong>{{ $tracking->status }}</strong></div>
                                     <div class="body-text">{{ $tracking->description }}</div>
                                     <div class="body-text">{{ $tracking->location ?? 'N/A' }}</div>
@@ -184,10 +201,7 @@
         </div>
 
         <div class="bottom-page">
-            <div class="body-text">Copyright © 2026 Earth Craft. All
-                rights
-                reserved. Designed and Developed </div>
-            {{-- <i class="icon-heart"></i> --}}
+            <div class="body-text">Copyright © 2026 Earth Craft. All rights reserved. Designed and Developed </div>
             <div class="body-text">by <a href="https://innovatechbd.net/">Innovatech</a></div>
         </div>
     </div>

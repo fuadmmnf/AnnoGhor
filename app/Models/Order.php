@@ -22,12 +22,10 @@ class Order extends Model
         'payment_status',
         'order_status',
         'order_notes',
-        'country',
-        'city',
-        'postcode',
-        'street_address',
+        'tracking_code',
+        
+        'address',
         'phone',
-        'email',
         'expected_delivery_date',
     ];
 
@@ -58,10 +56,7 @@ class Order extends Model
     public function getFullAddressAttribute()
     {
         return trim(implode(', ', array_filter([
-            $this->street_address,
-            $this->city,
-            $this->postcode,
-            $this->country,
+            $this->address,
         ])));
     }
 
