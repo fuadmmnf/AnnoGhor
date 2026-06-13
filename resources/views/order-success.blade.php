@@ -56,13 +56,13 @@
             margin: 20px 0;
             height: 1px;
         }
-        /* 🖨️ প্রিন্ট মোড কনফিগারেশন: প্রিন্ট করার সময় বাটন ও ব্যানার হাইড হয়ে পারফেক্ট পেপার সাইজ নিবে */
+        /* 🖨️ প্রিন্ট মোড কনফিগারেশন: প্রিন্ট করার সময় বাটন ও ব্যানার হাইড হয়ে পারফেক্ট পেপার সাইজ নিবে */
         @media print {
             body {
                 background: #fff !important;
                 color: #000 !important;
             }
-            .no-print, .main-header, .main-footer, .btn {
+            .no-print, .main-header, .main-footer, .btn, .alert {
                 display: none !important;
             }
             .invoice-card {
@@ -83,7 +83,7 @@
                 <div class="col-lg-9">
 
                     {{-- Guest Suggestion Banner --}}
-                    @if($order->isGuestOrder())
+                    @if(Auth::guest())
                         <div class="alert d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4 no-print"
                              style="background:#fff8e1; border:1px solid #E2B718; border-radius:12px; padding:16px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
                             <span style="color:#7a6000; font-weight:500; font-size: 14px;">
@@ -119,11 +119,14 @@
                         <div class="row mb-4">
                             <div class="col-sm-6 mb-3 mb-sm-0">
                                 <span style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 6px; letter-spacing: 0.5px;">Customer Details</span>
-                                <h6 class="fw-bold mb-1 text-dark" style="font-size: 16px;">{{ $order->guest_name ?? $order->user?->name ?? 'Guest User' }}</h6>
+                                <h6 class="fw-bold mb-1 text-dark" style="font-size: 16px;">{{ $order->guest_name ?? $order->user?->name ?? 'Customer' }}</h6>
                                 <p class="text-muted small mb-0" style="line-height: 1.5;">
-                                    Address: {{ $order->full_address }}<br>
-                                    Phone: {{ $order->phone }}<br>
-                                    Email: {{ $order->email }}
+                                    {{-- 💡 এখানে আপনার নতুন কলাম $order->address ব্যবহার করা হয়েছে --}}
+                                    <strong>Address:</strong> {{ $order->address ?? 'N/A' }}<br>
+                                    <strong>Phone:</strong> {{ $order->phone }}<br>
+                                    @if($order->user?->email)
+                                        <strong>Email:</strong> {{ $order->user->email }}
+                                    @endif
                                 </p>
                             </div>
 
@@ -149,7 +152,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse (collect($order->orderItems ?? $order->orderltems ?? []) as $index => $item)
+                                    {{-- 💡 কালেকশন জ্যাম দূর করতে রিয়েল রিলেশনটি কল করা হয়েছে --}}
+                                    @forelse ($order->orderItems as $index => $item)
                                         <tr>
                                             <td class="text-center text-muted" style="font-size: 13px;">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</td>
                                             <td>
@@ -226,3 +230,16 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fbq('track', 'Purchase', {
+                value: {{ $order->total_amount ?? 0 }}, 
+                currency: 'BDT', 
+                content_ids: ['{{ $order->order_number }}'], 
+                num_items: {{ $order->orderItems->count() ?? 1 }} 
+            });
+        });
+    </script>
+@endpush

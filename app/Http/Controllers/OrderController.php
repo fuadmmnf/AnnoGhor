@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use App\Mail\OrderInvoiceMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http; // 👈 স্টেডফাস্ট এপিআই কল করার জন্য নতুন যুক্ত করা হয়েছে
 use Throwable;
 
 class OrderController extends Controller
@@ -34,14 +35,11 @@ class OrderController extends Controller
 
     public function placeOrder(Request $request)
     {
+        // 💡 শুধুমাত্র নাম, ফোন, পেমেন্ট মেথড এবং এরিয়া ভ্যালিডেশন রাখা হয়েছে (বাকিগুলো বাদ)
         $request->validate([
             'name'           => 'required|string|max:255',
             'phone'          => 'required|string|max:20',
-            'email'          => 'required|email',
-            'country'        => 'required|string|max:100',
-            'city'           => 'nullable|string|max:100',
-            'postcode'       => 'nullable|string|max:20',
-            'street_address' => 'nullable|string|max:500',
+            'address'        => 'required|string|max:1000', // এড্রেস নেওয়া বাধ্যতামুলক করা হলো
             'payment_method' => 'required|string|in:Cash On Delivery',
             'order_notes'    => 'nullable|string',
             'delivery_area'  => 'required|string|in:inside,outside', 
@@ -116,6 +114,7 @@ class OrderController extends Controller
                 $orderNumber      = '#' . strtoupper(uniqid());
                 $expectedDelivery = now()->addDays(7)->toDateString();
 
+                // 💡 ডাটাবেজ কলামের সাথে ফর্ম ইনপুট ম্যাচিং করে ইনসার্ট
                 $order = Order::create([
                     'user_id'                => $isGuest ? null : Auth::id(),
                     'guest_token'            => $guestToken,
@@ -129,12 +128,8 @@ class OrderController extends Controller
                     'payment_status'         => 'Pending',
                     'order_status'           => 'Pending',
                     'order_notes'            => $request->order_notes,
-                    'country'                => $request->country,
-                    'city'                   => $request->city,
-                    'postcode'               => $request->postcode,
-                    'street_address'         => $request->street_address,
+                    'address'                => $request->address, // 💡 মাইগ্রেশন অনুযায়ী মূল এড্রেস কলাম
                     'phone'                  => $request->phone,
-                    'email'                  => $request->email,
                     'expected_delivery_date' => $expectedDelivery,
                 ]);
 
@@ -156,7 +151,7 @@ class OrderController extends Controller
                     'order_id'      => $order->id,
                     'status'        => 'Receiving orders',
                     'description'   => 'Your order has been received and is being processed.',
-                    'location'      => trim(($request->city ?? '') . ', ' . $request->country, ', '),
+                    'location'      => ($request->delivery_area === 'inside') ? 'Dhaka' : 'Outside Dhaka',
                     'tracking_date' => now(),
                 ]);
 
@@ -170,40 +165,27 @@ class OrderController extends Controller
                 $order->load(['user', 'orderltems.product']);
             }
 
-            // ৩. ইউজারের প্রোফাইল আপডেট
+            // ৩. ইউজারের প্রোফাইল আপডেট ( his ফোন এবং এড্রেস আপডেট হবে)
             if (!$isGuest) {
-                $userProfileData = [
-                    'country' => $request->country,
-                    'phone'   => $request->phone,
-                ];
-
-                if ($request->filled('city')) {
-                    $userProfileData['city'] = $request->city;
-                }
-                if ($request->filled('postcode')) {
-                    $userProfileData['postcode'] = $request->postcode;
-                }
-                if ($request->filled('street_address')) {
-                    $userProfileData['street_address'] = $request->street_address;
-                }
-
                 try {
-                    Auth::user()->update($userProfileData);
+                    Auth::user()->update([
+                        'phone'   => $request->phone,
+                        'address' => $request->address,
+                    ]);
                 } catch (\Throwable $profileError) {
                     Log::error('User profile update failed: ' . $profileError->getMessage());
                 }
             }
 
-            // ৪. মেইল পাঠানো
-            try {
-                $siteSettings = Setting::first() ?? new Setting();
-                Mail::to($order->email)->send(new OrderInvoiceMail($order, $siteSettings));
-            } catch (\Throwable $mailException) {
-                Log::warning('Order invoice email failed to send.', [
-                    'order_id' => $order->id,
-                    'email'    => $order->email,
-                    'error'    => $mailException->getMessage(),
-                ]);
+            // ৪. মেইল পাঠানো (ইমেইল ফিল্ড থাকলে পাঠাবে, না থাকলে স্কিপ করবে)
+            $userEmail = !empty(Auth::user()->email ?? '') ? (Auth::user()->email) : ($request->email ?? null);
+            if ($userEmail) {
+                try {
+                    $siteSettings = Setting::first() ?? new Setting();
+                    Mail::to($userEmail)->send(new OrderInvoiceMail($order, $siteSettings));
+                } catch (\Throwable $mailException) {
+                    Log::warning('Order invoice email failed to send: ' . $mailException->getMessage());
+                }
             }
 
             // ৫. কার্ট ক্লিয়ার করা
@@ -254,5 +236,122 @@ class OrderController extends Controller
         }
 
         return view('orders', compact('orders'));
+    }
+
+    /**
+          * 🚚 [NEW METHOD] অ্যাডমিন প্যানেল থেকে অর্ডারটি স্টেডফাস্ট কুরিয়ারে পুশ করার জন্য
+     */
+    public function sendToSteadfast($id)
+    {
+        $order = Order::findOrFail($id);
+        $phone = str_replace([' ', '-', '+88'], '', $order->phone);
+
+       
+        $customerName = $order->guest_name ?? ($order->user ? $order->user->name : 'Customer');
+
+       
+        try {
+            $response = Http::withHeaders([
+                'Api-Key'      => env('STEADFAST_API_KEY'),
+                'Secret-Key'   => env('STEADFAST_SECRET_KEY'),
+                'Content-Type' => 'application/json',
+            ])->post(env('STEADFAST_BASE_URL') . '/create_order', [
+                'invoice'           => (string) $order->order_number, 
+                'recipient_name'    => substr($customerName, 0, 100), 
+                'recipient_phone'   => $phone,                       
+                'recipient_address' => $order->address,              
+                'cod_amount'        => (float) $order->total_amount,  
+                'note'              => $order->order_notes ?? 'Please delivery fast', 
+            ]);
+
+            if ($response->successful()) {
+                $result = $response->json();
+
+                if (isset($result['status']) && $result['status'] == 200) {
+                    
+                    
+                    $order->update([
+                        'order_status'   => 'Processing', 
+                        'tracking_code'  => $result['consignment']['tracking_code'] ?? null, // [cite: 66]
+                    ]);
+
+                   
+                    OrderTracking::create([
+                        'order_id'      => $order->id,
+                        'status'        => 'Handed over to Courier',
+                        'description'   => 'Your order has been dispatched via Steadfast Courier. Tracking Code: ' . ($result['consignment']['tracking_code'] ?? ''),
+                        'location'      => 'Dhaka Hub',
+                        'tracking_date' => now(),
+                    ]);
+
+                    return back()->with('success', 'Order successfully sent to Steadfast Courier!');
+                }
+
+                return back()->with('error', 'Courier Error: ' . ($result['message'] ?? 'Unknown error occurred.'));
+            }
+
+            return back()->with('error', 'Failed to connect with Steadfast Courier API.');
+
+        } catch (\Exception $e) {
+            Log::error('Steadfast API Error: ' . $e->getMessage());
+            return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * 🔄 [NEW METHOD] যেকোনো সময় সিঙ্গেল ক্লিকের মাধ্যমে স্টেডফাস্ট থেকে লাইভ স্ট্যাটাস সিঙ্ক করার জন্য
+     */
+    public function checkSteadfastStatus($id)
+    {
+        $order = Order::findOrFail($id);
+
+        if (!$order->tracking_code) {
+            return back()->with('error', 'This order has not been sent to Steadfast yet.');
+        }
+
+        try {
+            // ইনভয়েস নম্বর (অথবা ট্র্যাকিং কোড) দিয়ে স্ট্যাটাস চেক করার এন্ডপয়েন্ট [cite: 201]
+            $response = Http::withHeaders([
+                'Api-Key'    => env('STEADFAST_API_KEY'),
+                'Secret-Key' => env('STEADFAST_SECRET_KEY'),
+            ])->get(env('STEADFAST_BASE_URL') . '/status_by_invoice/' . $order->order_number); // [cite: 201]
+
+            if ($response->successful()) {
+                $result = $response->json();
+
+                if (isset($result['status']) && $result['status'] == 200) {
+                    $courierStatus = $result['delivery_status']; // উদাহরণ: delivered, pending, cancelled, hold [cite: 218, 230]
+
+                    // স্টেডফাস্টের লাইভ রেসপন্স অনুযায়ী আপনার সিস্টেমে স্ট্যাটাস কনভার্ট করুন
+                    $mappedStatus = 'Processing';
+                    if ($courierStatus === 'delivered') {
+                        $mappedStatus = 'Delivered';
+                    } elseif (in_array($courierStatus, ['cancelled_approval_pending', 'unknown_approval_pending'])) {
+                        $mappedStatus = 'Cancelled';
+                    }
+
+                    // ডাটাবেজ আপডেট
+                    $order->update([
+                        'order_status' => $mappedStatus
+                    ]);
+
+                    // ট্র্যাকিং লগ আপডেট করা
+                    OrderTracking::create([
+                        'order_id'      => $order->id,
+                        'status'        => 'Courier Update: ' . ucfirst($courierStatus),
+                        'description'   => 'Live courier delivery status synced from Steadfast.',
+                        'location'      => 'Courier Hub',
+                        'tracking_date' => now(),
+                    ]);
+
+                    return back()->with('success', 'Order status updated successfully to: ' . $courierStatus);
+                }
+            }
+
+            return back()->with('error', 'Could not sync status from courier.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Status check failed: ' . $e->getMessage());
+        }
     }
 }

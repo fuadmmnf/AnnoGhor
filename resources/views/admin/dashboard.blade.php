@@ -3,14 +3,11 @@
 @section('title', 'Admin Dashboard')
 
 @section('content')
-    <!-- main-content -->
     <div class="main-content">
-        <!-- main-content-wrap -->
         <div class="main-content-inner">
-            <!-- main-content-wrap -->
             <div class="main-content-wrap">
-                <div class="tf-section-4 mb-30">
-                    <!-- chart-default -->
+                {{-- 🌟 টপ কার্ড সেকশন (৫টি কার্ডের জন্য গ্রিড লেআউট আপডেট করা হয়েছে) --}}
+                <div class="tf-section-4 mb-30" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
                     <div class="wg-chart-default">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap14">
@@ -38,8 +35,6 @@
                             <div id="line-chart-1"></div>
                         </div>
                     </div>
-                    <!-- /chart-default -->
-                    <!-- chart-default -->
                     <div class="wg-chart-default">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap14">
@@ -66,8 +61,6 @@
                             <div id="line-chart-2"></div>
                         </div>
                     </div>
-                    <!-- /chart-default -->
-                    <!-- chart-default -->
                     <div class="wg-chart-default">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap14">
@@ -95,8 +88,6 @@
                             <div id="line-chart-3"></div>
                         </div>
                     </div>
-                    <!-- /chart-default -->
-                    <!-- chart-default -->
                     <div class="wg-chart-default">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap14">
@@ -123,10 +114,26 @@
                             <div id="line-chart-4"></div>
                         </div>
                     </div>
-                    <!-- /chart-default -->
-                </div>
+                    {{-- 🌟 NEW: Steadfast Courier Balance Integration --}}
+                    <div class="wg-chart-default" style="border: 1px solid #10b981; background: #ecfdf5;">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap14">
+                                <div class="image type-white" style="background: #10b981; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="icon-truck" style="color: white; font-size: 24px;"></i>
+                                </div>
+                                <div>
+                                    <div class="body-text mb-2" style="color: #047857; font-weight: 600;">Steadfast Balance</div>
+                                    <h4 style="color: #065f46;">৳{{ number_format($steadfastBalance ?? 0, 2) }}</h4>
+                                </div>
+                            </div>
+                            <div class="box-icon-trending" style="background: none; box-shadow: none;">
+                                <i class="icon-check-circle" style="color: #10b981; font-size: 20px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
                 <div class="tf-section-5 mb-30">
-                    <!-- chart -->
                     <div class="wg-box">
                         <div class="flex items-center justify-between">
                             <h5>Recent Order</h5>
@@ -147,8 +154,6 @@
                         </div>
                         <div id="line-chart-5"></div>
                     </div>
-                    <!-- /chart -->
-
                     <div class="wg-box">
                         <div class="flex items-center justify-between">
                             <h5>Orders</h5>
@@ -216,7 +221,6 @@
                     </div>
                 </div>
                 <div class="tf-section-3">
-                    <!-- earnings -->
                     <div class="wg-box">
                         <div class="flex items-center justify-between">
                             <h5>Earnings</h5>
@@ -271,21 +275,15 @@
                         </div>
                         <div id="line-chart-6"></div>
                     </div>
-                    <!-- /earnings -->
-                </div>
+                    </div>
             </div>
-            <!-- /main-content-wrap -->
-        </div>
-        <!-- /main-content-wrap -->
-        <!-- bottom-page -->
+            </div>
         <div class="bottom-page">
-            <div class="body-text">Copyright © 2026 Earth Craft. All
+            <div class="body-text">Copyright © 2026 Annoghor. All
                 rights
                 reserved. Designed and Developed </div>
             {{-- <i class="icon-heart"></i> --}}
             <div class="body-text">by <a href="https://innovatechbd.net/">Innovatech</a></div>
         </div>
-        <!-- /bottom-page -->
-    </div>
-    <!-- /main-content -->
-@endsection
+        </div>
+    @endsection

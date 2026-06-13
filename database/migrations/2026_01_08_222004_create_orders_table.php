@@ -22,12 +22,9 @@ return new class extends Migration
             $table->enum('payment_status', ['Pending', 'Success', 'Failed'])->default('Pending');
             $table->enum('order_status', ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'])->default('Pending');
             $table->text('order_notes')->nullable();
-            $table->string('country');
-            $table->string('city')->nullable();
-            $table->string('postcode')->nullable();
-            $table->text('street_address')->nullable();
+            $table->text('address')->nullable();
             $table->string('phone');
-            $table->string('email');
+          
             $table->date('expected_delivery_date')->nullable();
             $table->timestamps();
         });
