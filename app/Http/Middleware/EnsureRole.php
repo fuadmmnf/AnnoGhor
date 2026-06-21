@@ -36,7 +36,8 @@ class EnsureRole
 
         return match ($role) {
             'customer' => 'user',
-            'superadmin', 'super-admin' => 'admin',
+            'superadmin', 'super-admin' => 'superadmin',
+            'admin' => 'admin',
             default => $role,
         };
     }

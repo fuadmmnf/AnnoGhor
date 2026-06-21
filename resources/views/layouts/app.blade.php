@@ -593,6 +593,127 @@
             padding: 0 !important;
             min-height: auto !important;
         }
+
+        /* ============================================= */
+        /* MOBILE STICKY COMPONENTS DESIGN TYPES */
+        /* ============================================= */
+        
+        /* 💡 ডিফল্টভাবে সব ডিভাইসের জন্য সম্পূর্ণ হাইড (লুকানো) থাকবে */
+        .mobile-floating-cart, 
+        .mobile-bottom-nav {
+            display: none !important;
+        }
+
+        /* 📱 শুধুমাত্র ৯৯১ পিক্সেল বা তার নিচের মোবাইল/ট্যাবলেট স্ক্রিনে এটি একটিভ হবে */
+        @media (max-width: 991.98px) {
+            
+            /* ১. ভাসমান কার্ট বোতাম */
+            .mobile-floating-cart {
+                display: flex !important; /* মোবাইলে শো করবে */
+                position: fixed;
+                right: 0;
+                top: 45%;
+                transform: translateY(-50%);
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-right: none;
+                border-top-left-radius: 8px;
+                border-bottom-left-radius: 8px;
+                box-shadow: -4px 4px 12px rgba(0,0,0,0.12);
+                z-index: 999;
+                flex-direction: column;
+                align-items: center;
+                width: 75px;
+                padding: 8px 0;
+                text-decoration: none !important;
+                transition: all 0.2s ease;
+            }
+            .mobile-floating-cart .cart-icon-wrap {
+                position: relative;
+                background: #f15922;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #fff;
+                font-size: 16px;
+                margin-bottom: 4px;
+            }
+            .mobile-floating-cart .cart-icon-wrap .badge {
+                position: absolute;
+                top: -6px;
+                right: -6px;
+                font-size: 10px;
+                padding: 3px 6px;
+                border-radius: 50%;
+            }
+            .mobile-floating-cart .cart-info-wrap {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .mobile-floating-cart .cart-info-wrap .item-text {
+                font-size: 11px;
+                color: #475569;
+                font-weight: 500;
+            }
+            .mobile-floating-cart .cart-info-wrap .price-text {
+                font-size: 13px;
+                color: #f15922;
+                font-weight: 700;
+                margin-top: 1px;
+            }
+
+            /* ২. মোবাইল বটম নেভিগেশন বার */
+            .mobile-bottom-nav {
+                display: flex !important; /* মোবাইলে শো করবে */
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: #ffffff;
+                border-top: 1px solid #e2e8f0;
+                height: 60px;
+                z-index: 9998;
+                box-shadow: 0 -4px 10px rgba(0,0,0,0.06);
+            }
+            .nav-item-box {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                color: #64748b;
+                text-decoration: none !important;
+                font-size: 11px;
+                font-weight: 600;
+                flex: 1;
+                height: 100%;
+                transition: all 0.2s ease;
+            }
+            .nav-item-box i {
+                font-size: 18px;
+                margin-bottom: 3px;
+            }
+            .nav-item-box.active {
+                color: #f15922;
+            }
+            .nav-cart-count {
+                position: absolute;
+                top: 6px;
+                right: 36%;
+                font-size: 9px;
+                padding: 2px 5px;
+                border-radius: 50%;
+                color: #fff;
+            }
+            
+            body {
+                padding-bottom: 60px !important;
+            }
+        }
     </style>
 
     <!-- Meta Pixel Code -->
@@ -997,7 +1118,58 @@
                 </div>
             </div>
         </div>
-    </header><main class="main-bg">
+    </header>
+   
+
+    <a href="{{ route('cart') }}" class="mobile-floating-cart d-lg-none">
+        <div class="cart-icon-wrap">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="badge cart-count bg-danger text-white">
+                {{ session()->has('cart') ? count(session()->get('cart')) : 0 }}
+            </span>
+        </div>
+        <div class="cart-info-wrap">
+            <span class="item-text"><span class="cart-count">{{ session()->has('cart') ? count(session()->get('cart')) : 0 }}</span> Items</span>
+            <span class="price-text">৳<span class="pro-total-amount">{{ session()->has('cart') ? array_sum(array_column(session()->get('cart'), 'total_price')) : '0.00' }}</span></span>
+        </div>
+    </a>
+
+    <div class="mobile-bottom-nav d-flex d-lg-none justify-content-around align-items-center">
+        <a href="{{ url('/') }}" class="nav-item-box {{ Request::is('/') ? 'active' : '' }}">
+            <i class="fas fa-home"></i>
+            <span>HOME</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item-box mobile-menu-trigger-btn">
+            <i class="fas fa-th-large"></i>
+            <span>MENU</span>
+        </a>
+        <a href="{{ route('cart') }}" class="nav-item-box position-relative {{ Request::is('cart*') ? 'active' : '' }}">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="badge nav-cart-count cart-count bg-danger">
+                {{ session()->has('cart') ? count(session()->get('cart')) : 0 }}
+            </span>
+            <span>CART</span>
+        </a>
+        <a href="{{ route('shops') }}?search=1" class="nav-item-box">
+            <i class="fas fa-search"></i>
+            <span>SEARCH</span>
+        </a>
+        @auth
+        <a href="{{ route('profile') }}" class="nav-item-box {{ Request::is('profile*') ? 'active' : '' }}">
+            <i class="fas fa-user"></i>
+            <span>ACCOUNT</span>
+        </a>
+        @else
+            <a href="{{ route('login') }}" class="nav-item-box {{ Request::is('login*') ? 'active' : '' }}">
+                <i class="fas fa-user"></i>
+                <span>ACCOUNT</span>
+            </a>
+        @endauth
+    </div>
+
+    
+    
+    <main class="main-bg">
         @yield('content')
     </main>
 
@@ -1015,15 +1187,15 @@
                                 <div class="widget-content">
                                     <img src="{{ isset($siteSettings->site_logo) ? asset('uploads/settings/' . $siteSettings->site_logo) : asset('assets/images/logo/logo-main.png') }}"
                                         alt="{{ $siteSettings->site_name ?? config('app.name') }} Logo" style="height: 100px; object-fit: contain;">
-                                    <p>AnnoGhor is an exciting International brand we provide high quality cloths</p>
+                                    <p>100% organic products</p>
                                     <ul class="ct-info-list mb-30">
                                         <li>
                                             <i class="fas fa-envelope"></i>
-                                            <a href="mailto:info@mydomain.com">info@mydomain.com</a>
+                                            <a href="mailto:info@mydomain.com">annoghor@gmail.com</a>
                                         </li>
                                         <li>
                                             <i class="fas fa-phone-alt"></i>
-                                            <a href="mailto:info@mydomain.com">info@mydomain.com</a>
+                                            <a href="tel:+880170090059">0170090059</a>
                                         </li>
                                     </ul>
                                     <ul class="social-link">
@@ -1050,9 +1222,9 @@
                                     <h4 class="widget-title">Customer Services</h4>
                                     <ul class="widget-menu">
                                         <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="#">Collections & Delivery</a></li>
-                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="#">Returns & Refunds</a></li>
-                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="#">Terms & Conditions</a></li>
-                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="#">Delivery Return</a></li>
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route("returns") }}">Returns & Refunds</a></li>
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('terms') }}">Terms & Conditions</a></li>
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('delivery.return') }}">Delivery Return</a></li>
                                         <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="#">Store Locations</a></li>
                                     </ul>
                                 </div>
@@ -1063,11 +1235,11 @@
                                 <div class="widget-content">
                                     <h4 class="widget-title">Quick Link</h4>
                                     <ul class="widget-menu">
-                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="#">Privacy Policy</a></li>
-                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="#">Terms Of Use</a></li>
-                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="#">FAQ</a></li>
-                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="#">Contact</a></li>
-                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="#">Login / Register</a></li>
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('privacy.policy') }}">Privacy Policy</a></li>
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('terms.of.use') }}">Terms Of Use</a></li>
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('faq') }}">FAQ</a></li>
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('contact') }}">Contact</a></li>
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('login') }}">Login / Register</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -1077,17 +1249,10 @@
                                 <h4 class="widget-title">Working Hours</h4>
                                 <div class="widget-content working-hours">
                                     <div class="hour-item">
-                                        <span class="day">Monday – Friday</span>
-                                        <span class="time">9:00 AM – 8:00 PM</span>
+                                        <span class="day">7 days</span>
+                                        <span class="time">24 hours</span>
                                     </div>
-                                    <div class="hour-item">
-                                        <span class="day">Saturday</span>
-                                        <span class="time">10:00 AM – 6:00 PM</span>
-                                    </div>
-                                    <div class="hour-item closed">
-                                        <span class="day">Sunday</span>
-                                        <span class="time">Closed</span>
-                                    </div>
+                
                                 </div>
                             </div>
                         </div>
@@ -1146,6 +1311,13 @@
             // Mobile menu user section
             $('.navbar-toggler').on('click', function() {
                 $('.user-account').toggleClass('mobile-visible');
+            });
+
+            $('.mobile-menu-trigger-btn').on('click', function(e) {
+                e.preventDefault();
+                
+                // থিমের মেইন মোবাইল নেভিগেশন টগলার বোতামটিকে অটো-ক্লিক (Trigger) করাবে
+                $('.navbar-toggler').trigger('click'); 
             });
         });
     </script>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use App\Models\Subcategory;
 use Illuminate\Http\RedirectResponse;
@@ -36,8 +37,10 @@ class ProductController extends Controller
             ->with(['category', 'subcategory', 'images'])
             ->limit(4)
             ->get();
-
-        return view('product-details', compact('product', 'relatedProducts'));
+        
+        $productsReviews = Review::where('product_id', $product->id)->where('is_active', 1)->latest()->get();  
+          
+        return view('product-details', compact('product', 'relatedProducts', 'productsReviews'));
     }
 
     public function showDetailsById(Product $product): RedirectResponse|\Illuminate\View\View

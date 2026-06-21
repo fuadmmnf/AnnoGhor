@@ -324,7 +324,7 @@
             </div>
         </div>
         <div class="bottom-page">
-            <div class="body-text">Copyright © 2026 Earth Craft. All rights reserved. Designed and Developed </div>
+            <div class="body-text">Copyright © Annoghor. All rights reserved. Designed and Developed </div>
             <div class="body-text">by <a href="https://innovatechbd.net/">Innovatech</a></div>
         </div>
     </div>

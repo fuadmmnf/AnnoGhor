@@ -40,14 +40,14 @@
 
                                             {{-- Name --}}
                                             <div class="col-lg-12">
-                                                <div class="form-group">
-                                                    <label>Full Name</label>
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label">Full Name</label>
                                                     @auth
-                                                        <input type="text" class="form_control"
+                                                        <input type="text" class="form-control"
                                                                value="{{ auth()->user()->name }}"
                                                                name="name" required readonly>
                                                     @else
-                                                        <input type="text" class="form_control"
+                                                        <input type="text" class="form-control"
                                                                placeholder="Your full name"
                                                                name="name" required
                                                                value="{{ old('name') }}">
@@ -57,15 +57,15 @@
 
                                             {{-- Phone --}}
                                             <div class="col-lg-6">
-                                                <div class="form_group">
-                                                    <label>Phone Number</label>
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label">Phone Number</label>
                                                     @auth
-                                                        <input type="text" class="form_control"
+                                                        <input type="text" class="form-control"
                                                                placeholder="Ex: +880 1XXX-XXXXXX"
                                                                value="{{ auth()->user()->phone }}"
                                                                name="phone" required>
                                                     @else
-                                                        <input type="text" class="form_control"
+                                                        <input type="text" class="form-control"
                                                                placeholder="Ex: +880 1XXX-XXXXXX"
                                                                name="phone" required
                                                                value="{{ old('phone') }}">
@@ -73,26 +73,22 @@
                                                 </div>
                                             </div>
 
-
-
                                             {{-- Address --}}
                                             <div class="col-lg-6">
-                                                <div class="form_group">
-                                                    <label>Address</label>
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label">Address</label>
                                                     @auth
-                                                        <input type="text" class="form_control"
+                                                        <input type="text" class="form-control"
                                                                value="{{ auth()->user()->address }}"
-                                                               name="address">
+                                                               name="address" required>
                                                     @else
-                                                        <input type="text" class="form_control"
+                                                        <input type="text" class="form-control"
                                                                placeholder="Address"
-                                                               name="address"
+                                                               name="address" required
                                                                value="{{ old('address') }}">
                                                     @endauth
                                                 </div>
                                             </div>
-
-                                            
 
                                             {{-- 🚚 ডাইনামিক চেকমার্ক (Radio Card) সেকশন --}}
                                             <div class="col-lg-12 mt-3 mb-3">
@@ -120,9 +116,9 @@
 
                                             {{-- Order Notes --}}
                                             <div class="col-lg-12">
-                                                <div class="form_group">
-                                                    <label>Order Notes (optional)</label>
-                                                    <textarea name="order_notes" class="form_control"
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label">Order Notes (optional)</label>
+                                                    <textarea name="order_notes" class="form-control" rows="3"
                                                               placeholder="e.g. special notes for delivery.">{{ old('order_notes') }}</textarea>
                                                 </div>
                                             </div>
@@ -179,16 +175,16 @@
 
                                     <div class="payment-method-wrapper">
                                         <h4 class="title mb-20">Payment Method</h4>
-                                        <ul id="paymentMethod" class="mb-20">
+                                        <ul id="paymentMethod" class="mb-20 list-unstyled">
                                             <li class="form-check mb-0 p-0">
-                                                <div class="d-block w-100 p-3 mb-0">
+                                                <div class="d-block w-100 p-3 mb-0" style="background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
                                                     <input type="hidden" name="payment_method" value="Cash On Delivery">
-                                                    <span class="form-check-label fw-medium">Cash On Delivery</span>
-                                                    <p class="mt-2 mb-0">Pay with cash upon delivery.</p>
+                                                    <span class="form-check-label fw-medium text-dark">Cash On Delivery</span>
+                                                    <p class="mt-2 mb-0 text-muted small">Pay with cash upon delivery.</p>
                                                 </div>
                                             </li>
                                         </ul>
-                                        <button id="place-order-btn" type="submit" class="theme-btn style-one">Place Order</button>
+                                        <button id="place-order-btn" type="submit" class="theme-btn style-one w-100">Place Order</button>
                                     </div>
                                 </div>
 
@@ -203,16 +199,17 @@
 
 @push('scripts')
     <script>
-
         document.addEventListener('DOMContentLoaded', function () {
-            fbq('track', 'InitiateCheckout');
-        });
-        
+            if (typeof fbq !== 'undefined') {
+                fbq('track', 'InitiateCheckout');
+            }
+        }); // <-- এখানে ব্র্যাকেট ক্লোজিং ফিক্স করা হয়েছে
+
         var insideDhakaCharge = 0;
         var outsideDhakaCharge = 0;
         var isChargesApiReady = false;
 
-        // ১. ন্যাটিভ ভ্যানিলা জেএস দিয়ে এপিআই কল (যাতে কনসোলে অন্য এরর থাকলেও এটি ব্যাকগ্রাউন্ডে কাজ সম্পন্ন করতে পারে)
+        // ১. ন্যাটিভ ভ্যানিলা জেএস দিয়ে এপিআই কল
         function fetchDynamicCharges() {
             fetch('{{ route("api.delivery-charges") }}')
                 .then(function(res) {
@@ -227,14 +224,14 @@
                     document.getElementById('inside-cost-text').innerText = '৳' + insideDhakaCharge.toFixed(2);
                     document.getElementById('outside-cost-text').innerText = '৳' + outsideDhakaCharge.toFixed(2);
 
-                    // ইউজার যদি এপিআই লোড শেষ হওয়ার আগেই রেডিও সিলেক্ট করে ফেলে, তবে দাম অটোমেটিক আপডেট হবে
+                    // ইউজার যদি এপিআই লোড শেষ হওয়ার আগেই রেডিও সিলেক্ট করে ফেলে, তবে দাম অটোমেটিক আপডেট হবে
                     var checkedInput = document.querySelector('.delivery-radio:checked');
                     if (checkedInput) {
                         calculateLiveTotal(checkedInput);
                     }
                 })
                 .catch(function(err) {
-                    // ফলব্যাক সেফটি রেট (যদি কোনো কারণে এপিআই ব্লক হয়)
+                    // ফলব্যাক সেফটি রেট
                     insideDhakaCharge = 60;
                     outsideDhakaCharge = 120;
                     isChargesApiReady = true;
@@ -243,7 +240,7 @@
                 });
         }
 
-        // পেজ লোড হওয়ার সাথে সাথেই এপিআই থেকে রিয়েল প্রাইস নিয়ে আসবে
+        // পেজ লোড হওয়ার সাথে সাথেই এপিআই থেকে রিয়েল প্রাইস নিয়ে আসবে
         window.addEventListener('DOMContentLoaded', fetchDynamicCharges);
 
         // ২. লাইভ গ্র্যান্ড টোটাল ও শিপিং কস্ট রেন্ডারিং মেকানিজম
@@ -261,7 +258,7 @@
                 targetCard.style.background = '#fffbf9';
             }
 
-            // যদি এপিআই ডেটা লোড হতে কয়েক মিলি সেকেন্ড দেরি হয়
+            // যদি এপিআই ডেটা লোড হতে কয়েক মিলি সেকেন্ড দেরি হয়
             if (!isChargesApiReady) {
                 document.getElementById('shipping-cost-display').innerText = 'Calculating...';
                 return;

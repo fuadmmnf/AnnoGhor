@@ -36,7 +36,7 @@ class AuthController extends Controller
             // === লগইন সফল হওয়ার পর কার্ট মার্জ করা হচ্ছে ===
             $this->mergeCartToDatabase($user);
 
-            if ($user->role === 'admin') {
+            if (in_array(strtolower($user->role), ['admin', 'superadmin'])) {
                 return redirect()->route('admin.dashboard');
             }
 

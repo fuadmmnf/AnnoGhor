@@ -231,7 +231,7 @@
         </div>
 
         <div class="bottom-page">
-            <div class="body-text">Copyright © 2026 Earth Craft. All
+            <div class="body-text">Copyright © 2026 Annoghor. All
                 rights
                 reserved. Designed and Developed </div>
             {{-- <i class="icon-heart"></i> --}}
