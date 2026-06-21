@@ -410,9 +410,7 @@
                                 @endif
                             </div>
 
-                            <div class="summernote-content text-muted mb-4" style="font-size: 15px; line-height: 1.7;">
-                                {!! $product->description ?? '<p>No description available.</p>' !!}
-                            </div>
+                           
 
                             <div class="product-cart-variation mt-4 pt-2">
                                 <div class="d-flex align-items-center mb-4 flex-wrap gap-3">
@@ -505,31 +503,61 @@
 
                                     <div class="tab-pane fade" id="reviews">
                                         <div class="pesco-comment-area">
-                                            <h5 class="fw-bold text-dark mb-4">Customer Reviews</h5>
+                                            <h5 class="fw-bold text-dark mb-4">Customer Reviews ({{ $productsReviews->count() }})</h5>
+                                            
                                             <ul class="list-unstyled p-0 m-0">
-                                                @for ($i = 1; $i <= 2; $i++)
+                                                @forelse ($productsReviews as $review)
                                                     <li class="comment mb-3">
                                                         <div class="pesco-reviews-item">
-                                                            <div class="d-flex align-items-center gap-3 mb-3">
-                                                                <div class="author-thumb">
-                                                                    <img src="{{ asset('assets/images/products/review-' . $i . '.jpg') }}" onerror="this.src='https://placehold.co/48x48?text=U'" alt="Author">
+                                                            <div class="d-flex align-items-center gap-3 mb-3" style="display: flex; align-items: center;">
+                                                                
+                                                                <!-- কাস্টমারের প্রোফাইল ইমেজ -->
+                                                                <div class="author-thumb" style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; margin-right: 15px;">
+                                                                    @if($review->reviewer_image)
+                                                                        <img src="{{ asset('storage/' . $review->reviewer_image) }}" alt="Author" style="width: 100%; height: 100%; object-fit: cover;">
+                                                                    @else
+                                                                        <img src="https://placehold.co/48x48?text={{ substr($review->reviewer_name, 0, 1) }}" alt="Author" style="width: 100%; height: 100%; object-fit: cover;">
+                                                                    @endif
                                                                 </div>
+
                                                                 <div class="author-info">
-                                                                    <h6 class="fw-bold text-dark mb-1">Verified Buyer {{ $i }}</h6>
-                                                                    <div class="d-flex align-items-center gap-2">
-                                                                        <div class="text-warning small">
-                                                                            @for ($j = 1; $j <= 5; $j++) <i class="fas fa-star"></i> @endfor
+                                                                    <!-- কাস্টমারের নাম এবং ভেরিফাইড ব্যাজ -->
+                                                                    <h6 class="fw-bold text-dark mb-1" style="margin: 0 0 5px 0;">
+                                                                        {{ $review->reviewer_name }} 
+                                                                        @if($review->order_id)
+                                                                            <small class="text-success" style="font-size: 11px; font-weight: 600; margin-left: 5px;"><i class="fas fa-check-circle"></i> Verified Buyer</small>
+                                                                        @endif
+                                                                    </h6>
+                                                                    
+                                                                    <div class="d-flex align-items-center gap-2" style="display: flex; align-items: center;">
+                                                                        <!-- ডাইনামিক স্টার রেটিং মেকানিজম -->
+                                                                        <div class="text-warning small" style="color: #ffb703; margin-right: 10px;">
+                                                                            @for ($j = 1; $j <= 5; $j++)
+                                                                                @if($j <= $review->rating)
+                                                                                    <i class="fas fa-star"></i>
+                                                                                @else
+                                                                                    <i class="far fa-star"></i>
+                                                                                @endif
+                                                                            @endfor
                                                                         </div>
-                                                                        <small class="text-muted">{{ now()->subDays(rand(1, 10))->format('d M Y') }}</small>
+                                                                        <!-- রিভিউ দেওয়ার সময় (Diff for humans যেমন: 2 days ago) -->
+                                                                        <small class="text-muted" style="font-size: 12px;">{{ $review->created_at->diffForHumans() }}</small>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="author-review-content text-muted small">
-                                                                <p class="mb-0">Excellent product with great quality. Fully satisfied with the quick packaging and original product delivery.</p>
+
+                                                            <!-- রিভিউর মূল টেক্সট -->
+                                                            <div class="author-review-content text-muted small" style="margin-top: 10px; font-size: 14px; line-height: 1.6;">
+                                                                <p class="mb-0" style="color: #444;">{{ $review->review_text }}</p>
                                                             </div>
                                                         </div>
                                                     </li>
-                                                @endfor
+                                                @empty
+                                                    <!-- যদি কোনো কাস্টমার রিভিউ না দিয়ে থাকে -->
+                                                    <li class="text-center py-4" style="list-style: none;">
+                                                        <p class="text-muted" style="font-style: italic;">No reviews yet for this product. Be the first to share your experience!</p>
+                                                    </li>
+                                                @endforelse
                                             </ul>
                                         </div>
                                     </div>

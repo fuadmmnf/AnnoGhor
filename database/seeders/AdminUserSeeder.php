@@ -14,7 +14,7 @@ class AdminUserSeeder extends Seeder
             'name' => 'Upama',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('admin123'),
-            'role' => 'admin',
+            'role' => 'superadmin',
         ]);
     }
 }

@@ -16,11 +16,14 @@ class AdminMiddleware
 
         $user = Auth::user();
 
-        if (!$user || $user->role !== 'admin') {
+        if (!$user || !in_array($user->role, ['admin', 'superadmin'])) {
             abort(403, 'Unauthorized access.');
         }
 
         return $next($request);
     }
+
+
+  
 }
 

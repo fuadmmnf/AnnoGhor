@@ -130,4 +130,26 @@ class HomeController extends Controller
 
         return back()->with('success', 'Profile updated successfully!');
     }
+
+
+    public function returns(){
+        return view('return-refund');
+    }
+
+    public function terms() {
+        return view('terms');
+    }
+
+    public function deliveryReturn() {
+        return view('delivery-return');
+    }
+
+
+    public function privacyPolicy() {
+        return view('privacy-policy');
+    }
+
+    public function termsOfUse() {
+        return view('terms-of-use');
+    }
 }

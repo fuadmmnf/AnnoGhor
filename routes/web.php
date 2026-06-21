@@ -17,6 +17,7 @@ use App\Http\Controllers\FaqController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ReviewController as UserReviewController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\HeadlineController;
 use App\Http\Controllers\Admin\ReportController;
@@ -31,7 +32,7 @@ Route::get('/admin/login', [AuthController::class, 'showLogin'])->name('admin.lo
 Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.submit');
 Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     // Admin Product Routes
@@ -121,10 +122,13 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('/admin/messages/{id}', [ContactMessageController::class, 'destroy'])->name('admin.messages.destroy');
     Route::get('/admin/notifications/unread-messages', [ContactMessageController::class, 'getUnreadMessages'])->name('notifications.unread-messages');
 
-    // Admin User Routes
+    Route::middleware('role:superadmin')->group(function () {
+        // Admin User Routes
     Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin.all-user');
+    Route::post('/admin/users/{id}/update-role', [AdminUserController::class, 'updateRole'])->name('admin.all-user.update-role');
     Route::delete('/admin/users/{id}/delete', [AdminUserController::class, 'destroy'])->name('admin.all-user.delete');
 
+    });
     // Currency Settings
     Route::get('/admin/currency-settings', [App\Http\Controllers\Admin\CurrencySettingController::class, 'index'])->name('admin.currency-settings.index');
     Route::post('/admin/currency-settings/store', [App\Http\Controllers\Admin\CurrencySettingController::class, 'store'])->name('admin.currency-settings.store');
@@ -176,6 +180,7 @@ Route::get('/order/success/{order}', [OrderController::class, 'orderSuccess'])->
 // ===== Auth Only Routes =====
 Route::middleware(['auth.user', 'role:user'])->group(function () {
     Route::get('/my-orders', [OrderController::class, 'userOrders'])->name('user.orders');
+    Route::post('/review', [UserReviewController::class, 'storeCustomerReview'])->name('store.review');
 
     Route::get('/wishlist', [App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist');
     Route::post('/wishlist/toggle', [App\Http\Controllers\WishlistController::class, 'toggle'])->name('wishlist.toggle');
@@ -207,6 +212,13 @@ Route::get('/{cat_slug}/{subcat_slug}/{prod_slug}', [ProductController::class, '
 
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/faq', [FaqController::class, 'index'])->name('faq');
+Route::get('/returns-refunds', [HomeController::class, 'returns'])->name('returns');
+Route::get('/delivery-return', [HomeController::class, 'deliveryReturn'])->name('delivery.return');
+Route::get('/terms-and-conditions', [HomeController::class, 'terms'])->name('terms');
+Route::get('/privacy-policy', [HomeController::class, 'privacyPolicy'])->name('privacy.policy');
+Route::get('/terms-of-use', [HomeController::class, 'termsOfUse'])->name('terms.of.use');
+// Route::get('/store-locations', [HomeController::class, 'locations'])->name('locations');
+// Route::get('/collections-delivery', [HomeController::class, 'collections'])->name('collections');
 Route::get('/new-arrivals', [App\Http\Controllers\HomeController::class, 'newArrivals'])->name('new-arrivals');
 
 // Checkout page delivery charge API

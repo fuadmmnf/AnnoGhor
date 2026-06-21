@@ -186,15 +186,29 @@
                             <div class="body-title">Order Status</div>
                             <form action="{{ route('admin.order.update-status', $order->id) }}" method="POST">
                                 @csrf
-                                <select name="order_status" class="form-control mb-2" required>
-                                    <option value="Pending" {{ $order->order_status === 'Pending' ? 'selected' : '' }}>Pending</option>
-                                    <option value="Processing" {{ $order->order_status === 'Processing' ? 'selected' : '' }}>Processing</option>
-                                    <option value="Shipped" {{ $order->order_status === 'Shipped' ? 'selected' : '' }}>Shipped</option>
-                                    <option value="Delivered" {{ $order->order_status === 'Delivered' ? 'selected' : '' }}>Delivered</option>
-                                    <option value="Cancelled" {{ $order->order_status === 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
-                                </select>
-                                <button type="submit" class="tf-button style-1 w-full mb-2">Update Status</button>
-                            </</form>
+                                
+                                <div class="form-group mb-3">
+                                    <label class="body-title mb-1" style="font-size: 14px; font-weight: bold;">Order Status</label>
+                                    <select name="order_status" class="form-control" required>
+                                        <option value="Pending" {{ $order->order_status === 'Pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="Processing" {{ $order->order_status === 'Processing' ? 'selected' : '' }}>Processing</option>
+                                        <option value="Shipped" {{ $order->order_status === 'Shipped' ? 'selected' : '' }}>Shipped</option>
+                                        <option value="Delivered" {{ $order->order_status === 'Delivered' ? 'selected' : '' }}>Delivered</option>
+                                        <option value="Cancelled" {{ $order->order_status === 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="body-title mb-1" style="font-size: 14px; font-weight: bold;">Payment Status</label>
+                                    <select name="payment_status" class="form-control" required>
+                                        <option value="Pending" {{ $order->payment_status === 'Pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="Success" {{ $order->payment_status === 'Success' ? 'selected' : '' }}>Success</option>
+                                        <option value="Failed" {{ $order->payment_status === 'Failed' ? 'selected' : '' }}>Failed</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="tf-button style-1 w-full mb-2">Update Order & Payment</button>
+                            </form>
 
                             @if($order->expected_delivery_date)
                                 <div class="body-title-2 tf-color-2 mt-3">
@@ -212,7 +226,7 @@
         </div>
 
         <div class="bottom-page">
-            <div class="body-text">Copyright © 2026 Earth Craft. All rights reserved. Designed and Developed </div>
+            <div class="body-text">Copyright © 2026 Annoghor. All rights reserved. Designed and Developed </div>
             <div class="body-text">by <a href="https://innovatechbd.net/">Innovatech</a></div>
         </div>
     </div>

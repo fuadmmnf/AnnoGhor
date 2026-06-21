@@ -47,10 +47,29 @@
         }
         
         /* Table Styling */
-        .table { min-width: 800px; } /* Ensures readability on small screens */
+        .table { min-width: 900px; } /* Slightly increased to fit the role selector smoothly */
         .table-hover tbody tr:hover {
             background-color: #f9f9f9 !important;
             transition: 0.3s;
+        }
+
+        /* Role Select Dropdown Custom Styling */
+        .role-select {
+            height: 36px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            padding: 0 10px;
+            cursor: pointer;
+            border: 1px solid #cbd5e1;
+            background-color: #f8fafc;
+            color: #334155;
+            transition: all 0.2s;
+        }
+        .role-select:focus {
+            outline: none;
+            border-color: #2377FC;
+            box-shadow: 0 0 0 3px rgba(35, 119, 252, 0.15);
         }
     </style>
 
@@ -72,9 +91,18 @@
                     </ul>
                 </div>
 
+                {{-- Success Message Alert --}}
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert" style="font-size: 16px; border-radius: 8px;">
                         <strong>Success!</strong> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                {{-- Error Message Alert --}}
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="font-size: 16px; border-radius: 8px;">
+                        <strong>Error!</strong> {{ session('error') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
@@ -109,7 +137,8 @@
                                 <tr style="background-color: #f8f9fa;">
                                     <th class="text-center" style="padding: 15px; font-size: 14px; color: #444; border-bottom: 2px solid #eee;">No.</th>
                                     <th style="padding: 15px; font-size: 14px; color: #444; border-bottom: 2px solid #eee;">User Details</th>
-                                    <th style="padding: 25px; width:25%; font-size: 14px; color: #444; border-bottom: 2px solid #eee;">Email Address</th>
+                                    <th style="padding: 15px; font-size: 14px; color: #444; border-bottom: 2px solid #eee;">Email Address</th>
+                                    <th style="padding: 15px; font-size: 14px; color: #444; border-bottom: 2px solid #eee;">Role Management</th>
                                     <th style="padding: 15px; font-size: 14px; color: #444; border-bottom: 2px solid #eee;">Joined Date</th>
                                     <th class="text-center" style="padding: 15px; font-size: 14px; color: #444; border-bottom: 2px solid #eee;">Orders</th>
                                     <th class="text-center" style="padding: 15px; font-size: 14px; color: #444; border-bottom: 2px solid #eee;">Action</th>
@@ -124,8 +153,23 @@
                                         <td style="padding: 15px;">
                                             <div style="font-size: 16px; font-weight: 700; color: #333;">{{ $user->name }}</div>
                                         </td>
-                                        <td style="padding: 25px; width:25%; font-size: 15px; color: #555;">
+                                        <td style="padding: 15px; font-size: 15px; color: #555;">
                                             {{ $user->email }}
+                                        </td>
+                                        
+                                        {{-- রোল আপডেট ড্রপডাউন কলাম --}}
+                                        <td style="padding: 15px;">
+                                            @if($user->role === 'superadmin')
+                                                <span class="badge bg-dark" style="padding: 8px 12px; font-size: 13px;">Super Admin</span>
+                                            @else
+                                                <form action="{{ route('admin.all-user.update-role', $user->id) }}" method="POST" onchange="this.submit()">
+                                                    @csrf
+                                                    <select name="role" class="role-select" style="{{ $user->role === 'admin' ? 'border-color: #ef4444; color: #ef4444; background-color: #fef2f2;' : '' }}">
+                                                        <option value="user" {{ $user->role === 'user' ? 'selected' : '' }}>User / Customer</option>
+                                                        <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
+                                                    </select>
+                                                </form>
+                                            @endif
                                         </td>
                                         <td style="padding: 15px; font-size: 15px; color: #555;">
                                             {{ $user->created_at->format('M d, Y') }}
@@ -142,16 +186,17 @@
                                             @endif
                                         </td>
                                         <td class="text-center" style="padding: 15px;">
+                                            {{-- 🌟 ডিলিট বাটন --}}
                                             <a href="javascript:void(0)" 
                                                style="display: inline-block; background: #fff1f0; color: #ff4d4f; padding: 10px; border-radius: 8px; border: 1px solid #ffa39e;"
-                                               onclick="deleteUser({{ $user->id }}, '{{ $user->name }}', {{ $user->orders_count }})">
+                                               onclick="deleteUser({{ $user->id }}, '{{ addslashes($user->name) }}', {{ $user->orders_count }})">
                                                 <i class="icon-trash-2" style="font-size: 18px;"></i>
                                             </a>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-5" style="font-size: 16px; color: #999;">No records found.</td>
+                                        <td colspan="7" class="text-center py-5" style="font-size: 16px; color: #999;">No records found.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -174,11 +219,32 @@
         </div>
 
         <div class="bottom-page">
-            <div class="body-text">Copyright © 2026 Earth Craft. All
-                rights
-                reserved. Designed and Developed </div>
-            {{-- <i class="icon-heart"></i> --}}
+            <div class="body-text">Copyright © Annoghor. All rights reserved. Designed and Developed </div>
             <div class="body-text">by <a href="https://innovatechbd.net/">Innovatech</a></div>
         </div>
     </div>
+
+    {{-- 🌟 [GHOST FORM] ব্যাকগ্রাউন্ডে ডিলিট রিকোয়েস্ট পাঠানোর জন্য এই অদৃশ্য ফর্মটি দরকার --}}
+    <form id="delete-user-form" action="" method="POST" style="display: none;">
+        @csrf
+        @method('DELETE')
+    </form>
 @endsection
+
+{{-- 🌟 জাভাস্ক্রিপ্ট মেকানিজম অ্যাক্টিভেশন জোন --}}
+<script>
+    function deleteUser(userId, userName, ordersCount) {
+        if (ordersCount > 0) {
+            alert("দুঃখিত! '" + userName + "' এর নামে " + ordersCount + " টি অর্ডার সচল আছে। অর্ডার থাকা অবস্থায় কোনো ইউজার ডিলিট করা সম্ভব নয়।");
+            return;
+        }
+
+        var confirmDelete = confirm("আপনি কি নিশ্চিতভাবে '" + userName + "' কে ডিলিট করতে চান? এই অ্যাকশনটি আর ফেরত আনা যাবে না!");
+        
+        if (confirmDelete) {
+            var form = document.getElementById('delete-user-form');
+            form.action = '/admin/users/' + userId + '/delete';
+            form.submit();
+        }
+    }
+</script>
