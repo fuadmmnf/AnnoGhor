@@ -713,6 +713,101 @@
             body {
                 padding-bottom: 60px !important;
             }
+
+
+            /* ============================================= */
+        /* 🔍 ULTRA-FIXED MOBILE SEARCH POPUP STYLES */
+        /* ============================================= */
+        
+        /* ডিফল্ট অবস্থায় সব ডিভাইসে সার্চের এই পার্টটি সম্পূর্ণ অদৃশ্য থাকবে */
+        .mobile-search-overlay {
+            display: none !important;
+            position: fixed !important;
+            z-index: 999999 !important; /* সর্বোচ্চ লেয়ারে রাখা হলো */
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background-color: rgba(0, 0, 0, 0.6) !important; /* কালো ঝাপসা ব্যাকগ্রাউন্ড */
+            backdrop-filter: blur(4px) !important;
+        }
+
+        /* পপআপের ভেতরের সাদা কার্ড বক্স */
+        .mobile-search-box-card {
+            background: #ffffff !important;
+            margin: 100px auto !important; /* উপর থেকে ১০০ পিক্সেল নিচে নামবে */
+            padding: 25px !important;
+            border-radius: 12px !important;
+            width: 90% !important;
+            max-width: 450px !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important;
+            position: relative !important;
+            box-sizing: border-box !important;
+            animation: searchSlideDown 0.3s ease-out !important;
+        }
+
+        @keyframes searchSlideDown {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* ক্লোজ বোতাম (ক্রস বাটন) */
+        .mobile-search-close-btn {
+            position: absolute !important;
+            right: 15px !important;
+            top: 10px !important;
+            font-size: 30px !important;
+            color: #999 !important;
+            border: none !important;
+            background: transparent !important;
+            cursor: pointer !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+        }
+        .mobile-search-close-btn:hover {
+            color: #000 !important;
+        }
+
+        /* সার্চ ইনপুট ফিল্ড */
+        .custom-popup-search-input {
+            width: 100% !important;
+            padding: 12px 60px 12px 15px !important; /* ডানে বাটনের জন্য জায়গা রাখা হয়েছে */
+            border: 1px solid #ccc !important;
+            border-radius: 8px !important;
+            font-size: 15px !important;
+            outline: none !important;
+            background: #fff !important;
+            color: #333 !important;
+            box-sizing: border-box !important;
+            height: 48px !important;
+        }
+        .custom-popup-search-input:focus {
+            border-color: #f15922 !important; /* থিম ফোকাস কালার */
+            box-shadow: 0 0 0 3px rgba(241, 89, 34, 0.1) !important;
+        }
+
+        /* সার্চ ফর্মে থাকা সাবমিট বাটন */
+        .custom-popup-search-btn {
+            position: absolute !important;
+            right: 5px !important;
+            top: 5px !important;
+            bottom: 5px !important;
+            background: #f15922 !important; /* থিম অরেঞ্জ কালার */
+            color: #fff !important;
+            border: none !important;
+            width: 45px !important;
+            height: 38px !important;
+            border-radius: 6px !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 15px !important;
+            padding: 0 !important;
+        }
+        .custom-popup-search-btn i {
+            color: #fff !important;
+        }
         }
     </style>
 
@@ -749,7 +844,7 @@
                     <div class="site-branding">
                         <a href="{{ route('home') }}" class="brand-logo">
                             <img src="{{ isset($siteSettings->site_logo) ? asset('uploads/settings/' . $siteSettings->site_logo) : asset('assets/images/logo/logo-main.png') }}"
-                                alt="Logo" style="height: 100px; object-fit: contain;">
+                                alt="Logo" style="height: 70px; object-fit: contain;">
                         </a>
                     </div>
                     <div class="product-search-category">
@@ -924,6 +1019,9 @@
                                                     <li class="menu-item"><a href="{{ route('about') }}">About Us</a></li>
                                                     <li class="menu-item"><a href="{{ route('faq') }}">FAQs</a></li>
                                                     <li class="menu-item"><a href="{{ route('contact') }}">Contact</a></li>
+                                                    <li class="menu-item">
+                                                        <a href="{{ route('order.track.form') }}">Track Order</a>
+                                                    </li>
                                                 </ul>
                                             </nav>
                                         </div>
@@ -1009,8 +1107,11 @@
                                         </li>
 
                                         <li><a href="{{ route('about') }}">About Us</a></li>
-                                        <li><a href="{{ route('faq') }}">FAQs</a></li>
+                                        <li class="menu-item"><a href="{{ route('order.track.form') }}">Track Order</a> </li>
+                                
                                         <li class="menu-item"><a href="{{ route('contact') }}">Contact</a></li>
+                                       
+                                                    
 
                                         @if(isset($currencySettings) && $currencySettings->currency_mode === 'double')
                                             @php
@@ -1120,6 +1221,27 @@
         </div>
     </header>
    
+     <div id="mobileSearchPopup" class="annoghor-exclusive-search-overlay" style="display: none !important; position: fixed !important; z-index: 999999 !important; left: 0 !important; top: 0 !important; width: 100% !important; height: 100% !important; background-color: rgba(0, 0, 0, 0.7) !important; backdrop-filter: blur(5px) !important;">
+        <div class="annoghor-search-box-card" style="background: #ffffff !important; margin: 120px auto !important; padding: 25px !important; border-radius: 12px !important; width: 90% !important; max-width: 450px !important; box-shadow: 0 15px 35px rgba(0,0,0,0.3) !important; position: relative !important; box-sizing: border-box !important;">
+        
+            <button type="button" style="position: absolute !important; right: 15px !important; top: 10px !important; font-size: 32px !important; color: #999 !important; border: none !important; background: transparent !important; cursor: pointer !important; padding: 0 !important; line-height: 1 !important;" onclick="closeMobileSearch()">&times;</button>
+            
+            <h5 class="mb-3" style="font-size: 16px !important; font-weight: 700 !important; color: #5a3e2b !important; margin: 0 0 15px 0 !important; text-align: left !important; display: block !important;">Search Products</h5>
+            
+            <form action="{{ route('shops') }}" method="GET" style="margin: 0 !important; padding: 0 !important; display: block !important;">
+                <div style="position: relative !important; display: flex !important; align-items: center !important; width: 100% !important;">
+                    
+                    <input type="search" name="search" id="mobileSearchInput" placeholder="What are you looking for?..." required style="width: 100% !important; padding: 12px 60px 12px 15px !important; border: 1px solid #ccc !important; border-radius: 8px !important; font-size: 15px !important; outline: none !important; background: #fff !important; color: #333 !important; box-sizing: border-box !important; height: 48px !important;">
+                    
+                    <button type="submit" style="position: absolute !important; right: 5px !important; top: 5px !important; bottom: 5px !important; background: #f15922 !important; color: #fff !important; border: none !important; width: 45px !important; height: 38px !important; border-radius: 6px !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 15px !important; padding: 0 !important;">
+                        <i class="far fa-search" style="color: #fff !important;"></i>
+                    </button>
+                    
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <a href="{{ route('cart') }}" class="mobile-floating-cart d-lg-none">
         <div class="cart-icon-wrap">
@@ -1150,7 +1272,7 @@
             </span>
             <span>CART</span>
         </a>
-        <a href="{{ route('shops') }}?search=1" class="nav-item-box">
+        <a href="javascript:void(0)" class="nav-item-box" onclick="openMobileSearch()">
             <i class="fas fa-search"></i>
             <span>SEARCH</span>
         </a>
@@ -1221,11 +1343,10 @@
                                 <div class="widget-content">
                                     <h4 class="widget-title">Customer Services</h4>
                                     <ul class="widget-menu">
-                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="#">Collections & Delivery</a></li>
                                         <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route("returns") }}">Returns & Refunds</a></li>
                                         <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('terms') }}">Terms & Conditions</a></li>
                                         <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('delivery.return') }}">Delivery Return</a></li>
-                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="#">Store Locations</a></li>
+                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('privacy.policy') }}">Privacy Policy</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -1235,7 +1356,6 @@
                                 <div class="widget-content">
                                     <h4 class="widget-title">Quick Link</h4>
                                     <ul class="widget-menu">
-                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('privacy.policy') }}">Privacy Policy</a></li>
                                         <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('terms.of.use') }}">Terms Of Use</a></li>
                                         <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('faq') }}">FAQ</a></li>
                                         <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('contact') }}">Contact</a></li>
@@ -1291,6 +1411,46 @@
     <script src="{{ asset('assets/js/theme.js') }}"></script>
 
     <script>
+        // ============================================================
+        // 🔍 CUSTOM MOBILE SEARCH POPUP FUNCTIONS (গ্লোবাল ফাংশনসমূহ)
+        // ============================================================
+        
+        // ১. সার্চ পপ-আপ ওপেন করার ফাংশন
+        function openMobileSearch() {
+            var searchPopup = document.getElementById('mobileSearchPopup');
+            if (searchPopup) {
+                searchPopup.style.display = "block";
+                document.body.style.overflow = "hidden"; // পপ-আপ অন থাকলে পেজ স্ক্রল লক হবে
+                
+                // ওপেন হওয়ার সাথে সাথে ইনপুট বক্সে অটোমেটিক ফোকাস করবে (কিবোর্ড চলে আসবে)
+                setTimeout(function() {
+                    var searchInput = document.getElementById('mobileSearchInput');
+                    if(searchInput) searchInput.focus();
+                }, 150);
+            }
+        }
+
+        // ২. সার্চ পপ-আপ ক্লোজ করার ফাংশন
+        function closeMobileSearch() {
+            var searchPopup = document.getElementById('mobileSearchPopup');
+            if (searchPopup) {
+                searchPopup.style.display = "none";
+                document.body.style.overflow = "auto"; // পেজ স্ক্রল আবার সচল হবে
+            }
+        }
+
+        // ৩. সার্চ বক্সের বাইরে খালি জায়গায় ক্লিক করলে যেন অটো বন্ধ হয়ে যায়
+        window.addEventListener('click', function(event) {
+            var searchPopup = document.getElementById('mobileSearchPopup');
+            if (event.target === searchPopup) {
+                searchPopup.style.display = "none";
+                document.body.style.overflow = "auto";
+            }
+        });
+
+        // ============================================================
+        // JQUERY DOM READY
+        // ============================================================
         $(document).ready(function() {
             // User dropdown animation
             $('.user-account .dropdown-toggle').on('click', function() {
@@ -1318,6 +1478,15 @@
                 
                 // থিমের মেইন মোবাইল নেভিগেশন টগলার বোতামটিকে অটো-ক্লিক (Trigger) করাবে
                 $('.navbar-toggler').trigger('click'); 
+            });
+
+            // 💡 পুরোনো ট্রিগার মেথডটি এখানে রাখা হলো, তবে আপনি যদি বাটনটিতে onclick="openMobileSearch()" ব্যবহার করেন, তাহলে এটি আর কোনো প্রভাব ফেলবে না।
+            $('.mobile-search-trigger-btn').on('click', function(e) {
+                e.preventDefault();
+                $('.navbar-toggler').trigger('click'); 
+                setTimeout(function() {
+                    $('.nav-search .form_control').focus();
+                }, 400); 
             });
         });
     </script>

@@ -200,6 +200,13 @@ Route::get('/profile', function () {
     return view('profile');
 })->name('profile');
 
+
+// Tracking order as guest user
+
+Route::get('/track-order', [OrderController::class, 'trackOrderForm'])->name('order.track.form');
+Route::post('/track-order', [OrderController::class, 'handleOrderTracking'])->name('order.track.search');
+
+
 Route::put('/profile/update', [HomeController::class, 'updateProfile'])->name('profile.update');
 Route::post('/profile/update-password', [HomeController::class, 'updatePassword'])->name('profile.update-password');
 

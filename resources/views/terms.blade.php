@@ -124,7 +124,7 @@
                                     <i class="far fa-envelope text-primary mr-3" style="font-size: 24px;"></i>
                                     <div>
                                         <span class="d-block text-muted" style="font-size: 12px; font-weight: 600; text-transform: uppercase;">Email Address</span>
-                                        <a href="mailto:info@mydomain.com" style="font-size: 15px; font-weight: 600; color: #222;">info@mydomain.com</a>
+                                        <a href="mailto:annoghor@gmail.com" style="font-size: 15px; font-weight: 600; color: #222;">annoghor@gmail.com</a>
                                     </div>
                                 </div>
 
