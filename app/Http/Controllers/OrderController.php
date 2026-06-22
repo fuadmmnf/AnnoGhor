@@ -354,4 +354,41 @@ class OrderController extends Controller
             return back()->with('error', 'Status check failed: ' . $e->getMessage());
         }
     }
+
+
+
+    public function trackOrderForm() {
+        return view('tracking-order');
+    }
+
+    public function handleOrderTracking(Request $request) {
+
+        $request->validate([
+            'phone' => 'required|string',
+            'order_number' => 'required|string',
+        ]);
+
+
+
+        $order = Order::where('order_number', $request->order_number)
+                        ->where('phone', $request->phone)
+                        ->with('orderItems')
+                        ->first();
+
+        
+        if (!$order) {
+        return back()->withInput()->with('error', 'দুঃখিত, এই অর্ডার নম্বর বা ফোন নম্বরের কোনো রেকর্ড পাওয়া যায়নি।');
+        }
+
+
+        $trackingLogs = OrderTracking::where('order_id', $order->id)->latest()->get();
+
+
+        return view('tracking-order', compact('order', 'trackingLogs'));
+
+
+        
+    }
+
+
 }
