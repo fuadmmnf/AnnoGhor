@@ -623,29 +623,29 @@
                 z-index: 999;
                 flex-direction: column;
                 align-items: center;
-                width: 75px;
-                padding: 8px 0;
+                width: 60px;
+                padding-top: 4px;
                 text-decoration: none !important;
                 transition: all 0.2s ease;
             }
             .mobile-floating-cart .cart-icon-wrap {
                 position: relative;
                 background: #f15922;
-                width: 36px;
-                height: 36px;
+                width: 20px;
+                height: 20px;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 color: #fff;
-                font-size: 16px;
-                margin-bottom: 4px;
+                font-size: 10px;
+                margin-bottom: 0px;
             }
             .mobile-floating-cart .cart-icon-wrap .badge {
                 position: absolute;
-                top: -6px;
-                right: -6px;
-                font-size: 10px;
+                top: 6px;
+                right: -10px;
+                font-size: 8px;
                 padding: 3px 6px;
                 border-radius: 50%;
             }
@@ -656,15 +656,15 @@
                 text-align: center;
             }
             .mobile-floating-cart .cart-info-wrap .item-text {
-                font-size: 11px;
+                font-size: 9px;
                 color: #475569;
                 font-weight: 500;
             }
             .mobile-floating-cart .cart-info-wrap .price-text {
-                font-size: 13px;
+                font-size: 9px;
                 color: #f15922;
                 font-weight: 700;
-                margin-top: 1px;
+                margin-top: 0;
             }
 
             /* ২. মোবাইল বটম নেভিগেশন বার */
@@ -1245,7 +1245,7 @@
 
     <a href="{{ route('cart') }}" class="mobile-floating-cart d-lg-none">
         <div class="cart-icon-wrap">
-            <i class="fas fa-shopping-bag"></i>
+            <i class="fas fa-shopping-cart"></i>
             <span class="badge cart-count bg-danger text-white">
                 {{ session()->has('cart') ? count(session()->get('cart')) : 0 }}
             </span>
