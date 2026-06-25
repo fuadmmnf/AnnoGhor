@@ -58,7 +58,8 @@ class ProductController extends Controller
             ->limit(4)
             ->get();
 
-        return view('product-details', compact('product', 'relatedProducts'));
+        $productsReviews = Review::where('product_id', $product->id)->where('is_active' , 1)->latest()->get();
+        return view('product-details', compact('product', 'relatedProducts', 'productsReviews'));
     }
 
     /**

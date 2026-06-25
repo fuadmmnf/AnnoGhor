@@ -255,6 +255,11 @@ Route::get('/optimize-clear', function () {
     return 'Storage linked and cache cleared successfully!';
 });
 
+Route::get('/migrate', function() {
+    \Illuminate\Support\Facades\Artisan::call('migrate');
+    return "Migration successful";
+});
+
 Route::get('/admin/add-new-user', function () {
     return view('admin.add-new-user');
 })->name('admin.add-new-user');
