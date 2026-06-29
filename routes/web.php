@@ -246,13 +246,12 @@ Route::post('/change-currency', function (\Illuminate\Http\Request $request) {
 // Utility Routes
 Route::get('/run-cmd', function () {
     \Illuminate\Support\Facades\Artisan::call('storage:link');
-    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
-    return 'Storage linked and cache cleared successfully!';
+    return 'Storage linked successfully!';
 });
 
 Route::get('/optimize-clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
-    return 'Storage linked and cache cleared successfully!';
+    return 'Cache cleared successfully!';
 });
 
 Route::get('/migrate', function() {

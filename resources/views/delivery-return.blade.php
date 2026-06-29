@@ -4,122 +4,398 @@
 
 @section('content')
 
-    <!--====== Start Page Banner/Hero Section ======-->
-    <section class="page-banner-section pt-120 pb-60 bg_cover" style="background: #fdfaf7; border-bottom: 1px solid #f3ece6;">
+    <style>
+        /* =========================================
+           Delivery & Return Policy Page Styles
+           ========================================= */
+        :root {
+            --brand-primary: #5a3e2b;
+            --brand-light: #fff8f4;
+            --bg-offwhite: #fdfaf7;
+            --text-dark: #222222;
+            --text-muted: #555555;
+            --border-soft: #eaeaea;
+        }
+
+        /* Hero Section */
+        .policy-hero-section {
+            background-color: var(--bg-offwhite);
+            border-bottom: 1px solid var(--border-soft);
+            padding: 80px 0 60px;
+        }
+        .hero-sub-title {
+            color: var(--brand-primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-size: 14px;
+            background: #ffffff;
+            padding: 6px 16px;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-soft);
+        }
+        .hero-title {
+            color: var(--text-dark);
+            font-size: 44px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+        .hero-desc {
+            font-size: 17px;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Policy Cards */
+        .policy-card {
+            background: #ffffff;
+            border: 1px solid var(--border-soft);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+        .policy-card:hover {
+            box-shadow: 0 12px 30px rgba(90, 62, 43, 0.08);
+            transform: translateY(-3px);
+            border-color: #e5d8d0;
+        }
+        .card-title-box {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .num-badge {
+            background: var(--brand-primary);
+            color: #fff;
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            margin-right: 15px;
+            box-shadow: 0 4px 12px rgba(90, 62, 43, 0.25);
+        }
+        .policy-card-title {
+            font-size: 22px;
+            color: var(--text-dark);
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.3;
+        }
+        .policy-text {
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* Info Grid Boxes (Shipping) */
+        .shipping-info-box {
+            background: #ffffff;
+            border: 1px dashed #d1c4bc;
+            border-radius: 8px;
+            padding: 20px 15px;
+            text-align: center;
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+        .shipping-info-box:hover {
+            border-color: var(--brand-primary);
+            background: var(--brand-light);
+        }
+        .shipping-info-box i {
+            font-size: 28px;
+            color: var(--brand-primary);
+            margin-bottom: 12px;
+            display: block;
+        }
+        .shipping-info-box h5 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        .shipping-info-box p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Lists */
+        .policy-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        .policy-list li {
+            margin-bottom: 15px;
+            color: var(--text-muted);
+            font-size: 15.5px;
+            line-height: 1.7;
+            display: flex;
+            align-items: flex-start;
+        }
+        .policy-list li strong {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+        .policy-list li i {
+            color: #10b981; /* Success Green */
+            margin-top: 5px;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        /* Alert Box */
+        .policy-alert-box {
+            background: var(--brand-light);
+            border-left: 4px solid var(--brand-primary);
+            border-radius: 6px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+        }
+        .policy-alert-box p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .policy-alert-box p strong {
+            color: var(--text-dark);
+        }
+
+        /* Sidebar Support */
+        .support-sidebar-box {
+            background: var(--brand-primary);
+            border-radius: 12px;
+            padding: 35px 25px;
+            color: #fff;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(90, 62, 43, 0.15);
+        }
+        .support-icon {
+            font-size: 45px;
+            color: #ffffff;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        .support-title {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .support-desc {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 15px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        .contact-methods {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: left;
+        }
+        .contact-item {
+            display: flex;
+            align-items: center;
+        }
+        .contact-item:not(:last-child) {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-soft);
+        }
+        .contact-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .icon-whatsapp { background: #e8f5e9; color: #10b981; }
+        .icon-clock { background: #fff8e1; color: #f59e0b; }
+        
+        .contact-info-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        .contact-info-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-decoration: none;
+            display: block;
+        }
+        a.contact-info-value:hover {
+            color: var(--brand-primary);
+        }
+
+        /* Responsive Fixes */
+        @media (max-width: 991px) {
+            .support-sidebar-box {
+                margin-top: 10px;
+            }
+        }
+        @media (max-width: 767px) {
+            .policy-hero-section {
+                padding: 50px 0 40px;
+            }
+            .hero-title {
+                font-size: 32px;
+            }
+            .policy-card {
+                padding: 20px;
+            }
+            .policy-card-title {
+                font-size: 18px;
+            }
+            .num-badge {
+                width: 35px;
+                height: 35px;
+                min-width: 35px;
+                font-size: 16px;
+            }
+        }
+    </style>
+
+    <section class="policy-hero-section">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8 text-center">
-                    <div class="page-banner-content" data-aos="fade-up" data-aos-duration="1000">
-                        <div class="sub-heading d-inline-flex align-items-center mb-15">
-                            <i class="flaticon-sparkler"></i>
-                            <span class="sub-title" style="color:#5a3e2b; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Shipping & Returns</span>
+                    <div data-aos="fade-up" data-aos-duration="1000">
+                        <div class="d-inline-block mb-3">
+                            <span class="hero-sub-title"><i class="flaticon-sparkler me-2"></i> Shipping & Returns</span>
                         </div>
-                        <h1 style="color: #222; font-size: 42px; font-weight: 700; margin-bottom: 15px;">Delivery & Return Policy</h1>
-                        <p style="font-size: 16px; color: #666; max-width: 650px; margin: 0 auto;">At AnnoGhor, we strive to provide a seamless shopping experience. From the moment you place your order to the time it arrives at your doorstep, we ensure maximum care and premium service.</p>
+                        <h1 class="hero-title">Delivery & Return Policy</h1>
+                        <p class="hero-desc">At AnnoGhor, we strive to provide a seamless shopping experience. From the moment you place your order to the time it arrives at your doorstep, we ensure maximum care and premium service.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <!--====== End Page Banner/Hero Section ======-->
-
-    <!--====== Start Policy Details Section ======-->
-    <section class="policy-details-section pt-80 pb-120">
+    <section class="policy-details-section pt-60 pb-100">
         <div class="container">
             <div class="row">
-                <!-- Left Side: Policy Contents -->
-                <div class="col-xl-8 col-lg-7">
-                    <div class="policy-wrapper" data-aos="fade-up" data-aos-delay="50" data-aos-duration="1200">
+                <div class="col-lg-8">
+                    <div class="policy-wrapper" data-aos="fade-up" data-aos-delay="50" data-aos-duration="1000">
                         
-                        <!-- 1. Shipping & Delivery -->
-                        <div class="policy-card mb-40 p-4" style="background: #ffffff; border: 1px solid #eaeaea; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
-                            <div class="card-title-box d-flex align-items-center mb-25">
-                                <span class="num-badge d-flex align-items-center justify-content-center" style="background: #5a3e2b; color: #fff; width: 35px; height: 35px; border-radius: 50%; font-weight: 600; margin-right: 15px;">1</span>
-                                <h3 style="font-size: 22px; color: #222; font-weight: 600; margin: 0;">Shipping & Delivery</h3>
+                        <div class="policy-card">
+                            <div class="card-title-box">
+                                <span class="num-badge">1</span>
+                                <h3 class="policy-card-title">Shipping & Delivery</h3>
                             </div>
                             
-                            <div class="row">
-                                <div class="col-md-4 mb-15">
-                                    <div class="shipping-info-box text-center p-3" style="background: #fdfdfd; border: 1px solid #f0f0f0; border-radius: 6px; h-100">
-                                        <i class="fas fa-map-marked-alt mb-10" style="font-size: 24px; color: #5a3e2b;"></i>
-                                        <h5 style="font-size: 15px; font-weight: 600; margin-bottom: 5px;">Coverage</h5>
-                                        <p style="font-size: 13px; margin: 0; color: #666;">Home delivery all over Bangladesh.</p>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="shipping-info-box">
+                                        <i class="fas fa-map-marked-alt"></i>
+                                        <h5>Coverage</h5>
+                                        <p>Home delivery all over Bangladesh.</p>
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-15">
-                                    <div class="shipping-info-box text-center p-3" style="background: #fdfdfd; border: 1px solid #f0f0f0; border-radius: 6px; h-100">
-                                        <i class="far fa-calendar-alt mb-10" style="font-size: 24px; color: #5a3e2b;"></i>
-                                        <h5 style="font-size: 15px; font-weight: 600; margin-bottom: 5px;">Delivery Time</h5>
-                                        <p style="font-size: 13px; margin: 0; color: #666;">Processed & delivered within 5 days.</p>
+                                <div class="col-md-4">
+                                    <div class="shipping-info-box">
+                                        <i class="far fa-calendar-alt"></i>
+                                        <h5>Delivery Time</h5>
+                                        <p>Processed & delivered within 5 days.</p>
                                     </div>
                                 </div>
-                                <div class="col-md-4 mb-15">
-                                    <div class="shipping-info-box text-center p-3" style="background: #fdfdfd; border: 1px solid #f0f0f0; border-radius: 6px; h-100">
-                                        <i class="fas fa-hand-holding-usd mb-10" style="font-size: 24px; color: #5a3e2b;"></i>
-                                        <h5 style="font-size: 15px; font-weight: 600; margin-bottom: 5px;">Payment</h5>
-                                        <p style="font-size: 13px; margin: 0; color: #666;">Cash on Delivery (COD) available.</p>
+                                <div class="col-md-4">
+                                    <div class="shipping-info-box">
+                                        <i class="fas fa-hand-holding-usd"></i>
+                                        <h5>Payment</h5>
+                                        <p>Cash on Delivery (COD) available.</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 2. Doorstep Return Policy -->
-                        <div class="policy-card mb-40 p-4" style="background: #ffffff; border: 1px solid #eaeaea; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
-                            <div class="card-title-box d-flex align-items-center mb-20">
-                                <span class="num-badge d-flex align-items-center justify-content-center" style="background: #5a3e2b; color: #fff; width: 35px; height: 35px; border-radius: 50%; font-weight: 600; margin-right: 15px;">2</span>
-                                <h3 style="font-size: 22px; color: #222; font-weight: 600; margin: 0;">Doorstep Return Policy (Check Before You Pay)</h3>
+                        <div class="policy-card">
+                            <div class="card-title-box">
+                                <span class="num-badge">2</span>
+                                <h3 class="policy-card-title">Doorstep Return Policy (Check Before You Pay)</h3>
                             </div>
-                            <p style="color: #555; line-height: 1.7; margin-bottom: 20px;">We believe in 100% transparency. To ensure you are completely satisfied with your purchase, we offer an instant doorstep checking policy:</p>
+                            <p class="policy-text">We believe in 100% transparency. To ensure you are completely satisfied with your purchase, we offer an instant doorstep checking policy:</p>
                             
-                            <ul class="list-unstyled pl-2" style="color: #555; line-height: 1.8;">
-                                <li class="mb-10"><strong style="color: #222;"><i class="fas fa-search text-success mr-2"></i> Inspect on Arrival:</strong> When the courier agent delivers your package, please open and inspect the product (quality, packaging, and quantity) right in front of them.</li>
-                                <li class="mb-10"><strong style="color: #222;"><i class="fas fa-undo text-success mr-2"></i> Instant Return:</strong> If the product is damaged, spoiled, or does not match what you ordered, you can hand it right back to the delivery rider.</li>
-                                <li><strong style="color: #222;"><i class="fas fa-shield-alt text-success mr-2"></i> Zero Risk:</strong> If you choose to return the item at the doorstep, you do not have to pay for the product.</li>
+                            <ul class="policy-list">
+                                <li>
+                                    <i class="fas fa-search"></i>
+                                    <span><strong>Inspect on Arrival:</strong> When the courier agent delivers your package, please open and inspect the product (quality, packaging, and quantity) right in front of them.</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-undo"></i>
+                                    <span><strong>Instant Return:</strong> If the product is damaged, spoiled, or does not match what you ordered, you can hand it right back to the delivery rider.</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span><strong>Zero Risk:</strong> If you choose to return the item at the doorstep, you do not have to pay for the product.</span>
+                                </li>
                             </ul>
                         </div>
 
-                        <!-- 3. After-Delivery Support -->
-                        <div class="policy-card mb-40 p-4" style="background: #ffffff; border: 1px solid #eaeaea; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
-                            <div class="card-title-box d-flex align-items-center mb-20">
-                                <span class="num-badge d-flex align-items-center justify-content-center" style="background: #5a3e2b; color: #fff; width: 35px; height: 35px; border-radius: 50%; font-weight: 600; margin-right: 15px;">3</span>
-                                <h3 style="font-size: 22px; color: #222; font-weight: 600; margin: 0;">After-Delivery Support</h3>
+                        <div class="policy-card mb-0">
+                            <div class="card-title-box">
+                                <span class="num-badge">3</span>
+                                <h3 class="policy-card-title">After-Delivery Support</h3>
                             </div>
-                            <p style="color: #555; line-height: 1.7; margin-bottom: 15px;">If you notice an issue with your product after the delivery rider has already left, please contact us <strong>within 24 hours</strong>:</p>
+                            <p class="policy-text">If you notice an issue with your product after the delivery rider has already left, please contact us <strong>within 24 hours</strong>:</p>
                             
-                            <div class="p-3 mb-15" style="background: #fdfdfd; border-left: 4px solid #5a3e2b; border-radius: 4px;">
-                                <p style="margin: 0; font-size: 14px; color: #555;"><strong style="color:#222;">Condition:</strong> For a return or exchange post-delivery, the product must remain unused, untampered, and in its original packaging.</p>
+                            <div class="policy-alert-box">
+                                <p><strong>Condition:</strong> For a return or exchange post-delivery, the product must remain unused, untampered, and in its original packaging.</p>
                             </div>
-                            <div class="p-3" style="background: #fdfdfd; border-left: 4px solid #5a3e2b; border-radius: 4px;">
-                                <p style="margin: 0; font-size: 14px; color: #555;"><strong style="color:#222;">Process:</strong> Reach out to our support team with your order details, and we will arrange a replacement or refund depending on the issue.</p>
+                            <div class="policy-alert-box mb-0">
+                                <p><strong>Process:</strong> Reach out to our support team with your order details, and we will arrange a replacement or refund depending on the issue.</p>
                             </div>
                         </div>
 
                     </div>
                 </div>
 
-                <!-- Right Side: Sticky Support Sidebar -->
-                <div class="col-xl-4 col-lg-5">
-                    <div class="sidebar-widget-area sticky-top" style="top: 30px;" data-aos="fade-left" data-aos-delay="100" data-aos-duration="1200">
-                        <div class="support-sidebar-box p-4 text-center" style="background: #5a3e2b; border-radius: 8px; color: #fff;">
-                            <div class="icon mb-20" style="font-size: 40px; color: #fff;">
-                                <i class="fas fa-truck-loading"></i>
-                            </div>
-                            <h4 style="color: #fff; font-size: 22px; font-weight: 600; margin-bottom: 10px;">24/7 Support Helpline</h4>
-                            <p style="color: #f3ece6; font-size: 14px; margin-bottom: 25px;">If you have any questions about your delivery or need to initiate a return, our team is always ready to help.</p>
+                <div class="col-lg-4">
+                    <div class="sticky-top" style="top: 100px; z-index: 10;" data-aos="fade-left" data-aos-delay="100" data-aos-duration="1000">
+                        <div class="support-sidebar-box">
+                            <span class="support-icon"><i class="fas fa-truck-loading"></i></span>
+                            <h4 class="support-title">24/7 Support Helpline</h4>
+                            <p class="support-desc">If you have any questions about your delivery or need to initiate a return, our team is always ready to help.</p>
                             
-                            <div class="contact-methods text-left bg-white p-3 rounded" style="color: #222;">
-                                <div class="d-flex align-items-center mb-15">
-                                    <i class="fab fa-whatsapp text-success mr-3" style="font-size: 24px;"></i>
+                            <div class="contact-methods">
+                                <div class="contact-item">
+                                    <div class="contact-item-icon icon-whatsapp">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </div>
                                     <div>
-                                        <span class="d-block text-muted" style="font-size: 12px; font-weight: 600; text-transform: uppercase;">Phone / WhatsApp / Imo</span>
-                                        <a href="tel:01700900059" style="font-size: 18px; font-weight: 700; color: #222;">01700-900059</a>
+                                        <span class="contact-info-label">Phone / WhatsApp / Imo</span>
+                                        <a href="tel:01700900059" class="contact-info-value">01700-900059</a>
                                     </div>
                                 </div>
-                                <div class="d-flex align-items-center">
-                                    <i class="far fa-clock text-warning mr-3" style="font-size: 24px;"></i>
+                                <div class="contact-item">
+                                    <div class="contact-item-icon icon-clock">
+                                        <i class="far fa-clock"></i>
+                                    </div>
                                     <div>
-                                        <span class="d-block text-muted" style="font-size: 12px; font-weight: 600; text-transform: uppercase;">Service Status</span>
-                                        <span style="font-size: 14px; font-weight: 600;">Available 24 Hours / 7 Days</span>
+                                        <span class="contact-info-label">Service Status</span>
+                                        <span class="contact-info-value">Available 24 Hours / 7 Days</span>
                                     </div>
                                 </div>
                             </div>
@@ -129,6 +405,4 @@
             </div>
         </div>
     </section>
-    <!--====== End Policy Details Section ======-->
-
-@endsection
+    @endsection

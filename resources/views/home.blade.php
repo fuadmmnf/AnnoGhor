@@ -4,8 +4,8 @@
 
 @section('content')
 
-<section class="hero-banner py-0 py-lg-4" style="background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);">
-    <div class="banner-section mt-30">
+<section class="hero-banner py-0 py-lg-0" style="background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);">
+    <div class="banner-section mt-10">
         <div class="container">
             <div class="row align-items-stretch">
 
@@ -60,9 +60,9 @@
 
 <section class="featured-categories py-3 py-lg-0">
     <div class="container" style="position: relative;">
-        <div class="section-title text-center mb-3 mb-lg-5">
-            <h3 class="fw-bold">Featured Categories</h3>
-            <div class="title-line mx-auto"></div>
+        <div class="section-title text-center mb-3 mb-lg-2">
+            <h4 class="fw-bold">Featured Categories</h4>
+           
         </div>
 
         <div class="category-slider-wrapper" style="position: relative; padding: 0 40px;">
@@ -97,7 +97,7 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
-                <div class="section-title mb-0 mb-lg-4 text-center" data-aos="fade-down">
+                <div class="section-title mb-0 mb-lg-4 text-center">
                     <h2 class="fw-bold" style="color: #1e293b; font-size: 28px;">Top Selling Products</h2>
                 </div>
             </div>
@@ -257,7 +257,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-4">
-                    <div class="section-content-box mb-40" data-aos="fade-right" data-aos-delay="30" data-aos-duration="800">
+                    <div class="section-content-box mb-40" >
                         <div class="section-title mb-50">
                             <h2>What Our Clients Say About Us</h2>
                         </div>
@@ -265,7 +265,7 @@
                     </div>
                 </div>
                 <div class="col-lg-8">
-                    <div class="testimonial-slider-one" data-aos="fade-left" data-aos-delay="50" data-aos-duration="1000">
+                    <div class="testimonial-slider-one" >
                         @forelse($reviews as $review)
                             <div class="testimonial-item style-one mb-40">
                                 <div class="testimonial-content">
@@ -316,25 +316,59 @@
 
 @push('scripts')
 <style>
+    /* =============================================
+       Hero Banner & Sliders
+       ============================================= */
     .hero-slider-wrap:hover .hero-slider-arrow { opacity: 1 !important; visibility: visible !important; }
     .hero-slider-wrap:hover .hero-slider-prev { left: 20px !important; }
     .hero-slider-wrap:hover .hero-slider-next { right: 20px !important; }
     .hero-slider-arrow:hover { background: #f15922 !important; color: #ffffff !important; }
+    
+    .hero-banner { background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%); padding: 15px 0 20px 0; }
+    
+    .slider-responsive-img { 
+        width: 100%; 
+        height: 350px; 
+        object-fit: fill; /* ছবি ফাঁকা না রেখে পুরো বক্স কভার করবে */
+        border-radius: 8px !important; 
+    }
+    
+    /* 🌟 Static Side Banner Image - Fixed Size, No Empty Space */
+    .static-side-banner img { 
+        width: 100%; 
+        height: 350px !important; 
+        object-fit: fill; 
+        border-radius: 8px !important; 
+    }
+
+    /* 📱 মোবাইল ডিভাইসের জন্য সাইজ */
+    @media (max-width: 575.98px) { 
+        .slider-responsive-img { height: 180px !important; } 
+        .static-side-banner img { height: 180px !important; } 
+    }
+
+    /* =============================================
+       Notifications
+       ============================================= */
     .custom-notification { position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideInRight 0.3s ease-out; }
     @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    .hero-banner { background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%); padding: 15px 0 20px 0; }
-    .slider-responsive-img { width: 100%; height: 350px; object-fit: cover; border-radius: 8px !important; }
-    @media (max-width: 575.98px) { .slider-responsive-img { height: 180px !important; } }
-    .static-side-banner img { width: 100%; height: 350px !important; object-fit: cover; border-radius: 8px !important; }
+
+    /* =============================================
+       Categories Section
+       ============================================= */
     .featured-categories { background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); padding-bottom: 20px !important; }
-    .title-line { height: 3px; width: 60px; background: #f15922; margin: 0 auto 15px; border-radius: 2px; }
-    .category-icon-box { width: 120px; height: 120px; background: #ffffff; border-radius: 20px; display: flex; align-items: center; justify-content: center; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); margin: 0 auto; }
-    .category-name { color: #333; font-size: 0.95rem; font-weight: 600; margin-top: 10px; }
+    .title-line { height: 3px; width: 60px; background: #f15922; margin: 0 auto 1px; border-radius: 2px; }
+    .category-icon-box { width: 100px; height: 100px; background: #ffffff; border-radius: 20px; display: flex; align-items: center; justify-content: center; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); margin: 0 auto; }
+    .category-name { color: #333; font-size: 0.95rem; font-weight: 600; margin-top: 2px; }
     .category-slide-item { padding: 0 10px; }
     .category-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: #ffffff; border: 1px solid #e2e8f0; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #333; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); z-index: 10; }
     .category-arrow:hover { background: #f15922; color: #ffffff; border-color: #f15922; }
     .category-prev { left: -5px; }
     .category-next { right: -5px; }
+
+    /* =============================================
+       Product Cards (Grid)
+       ============================================= */
     .modern-grid-card { background: #ffffff; border: 1px solid #f1f5f9; border-radius: 16px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.015); transition: transform 0.2s ease, box-shadow 0.2s ease; }
     .modern-grid-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); }
     .grid-image-wrap { width: 100%; height: 200px; background-color: #f8fafc; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
@@ -345,19 +379,41 @@
     .price-previous { color: #94a3b8; font-size: 13px; }
     .discount-save-badge { background-color: #dcfce7; color: #15803d; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
     .grid-action-btns { display: flex; gap: 8px; margin-top: auto; }
+    
+    /* Product Card Buttons */
     .btn-grid-cart { background: transparent; border: 1px solid #dd6b20; color: #dd6b20; font-weight: 600; font-size: 13px; padding: 8px 10px; border-radius: 8px; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
     .btn-grid-cart:hover { background: #dd6b20; color: #ffffff; }
     .btn-grid-cart:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-grid-buy { background: #dd6b20; border: none; color: #ffffff; font-weight: 600; font-size: 13px; padding: 8px 10px; border-radius: 8px; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
     .btn-grid-buy:hover { background: #b75616; color: #ffffff !important; }
     .btn-view-all { border: 1px solid #e2e8f0; border-radius: 20px; padding: 5px 15px; font-weight: 500; color: #475569; }
+
+    /* Slick Dots Navigation */
     .dots-navigation-style .slick-dots { position: relative; bottom: 0; margin-top: 15px; list-style: none; display: flex !important; justify-content: center; padding: 0; gap: 8px; }
     .dots-navigation-style .slick-dots li { margin: 0; width: auto; height: auto; }
     .dots-navigation-style .slick-dots li button { width: 10px; height: 10px; padding: 0; border-radius: 50%; background: #cbd5e1; border: none; transition: all 0.3s ease; }
     .dots-navigation-style .slick-dots li button:before { display: none; }
     .dots-navigation-style .slick-dots li.slick-active button { background: #f15922; transform: scale(1.2); }
-    @media (max-width: 767.98px) { .grid-image-wrap { height: 150px; } .price-current { font-size: 13px; } .price-previous { font-size: 11px; } .discount-save-badge { font-size: 9px; padding: 3px 2px; } }
-    @media (max-width: 575.98px) { .grid-image-wrap { height: 135px; } .grid-product-title a { font-size: 14px; height: 20px; } .price-current { font-size: 12px; } .btn-grid-cart, .btn-grid-buy { font-size: 12px; padding: 6px 4px; } }
+
+    /* =============================================
+       Media Queries (Responsive)
+       ============================================= */
+    @media (max-width: 767.98px) { 
+        .grid-image-wrap { height: 150px; } 
+        .price-current { font-size: 13px; } 
+        .price-previous { font-size: 11px; } 
+        .discount-save-badge { font-size: 9px; padding: 3px 2px; } 
+    }
+    
+    @media (max-width: 575.98px) { 
+        /* 📱 মোবাইলে ব্যানার সাইজ ১৮০ পিক্সেল ফিক্সড */
+       
+        
+        .grid-image-wrap { height: 135px; } 
+        .grid-product-title a { font-size: 14px; height: 20px; } 
+        .price-current { font-size: 12px; } 
+        .btn-grid-cart, .btn-grid-buy { font-size: 12px; padding: 6px 4px; } 
+    }
 </style>
 
 <script>
@@ -380,6 +436,9 @@
             success: function(response) {
                 if (response.success) {
                     $('.cart-count, .pro-count').text(response.cart_count);
+                    if (response.total !== undefined) {
+                        $('.pro-total-amount').text(response.total);
+                    }
                     showCartNotification(response.message || 'Cart এ যোগ হয়েছে!', 'success');
                 } else {
                     showCartNotification(response.message || 'Failed to add to cart.', 'danger');

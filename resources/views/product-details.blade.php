@@ -42,7 +42,7 @@
             font-weight: 600;
         }
 
-        /* 🎯 ইমেজ গ্যালারি প্রিমিয়াম প্যানেল (স্লিক ফ্রেন্ডলি লেআউট) */
+        /* 🎯 ইমেজ গ্যালারি প্রিমিয়াম প্যানেল (স্লিক ফ্রেন্ডলি লেআউট) */
         .product-big-slider {
             border-radius: 16px;
             overflow: hidden;
@@ -55,7 +55,7 @@
             object-fit: cover;
         }
         
-        /* 🛠️ স্লাইডার থাম্বনেইল লেআউট ফিক্স (কোনো জর্বদস্তিমূলক ফ্লেক্স ছাড়া) */
+        /* 🛠️ স্লাইডার থাম্বনেইল লেআউট ফিক্স (কোনো জর্বদস্তিমূলক ফ্লেক্স ছাড়া) */
         .product-thumb-slider {
             margin-top: 15px;
             padding: 0 10px;
@@ -103,7 +103,7 @@
             font-weight: 600;
         }
 
-        /* 📝 প্রোডাক্ট কন্টেন্ট এরিয়া */
+        /* 📝 প্রোডাক্ট কন্টেন্ট এরিয়া */
         .product-title-luxury {
             font-size: 28px;
             font-weight: 700;
@@ -126,7 +126,7 @@
             margin-right: 10px;
         }
 
-        /* 🔢 কোয়ান্টিটি সিলেক্টর উইজেট */
+        /* 🔢 কোয়ান্টিটি সিলেক্টর উইজেট */
         .custom-qty-wrapper {
             display: inline-flex !important;
             align-items: center;
@@ -276,6 +276,17 @@
         .custom-toast.show { opacity: 1; transform: translateX(0); }
         .custom-toast-success { border-left: 4px solid #10b981; }
         .custom-toast-info { border-left: 4px solid #3b82f6; }
+        .custom-toast-warning { border-left: 4px solid #ef4444; }
+        .custom-toast-warning-text { color: #ef4444; font-weight: 700; }
+
+        /* ⚡ রিলেটেড প্রোডাক্ট বাটন স্টাইল (মোবাইল এবং ডেস্কটপ সবখানে পাওয়ার জন্য বাইরে আনা হয়েছে) */
+        .grid-action-btns { display: flex; gap: 8px; margin-top: auto; }
+        .btn-grid-cart { background: transparent; border: 1px solid #f15922; color: #f15922; font-weight: 600; font-size: 13px; padding: 8px 10px; border-radius: 8px; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
+        .btn-grid-cart:hover { background: #f15922; color: #ffffff; }
+        .btn-grid-cart:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .btn-grid-buy { background: #f15922; border: none; color: #ffffff; font-weight: 600; font-size: 13px; padding: 8px 10px; border-radius: 8px; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
+        .btn-grid-buy:hover { background: #d44816; color: #ffffff !important; }
 
         /* 📱 মোবাইল ডিভাইস অপ্টিমাইজেশন মিডিয়া কুয়েরি */
         @media (max-width: 768px) {
@@ -287,30 +298,29 @@
             }
             /* ⚡ বাটনগুলোকে মোবাইলে এক লাইনে ১টি করে সাজানো হলো */
             .action-buttons-grid {
-                grid-template-columns: repeat(2, fr);
+                grid-template-columns: repeat(2, 1fr);
                 gap: 12px;
             }
             .custom-grid-btn {
-                height: 52px;
-                font-size: 16px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                height: 35px;
+                font-size: 10px;
+                font-weight: 700;
+                border-radius: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.1px;
+                transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+                text-decoration: none !important;
+                border: none;
+                width: 100%;
             }
-
-             .custom-grid-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            height: 35px;
-            font-size: 10px;
-            font-weight: 700;
-            border-radius: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.1px;
-            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-            text-decoration: none !important;
-            border: none;
-            width: 100%;
         }
+        
+        @media (max-width: 575.98px) { 
+            .btn-grid-cart, .btn-grid-buy { font-size: 12px; padding: 6px 4px; } 
         }
     </style>
 
@@ -409,8 +419,6 @@
                                     <span class="stock-badge-custom"><i class="far fa-clock me-1"></i> Delivery in {{ $product->delivery_days }} days</span>
                                 @endif
                             </div>
-
-                           
 
                             <div class="product-cart-variation mt-4 pt-2">
                                 <div class="d-flex align-items-center mb-4 flex-wrap gap-3">
@@ -511,7 +519,6 @@
                                                         <div class="pesco-reviews-item">
                                                             <div class="d-flex align-items-center gap-3 mb-3" style="display: flex; align-items: center;">
                                                                 
-                                                                <!-- কাস্টমারের প্রোফাইল ইমেজ -->
                                                                 <div class="author-thumb" style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; margin-right: 15px;">
                                                                     @if($review->reviewer_image)
                                                                         <img src="{{ asset('storage/' . $review->reviewer_image) }}" alt="Author" style="width: 100%; height: 100%; object-fit: cover;">
@@ -521,7 +528,6 @@
                                                                 </div>
 
                                                                 <div class="author-info">
-                                                                    <!-- কাস্টমারের নাম এবং ভেরিফাইড ব্যাজ -->
                                                                     <h6 class="fw-bold text-dark mb-1" style="margin: 0 0 5px 0;">
                                                                         {{ $review->reviewer_name }} 
                                                                         @if($review->order_id)
@@ -530,7 +536,6 @@
                                                                     </h6>
                                                                     
                                                                     <div class="d-flex align-items-center gap-2" style="display: flex; align-items: center;">
-                                                                        <!-- ডাইনামিক স্টার রেটিং মেকানিজম -->
                                                                         <div class="text-warning small" style="color: #ffb703; margin-right: 10px;">
                                                                             @for ($j = 1; $j <= 5; $j++)
                                                                                 @if($j <= $review->rating)
@@ -540,20 +545,17 @@
                                                                                 @endif
                                                                             @endfor
                                                                         </div>
-                                                                        <!-- রিভিউ দেওয়ার সময় (Diff for humans যেমন: 2 days ago) -->
                                                                         <small class="text-muted" style="font-size: 12px;">{{ $review->created_at->diffForHumans() }}</small>
                                                                     </div>
                                                                 </div>
                                                             </div>
 
-                                                            <!-- রিভিউর মূল টেক্সট -->
                                                             <div class="author-review-content text-muted small" style="margin-top: 10px; font-size: 14px; line-height: 1.6;">
                                                                 <p class="mb-0" style="color: #444;">{{ $review->review_text }}</p>
                                                             </div>
                                                         </div>
                                                     </li>
                                                 @empty
-                                                    <!-- যদি কোনো কাস্টমার রিভিউ না দিয়ে থাকে -->
                                                     <li class="text-center py-4" style="list-style: none;">
                                                         <p class="text-muted" style="font-style: italic;">No reviews yet for this product. Be the first to share your experience!</p>
                                                     </li>
@@ -572,7 +574,7 @@
         </div>
     </section>
 
-    @if ($relatedProducts->count() > 0)
+   @if ($relatedProducts->count() > 0)
         <section class="releted-product-section pb-80">
             <div class="container">
                 <div class="row align-items-end mb-4">
@@ -590,8 +592,8 @@
                 <div class="releted-product-slider row g-4">
                     @foreach ($relatedProducts as $relatedProduct)
                         <div class="col-xl-3">
-                            <div class="product-item style-one mb-4 border rounded-4 bg-white overflow-hidden" style="border-color: #edf2f7 !important;">
-                                <div class="product-thumbnail position-relative" style="height: 280px; overflow: hidden;">
+                            <div class="product-item style-one mb-4 border rounded-4 bg-white overflow-hidden d-flex flex-column h-100" style="border-color: #edf2f7 !important;">
+                                <div class="product-thumbnail position-relative" style="height: 280px; overflow: hidden; flex-shrink: 0;">
                                     @if ($relatedProduct->thumbnail)
                                         <img src="{{ asset('storage/' . $relatedProduct->thumbnail) }}" alt="{{ $relatedProduct->name }}" style="width:100%; height:100%; object-fit:cover;">
                                     @else
@@ -603,17 +605,48 @@
                                         <a href="{{ $relatedProduct->details_url }}" class="icon-btn"><i class="fa fa-eye"></i></a>
                                     </div>
                                 </div>
-                                <div class="p-3 text-center">
+                                
+                                <div class="p-3 text-center d-flex flex-column flex-grow-1">
                                     <h6 class="mb-2">
-                                        <a href="{{ $relatedProduct->details_url }}" class="text-dark fw-bold text-decoration-none" style="font-family: 'Hind Siliguri', sans-serif;">{{ Str::limit($relatedProduct->name, 35) }}</a>
+                                        <a href="{{ $relatedProduct->details_url }}" class="text-dark fw-bold text-decoration-none" style="font-family: 'Hind Siliguri', sans-serif; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 40px;">
+                                            {{ Str::limit($relatedProduct->name, 45) }}
+                                        </a>
                                     </h6>
-                                    <div class="fw-bold text-brand" style="color: #f15922;">
+                                    
+                                    <div class="fw-bold text-brand mb-3" style="color: #f15922; font-size: 16px;">
                                         @if ($relatedProduct->discount_price)
                                             <span class="text-muted small text-decoration-line-through me-2 fw-normal">{{ \App\Helpers\CurrencyHelper::formatPrice($relatedProduct->regular_price) }}</span>
                                             <span>{{ \App\Helpers\CurrencyHelper::formatPrice($relatedProduct->discount_price) }}</span>
                                         @else
                                             <span>{{ \App\Helpers\CurrencyHelper::formatPrice($relatedProduct->regular_price) }}</span>
                                         @endif
+                                    </div>
+
+                                    <div class="grid-action-btns d-flex gap-2 mt-auto">
+                                        <button type="button" 
+                                            class="btn btn-grid-cart flex-grow-1 related-action-btn related-add-cart-btn" 
+                                            data-id="{{ $relatedProduct->id }}"
+                                            data-name="{{ $relatedProduct->name }}"
+                                            data-price="{{ $relatedProduct->discount_price ?? $relatedProduct->regular_price }}"
+                                            data-stock="{{ $relatedProduct->stock_quantity ?? 0 }}"
+                                            data-incart="{{ $relatedProduct->already_in_cart ?? 0 }}" 
+                                            data-url="{{ url('cart/ajax/' . $relatedProduct->id) }}">
+                                            <i class="fas fa-shopping-cart me-1"></i> Cart
+                                        </button>
+
+                                        <form action="{{ route('cart.add.item', $relatedProduct->id) }}" method="POST" class="d-inline flex-grow-1 m-0 p-0">
+                                            @csrf
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" name="action" value="buy_now" 
+                                                class="btn btn-grid-buy w-100 h-100 related-action-btn related-buy-now-btn"
+                                                data-id="{{ $relatedProduct->id }}"
+                                                data-name="{{ $relatedProduct->name }}"
+                                                data-price="{{ $relatedProduct->discount_price ?? $relatedProduct->regular_price }}"
+                                                data-stock="{{ $relatedProduct->stock_quantity ?? 0 }}"
+                                                data-incart="{{ $relatedProduct->already_in_cart ?? 0 }}">
+                                                Buy now
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -632,56 +665,157 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             
-            // 🌟 Meta Pixel: AddToCart Tracking
-            const addToCartBtn = document.querySelector('.add-cart-btn');
-            if(addToCartBtn) {
-                addToCartBtn.addEventListener('click', function() {
-                    fbq('track', 'AddToCart', {
-                        content_name: '{!! addslashes($product->name) !!}', 
-                        content_ids: ['{{ $product->id }}'],
-                        value: {{ $product->discount_price ? $product->discount_price : $product->regular_price }}, 
-                        currency: 'BDT'
-                    });
-                });
-            }
-
-            // 🌟 Meta Pixel: Buy Now Tracking (ঐচ্ছিক, তবে ভালো)
-            const buyNowBtn = document.querySelector('.buy-now-btn');
-            if(buyNowBtn) {
-                buyNowBtn.addEventListener('click', function() {
-                    fbq('track', 'AddToCart', { // Buy Now করলেও AddToCart হিসেবেই কাউন্ট হবে
-                        content_name: '{!! addslashes($product->name) !!}', 
-                        content_ids: ['{{ $product->id }}'],
-                        value: {{ $product->discount_price ? $product->discount_price : $product->regular_price }}, 
-                        currency: 'BDT'
-                    });
-                });
-            }
-
-            // --- আপনার আগের কোডগুলো নিচে যেমন ছিল তেমনই থাকবে ---
-            const quantityInput = document.getElementById('quantity');
-            const minusBtn = document.querySelector('.quantity-down');
-            const plusBtn = document.querySelector('.quantity-up');
-
-            if (minusBtn && plusBtn && quantityInput) {
-                minusBtn.addEventListener('click', function () {
-                    let v = parseInt(quantityInput.value);
-                    if (v > 1) quantityInput.value = v - 1;
-                });
-                plusBtn.addEventListener('click', function () {
-                    quantityInput.value = parseInt(quantityInput.value) + 1;
-                });
-            }
-
-            function triggerLocalToast(msg, mode = 'success') {
+            // ✅ গ্লোবাল টোস্ট ফাংশন
+            window.triggerLocalToast = function(msg, mode = 'success') {
                 const toast = document.getElementById('wishlistToast');
                 if(toast) {
                     toast.className = `custom-toast custom-toast-${mode} show`;
                     toast.innerText = msg;
                     setTimeout(() => { toast.classList.remove('show'); }, 2500);
                 }
+            };
+
+            // ✅ গ্লোবাল addToCart ফাংশন (যেটা মিসিং ছিলো)
+            window.addToCart = function(url, buttonElement) {
+                // CSRF টোকেন কালেক্ট করা
+                const metaToken = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = metaToken ? metaToken.content : '';
+                
+                // বাটন লোডিং স্টেট (অপশনাল, কিন্তু ভালো প্র্যাকটিস)
+                const originalText = buttonElement.innerHTML;
+                buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Adding...';
+                buttonElement.disabled = true;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ quantity: 1 }) // রিলেটেড প্রোডাক্ট থেকে ডিফল্ট ১টি যাবে
+                })
+                .then(response => response.json())
+                .then(data => {
+                    buttonElement.innerHTML = originalText;
+                    buttonElement.disabled = false;
+                    
+                    if (data.status === 'success' || data.success === true) {
+                        window.triggerLocalToast('প্রোডাক্টটি সফলভাবে কার্টে যুক্ত হয়েছে!', 'success');
+                        
+                        // যদি কার্ট কাউন্টার আইডি/ক্লাস থাকে, সেটি আপডেট করা
+                        if(data.cart_count !== undefined) {
+                            document.querySelectorAll('.cart-count, .cart-item-count').forEach(el => el.innerText = data.cart_count);
+                        }
+                    } else {
+                        window.triggerLocalToast(data.message || 'কার্টে যুক্ত করতে সমস্যা হয়েছে!', 'warning');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding to cart:', error);
+                    buttonElement.innerHTML = originalText;
+                    buttonElement.disabled = false;
+                    window.triggerLocalToast('সার্ভার এরর! দয়া করে আবার চেষ্টা করুন।', 'warning');
+                });
+            };
+
+            // ✅ PHP থেকে stock এবং কার্টে আগে থেকে থাকা পরিমাণ নেওয়া
+            const currentStock = parseInt('{{ $product->stock_quantity ?? 0 }}', 10);
+            const alreadyInCart = parseInt('{{ $alreadyInCart ?? 0 }}', 10);
+            const availableStock = currentStock - alreadyInCart; 
+
+            // 🌟 Meta Pixel: AddToCart Tracking
+            const addToCartBtn = document.querySelector('.add-cart-btn');
+            if(addToCartBtn) {
+                addToCartBtn.addEventListener('click', function(e) {
+                    const qty = parseInt(document.getElementById('quantity').value, 10) || 1;
+                    
+                    if (currentStock <= 0) {
+                        e.preventDefault();
+                        window.triggerLocalToast('দুঃখিত! প্রোডাক্টটি বর্তমানে স্টকে নেই।', 'warning');
+                        return;
+                    }
+
+                    if (qty > availableStock) {
+                        e.preventDefault();
+                        if (alreadyInCart > 0) {
+                            window.triggerLocalToast('স্টকে আর মাত্র ' + availableStock + ' KG অর্ডার করা যাবে। আপনার কার্টে ইতিমধ্যে ' + alreadyInCart + ' KG আছে।', 'warning');
+                        } else {
+                            window.triggerLocalToast('দুঃখিত! স্টকে মাত্র ' + currentStock + ' KG আছে।', 'warning');
+                        }
+                        return;
+                    }
+
+                    if (typeof fbq === 'function') {
+                        fbq('track', 'AddToCart', {
+                            content_name: '{!! addslashes($product->name) !!}', 
+                            content_ids: ['{{ $product->id }}'],
+                            value: {{ $product->discount_price ? $product->discount_price : $product->regular_price }}, 
+                            currency: 'BDT'
+                        });
+                    }
+                });
             }
 
+            // 🌟 Meta Pixel: Buy Now Tracking 
+            const buyNowBtn = document.querySelector('.buy-now-btn');
+            if(buyNowBtn) {
+                buyNowBtn.addEventListener('click', function(e) {
+                    const qty = parseInt(document.getElementById('quantity').value, 10) || 1;
+                    
+                    if (currentStock <= 0) {
+                        e.preventDefault();
+                        window.triggerLocalToast('দুঃখিত! প্রোডাক্টটি বর্তমানে স্টকে নেই।', 'warning');
+                        return;
+                    }
+
+                    if (qty > availableStock) {
+                        e.preventDefault();
+                        if (alreadyInCart > 0) {
+                            window.triggerLocalToast('স্টকে আর মাত্র ' + availableStock + ' KG অর্ডার করা যাবে। আপনার কার্টে ইতিমধ্যে ' + alreadyInCart + ' KG আছে।', 'warning');
+                        } else {
+                            window.triggerLocalToast('দুঃখিত! স্টকে মাত্র ' + currentStock + ' KG আছে।', 'warning');
+                        }
+                        return;
+                    }
+
+                    if (typeof fbq === 'function') {
+                        fbq('track', 'AddToCart', { 
+                            content_name: '{!! addslashes($product->name) !!}', 
+                            content_ids: ['{{ $product->id }}'],
+                            value: {{ $product->discount_price ? $product->discount_price : $product->regular_price }}, 
+                            currency: 'BDT'
+                        });
+                    }
+                });
+            }
+
+            // 🔢 Quantity +/- button
+            const quantityInput = document.getElementById('quantity');
+            const minusBtn = document.querySelector('.quantity-down');
+            const plusBtn = document.querySelector('.quantity-up');
+
+            if (minusBtn && plusBtn && quantityInput) {
+                minusBtn.addEventListener('click', function () {
+                    let v = parseInt(quantityInput.value, 10);
+                    if (v > 1) quantityInput.value = v - 1;
+                });
+                
+                plusBtn.addEventListener('click', function () {
+                    let v = parseInt(quantityInput.value, 10);
+                    if (v >= availableStock) {
+                        if (alreadyInCart > 0) {
+                            window.triggerLocalToast('আপনি সর্বোচ্চ ' + availableStock + ' KG সিলেক্ট করতে পারবেন (কার্টে ' + alreadyInCart + ' KG আছে)।', 'warning');
+                        } else {
+                            window.triggerLocalToast('সর্বোচ্চ ' + currentStock + ' KG অর্ডার করা যাবে।', 'warning');
+                        }
+                        return;
+                    }
+                    quantityInput.value = v + 1;
+                });
+            }
+
+            // ❤️ Wishlist system
             document.querySelectorAll('.add-to-wishlist').forEach(button => {
                 const productId = button.dataset.productId;
                 if(productId) {
@@ -713,24 +847,77 @@
                             if (data.action === 'added') {
                                 this.classList.add('active');
                                 if(icon) icon.className = 'fas fa-heart';
-                                triggerLocalToast('Added to wishlist!', 'success');
+                                window.triggerLocalToast('Added to wishlist!', 'success');
                             } else {
                                 this.classList.remove('active');
                                 if(icon) icon.className = 'far fa-heart';
-                                triggerLocalToast('Removed from wishlist!', 'info');
+                                window.triggerLocalToast('Removed from wishlist!', 'info');
                             }
                             fetch('/wishlist/count').then(r => r.json()).then(d => {
                                 document.querySelectorAll('.wishlist-count').forEach(el => el.textContent = d.count);
                             });
                         } else if (data.redirect) {
-                            triggerLocalToast(data.message, 'warning');
+                            window.triggerLocalToast(data.message, 'warning');
                             setTimeout(() => location.href = data.redirect, 1500);
                         }
                     });
                 });
             });
 
-            // 🔗 স্লাইডার কোর অ্যাক্টিভেশন এবং ইনফিনিট লুপ ফিক্সড জোন
+            // 🌟 Related Products: Add to Cart & Buy Now Tracking and Stock Validation
+            document.querySelectorAll('.related-action-btn').forEach(button => {
+                button.addEventListener('click', function (e) {
+                    const isBuyNow = this.classList.contains('related-buy-now-btn');
+                    const pId = this.dataset.id;
+                    const pName = this.dataset.name;
+                    const pPrice = parseFloat(this.dataset.price);
+                    const rStock = parseInt(this.dataset.stock, 10);
+                    const rInCart = parseInt(this.dataset.incart, 10);
+                    const rAvailable = rStock - rInCart;
+                    const qty = 1; 
+                    
+                    if (rStock <= 0) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.triggerLocalToast('দুঃখিত! প্রোডাক্টটি বর্তমানে স্টকে নেই।', 'warning');
+                        return;
+                    }
+
+                    if (qty > rAvailable) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (rInCart > 0) {
+                            window.triggerLocalToast('স্টকে আর মাত্র ' + rAvailable + ' টি অর্ডার করা যাবে। কার্টে ইতিমধ্যে ' + rInCart + ' টি আছে।', 'warning');
+                        } else {
+                            window.triggerLocalToast('দুঃখিত! স্টকে মাত্র ' + rStock + ' টি আছে।', 'warning');
+                        }
+                        return;
+                    }
+
+                    if (typeof fbq === 'function') {
+                        fbq('track', 'AddToCart', {
+                            content_name: pName,
+                            content_ids: [pId],
+                            value: pPrice,
+                            currency: 'BDT'
+                        });
+                    }
+
+                    if (!isBuyNow) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const ajaxUrl = this.dataset.url;
+                        
+                        if (typeof window.addToCart === 'function') {
+                            window.addToCart(ajaxUrl, this);
+                        } else {
+                            console.error("addToCart function is not defined globally.");
+                        }
+                    }
+                });
+            });
+
+            // 🔗 Slick slider
             if (typeof $ !== 'undefined' && $.fn.slick) {
                 $('.product-big-slider').slick({
                     slidesToShow: 1, 
@@ -750,12 +937,7 @@
                     infinite: true,
                     swipeToSlide: true,
                     responsive: [
-                        {
-                            breakpoint: 576,
-                            settings: {
-                                slidesToShow: 3 
-                            }
-                        }
+                        { breakpoint: 576, settings: { slidesToShow: 3 } }
                     ]
                 });
                 $('.releted-product-slider').slick({

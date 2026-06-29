@@ -957,6 +957,8 @@
 
                             if (cartSubtotal) cartSubtotal.textContent = data.subtotal;
                             if (cartTotal) cartTotal.textContent = data.total;
+                            document.querySelectorAll('.pro-total-amount').forEach(el => el.textContent = data.total);
+                            
 
                             updateHeaderCartCount(data.cart_count);
                             showNotification('Cart updated successfully', 'success');
@@ -1004,6 +1006,8 @@
 
                             if (cartSubtotal) cartSubtotal.textContent = data.subtotal;
                             if (cartTotal) cartTotal.textContent = data.total;
+                            document.querySelectorAll('.pro-total-amount').forEach(el => el.textContent = data.total);
+                            
 
                             updateHeaderCartCount(data.cart_count);
 
@@ -1041,7 +1045,8 @@
             // Update cart count in header
             function updateHeaderCartCount(count) {
                 console.log('Updating header cart count:', count);
-                const cartCountElements = document.querySelectorAll('.cart-count-badge, .pro-count');
+                const cartCountElements = document.querySelectorAll('.cart-count-badge, .pro-count, .cart-count');
+                
                 cartCountElements.forEach(element => {
                     element.textContent = count;
                 });

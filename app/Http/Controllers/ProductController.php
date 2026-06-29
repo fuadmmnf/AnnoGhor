@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Cart;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use App\Models\Subcategory;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 
 class ProductController extends Controller
@@ -39,8 +41,22 @@ class ProductController extends Controller
             ->get();
         
         $productsReviews = Review::where('product_id', $product->id)->where('is_active', 1)->latest()->get();  
+
+        $alreadyInCart = 0;
+
+        if(Auth::check()) {
+            $cartItem = Cart::where('user_id', Auth::id())->where('product_id', $product->id)->first();
+            if($cartItem) {
+                $alreadyInCart = $cartItem->quantity;
+            }
+        }else {
+            $sessionCart = session()->get('cart', []);
+            if($sessionCart) {
+                $alreadyInCart = $sessionCart[$product->id]['quantity'];
+            }
+        }
           
-        return view('product-details', compact('product', 'relatedProducts', 'productsReviews'));
+        return view('product-details', compact('product', 'relatedProducts', 'productsReviews', 'alreadyInCart'));
     }
 
     public function showDetailsById(Product $product): RedirectResponse|\Illuminate\View\View
@@ -59,7 +75,22 @@ class ProductController extends Controller
             ->get();
 
         $productsReviews = Review::where('product_id', $product->id)->where('is_active' , 1)->latest()->get();
-        return view('product-details', compact('product', 'relatedProducts', 'productsReviews'));
+
+        $alreadyInCart = 0;
+        
+        if (Auth::check()) {
+            $cartItem = Cart::where('user_id', Auth::id())->where('product_id', $product->id)->first();
+            if ($cartItem) {
+                $alreadyInCart = $cartItem->quantity;
+            }
+        } else {
+            $sessionCart = session()->get('cart', []);
+            if (isset($sessionCart[$product->id])) {
+                $alreadyInCart = $sessionCart[$product->id]['quantity'];
+            }
+        }
+
+        return view('product-details', compact('product', 'relatedProducts', 'productsReviews', 'alreadyInCart'));
     }
 
     /**
