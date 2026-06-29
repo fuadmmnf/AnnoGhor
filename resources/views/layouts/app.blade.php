@@ -115,6 +115,13 @@
             text-overflow: ellipsis;
         }
 
+
+        @media(max-width: 991px) {
+            .user-account {
+                display: none !important;
+            }
+        }
+
         .login-btn {
             font-size: 18px;
             font-weight: 600;
