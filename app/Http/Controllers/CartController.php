@@ -41,7 +41,7 @@ class CartController extends Controller
     {
         $cartItems = $this->getCartItems();
         $subtotal = $cartItems->sum('total_price');
-        $tax = $subtotal * 0.10;
+        $tax = 0;
         $total = $subtotal + $tax;
 
         return view('cart', compact('cartItems', 'subtotal', 'tax', 'total'));
@@ -100,11 +100,15 @@ class CartController extends Controller
                 session()->put('cart', $cart);
             }
 
+            $cartItems = $this->getCartItems();
+            $total = $cartItems->sum('total_price');
+
             // 🎯 জাভাস্ক্রিপ্ট ক্লায়েন্টের নোটিফিকেশন সিস্টেমের সাথে রেসপন্স সিঙ্ক করা হলো
             return response()->json([
                 'success'    => true,
                 'message'    => $message,
-                'cart_count' => $this->getCartCount()
+                'cart_count' => $this->getCartCount(),
+                'total'      => number_format($total, 2),
             ]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
@@ -198,11 +202,12 @@ class CartController extends Controller
 
             $cartItems = $this->getCartItems();
             $subtotal  = $cartItems->sum('total_price');
+            $total     = $subtotal; // ভ্যাট ছাড়া সরাসরি সাবটোটাল
 
             return response()->json([
                 'success'    => true,
                 'subtotal'   => number_format($subtotal, 2),
-                'total'      => number_format($subtotal, 2),
+                'total'      => number_format($total, 2),
                 'item_total' => number_format($itemTotalPrice, 2),
                 'cart_count' => $this->getCartCount(),
             ]);
@@ -226,7 +231,7 @@ class CartController extends Controller
 
             $cartItems = $this->getCartItems();
             $subtotal  = $cartItems->sum('total_price');
-            $tax       = $subtotal * 0.10;
+            $tax       = 0; // ভ্যাট 0
             $total     = $subtotal + $tax;
 
             return response()->json([

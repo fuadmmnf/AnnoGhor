@@ -41,6 +41,9 @@
             overflow: hidden;
             transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
             position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .product-card-modern:hover {
@@ -54,7 +57,7 @@
             overflow: hidden;
             background-color: #f8fafc;
             width: 100%;
-            height: 300px;
+            height: 250px;
         }
 
         .thumbnail-container img {
@@ -118,47 +121,12 @@
             color: #ffffff !important;
         }
 
-        /* 🛒 অ্যাড টু কার্ট ইনলাইন কাস্টম বাটন */
-        .cart-trigger-box {
-            position: absolute;
-            bottom: -50px;
-            left: 0;
-            width: 100%;
-            padding: 10px 14px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(8px);
-            transition: all 0.3s ease;
-            z-index: 3;
-        }
-
-        .product-card-modern:hover .cart-trigger-box {
-            bottom: 0;
-        }
-
-        .btn-cart-modern {
-            width: 100%;
-            background: #0f172a;
-            color: #ffffff !important;
-            border: none;
-            padding: 8px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: background 0.2s ease;
-            cursor: pointer;
-        }
-
-        .btn-cart-modern:hover {
-            background: #f15922;
-        }
-
         /* 📝 Produkt Content Area */
         .info-container {
             padding: 18px 16px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
         }
 
         .product-title-link {
@@ -185,6 +153,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            margin-bottom: 15px;
         }
 
         .price-new {
@@ -197,6 +166,62 @@
             font-size: 14px;
             color: #94a3b8;
             text-decoration: line-through;
+        }
+
+        /* ⚡ শপ পেজের বাটন স্টাইল */
+        .grid-action-btns { 
+            display: flex; 
+            gap: 8px; 
+            margin-top: auto; 
+        }
+        .btn-grid-cart { 
+            background: transparent; 
+            border: 1px solid #dd6b20; 
+            color: #dd6b20; 
+            font-weight: 600; 
+            font-size: 13px; 
+            padding: 8px 10px; 
+            border-radius: 8px; 
+            transition: all 0.2s ease; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .btn-grid-cart:hover { 
+            background: #dd6b20; 
+            color: #ffffff; 
+        }
+        .btn-grid-cart:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed; 
+        }
+
+        .btn-grid-buy { 
+            background: #dd6b20; 
+            border: none; 
+            color: #ffffff; 
+            font-weight: 600; 
+            font-size: 13px; 
+            padding: 8px 10px; 
+            border-radius: 8px; 
+            transition: all 0.2s ease; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .btn-grid-buy:hover { 
+            background: #b75616; 
+            color: #ffffff !important; 
+        }
+
+        @media (max-width: 575.98px) { 
+            .btn-grid-cart, .btn-grid-buy { 
+                font-size: 12px; 
+                padding: 6px 4px; 
+            } 
+            .thumbnail-container {
+                height: 180px;
+            }
         }
 
         /* 🗂️ সাইডবার উইজেট ডিজাইন */
@@ -378,8 +403,6 @@
                                                     <img src="{{ asset('assets/images/products/feature-product-' . (($loop->index % 5) + 1) . '.png') }}" alt="{{ $product->name }}">
                                                 @endif
                                             </a>
-                                            
-                                          
                                         </div>
 
                                         <div class="info-container">
@@ -403,6 +426,24 @@
                                                     </span>
                                                 @endif
                                             </div>
+
+                                            <div class="grid-action-btns d-flex gap-2 mt-3">
+                                                <button type="button" 
+                                                    class="btn btn-grid-cart flex-grow-1" 
+                                                    onclick="event.stopPropagation(); addToCart('{{ url('cart/ajax/' . $product->id) }}', this)">
+                                                    <i class="fas fa-shopping-cart me-1"></i> Cart
+                                                </button>
+
+                                                <form action="{{ route('cart.add.item', $product->id) }}" method="POST" 
+                                                      class="d-inline flex-grow-1 m-0 p-0" 
+                                                      onclick="event.stopPropagation();">
+                                                    @csrf
+                                                    <input type="hidden" name="quantity" value="1">
+                                                    <button type="submit" name="action" value="buy_now" 
+                                                            class="btn btn-grid-buy w-100 h-100">Buy now</button>
+                                                </form>
+                                            </div>
+
                                         </div>
 
                                     </div>
@@ -538,6 +579,58 @@
 
 @push('scripts')
     <script>
+        // 🎯 কাস্টম টোস্ট ফায়ারার ফাংশন (Global scope-এ রাখা হলো)
+        window.triggerShopToast = function(msg) {
+            const toast = document.getElementById('shopCartToast');
+            if(toast) {
+                toast.className = "custom-toast custom-toast-success show";
+                toast.innerText = msg;
+                setTimeout(() => { toast.classList.remove('show'); }, 2500);
+            }
+        };
+
+        // 🛒 Add to Cart Function (Global scope-এ রাখা হলো)
+        window.addToCart = function(url, btn) {
+            var $btn = $(btn);
+            $btn.prop('disabled', true); // বাটনটি ডিজেবল করে দেওয়া হলো যাতে ডাবল ক্লিক না পড়ে
+            
+            // বাটন ক্লিক করার পর একটু লোডিং ইফেক্ট দেখানোর জন্য
+            var originalHtml = $btn.html();
+            $btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Adding...');
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    quantity: 1
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // ১. কার্টের আইটেম সংখ্যা আপডেট করবে
+                        $('.cart-count, .pro-count, .cart-count-badge').text(response.cart_count);
+                        
+                        // ২. ফ্লোটিং কার্টের টোটাল প্রাইস আপডেট করবে
+                        if (response.total !== undefined) {
+                            $('.pro-total-amount').text(response.total);
+                        }
+
+                        // ৩. সাকসেস মেসেজ দেখাবে
+                        triggerShopToast(response.message || 'Cart এ যোগ হয়েছে!');
+                    } else {
+                        triggerShopToast(response.message || 'Failed to add to cart.');
+                    }
+                },
+                error: function(xhr) {
+                    triggerShopToast('কিছু একটা সমস্যা হয়েছে। পেজ রিলোড করুন।');
+                },
+                complete: function() {
+                    $btn.prop('disabled', false);
+                    $btn.html(originalHtml); // কাজ শেষ হলে বাটন আগের অবস্থায় ফিরে আসবে
+                }
+            });
+        };
+
         $(document).ready(function() {
             function updateURLAndRedirect(key, value) {
                 const url = new URL(window.location.href);
@@ -573,63 +666,6 @@
 
             $(document).on('change', '#sortProducts', function() {
                 updateURLAndRedirect('sort', $(this).val());
-            });
-
-            // 🎯 কাস্টম টোস্ট ফায়ারার ফাংশন
-            function triggerShopToast(msg) {
-                const toast = document.getElementById('shopCartToast');
-                if(toast) {
-                    toast.className = "custom-toast custom-toast-success show";
-                    toast.innerText = msg;
-                    setTimeout(() => { toast.classList.remove('show'); }, 2500);
-                }
-            }
-
-            // 🛒 লাইভ হেড কাউন্ট রি-রেন্ডারার সহ কার্ট অ্যাকশন লজিক
-            $(document).on('click', '.add-to-cart-sync', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const $this = $(this);
-                
-                const product = {
-                    id: $this.attr('data-id'),
-                    name: $this.attr('data-name'),
-                    price: $this.attr('data-price'),
-                    image: $this.attr('data-image'),
-                    quantity: 1
-                };
-
-                if(!product.id || !product.name) return;
-
-                let cart = JSON.parse(localStorage.getItem('cart')) || [];
-                
-                const existingItem = cart.find(item => parseInt(item.id) === parseInt(product.id));
-
-                if (existingItem) {
-                    existingItem.quantity = parseInt(existingItem.quantity) + 1;
-                } else {
-                    cart.push(product);
-                }
-
-                localStorage.setItem('cart', JSON.stringify(cart));
-
-                // টোস্ট নোটিফিকেশন অ্যালার্ট রান
-                triggerShopToast(`${product.name} added to cart!`);
-
-                // ⚡ লোকাল স্টোরেজ থেকে লাইভ হিসাব করে হেডারের ব্যাগ কাউন্টার ১ সেকেন্ডে আপডেট
-                let totalItemsCount = 0;
-                cart.forEach(function(item) {
-                    totalItemsCount += parseInt(item.quantity) || 1;
-                });
-
-                // আপনার থিমের হেডারের সব কার্ট ক্লাসে লাইভ ভ্যালু পুশ করা হচ্ছে (পেজ রিফ্রেশ ছাড়াই)
-                $('.cart-count, .pro-count, .cart-count-badge').text(totalItemsCount);
-
-                // হেডার বাস্কেট কাউন্টার রেন্ডারার ফাংশন কল
-                if(typeof updateCartCount === "function") {
-                    updateCartCount();
-                }
             });
         });
     </script>

@@ -466,6 +466,7 @@
 
             .user-account .dropdown-toggle,
             .login-btn {
+                display: none;
                 justify-content: center;
                 padding: 12px 15px;
             }
@@ -838,6 +839,24 @@
 </head>
 
 <body>
+    @php
+        $globalCartCount = 0;
+        $globalCartTotal = 0;
+        
+        if (Auth::check()) {
+            $userCart = \App\Models\Cart::where('user_id', Auth::id())->get();
+            $globalCartCount = $userCart->sum('quantity');
+            $globalCartTotal = $userCart->sum('total_price');
+        } else {
+            $sessionCart = session()->get('cart', []);
+            $globalCartCount = array_sum(array_column($sessionCart, 'quantity'));
+            
+            // 👇 এই অংশটুকু আপডেট করা হয়েছে 👇
+            foreach($sessionCart as $item) {
+                $globalCartTotal += ($item['price'] * $item['quantity']);
+            }
+        }
+    @endphp
     <div class="preloader">
         <div class="loader">
             <img src="{{ asset('assets/images/loader.gif') }}" alt="Loader">
@@ -1159,9 +1178,9 @@
                                 <div class="cart-button d-flex align-items-center">
                                     <div class="icon">
                                         <a href="{{ route('cart') }}">
-                                            <i class="fas fa-shopping-bag"></i>
+                                            <i class="fas fa-shopping-cart"></i>
                                             {{-- কার্ট ভেরিয়েবল মিসিং থাকলেও এরর খাবে না --}}
-                                            <span class="pro-count cart-count"> {{ $cartCount ?? 0 }}</span>
+                                            <span class="pro-count cart-count"> {{ $globalCartCount }}</span>
                                         </a>
                                     </div>
                                 </div>
@@ -1250,16 +1269,19 @@
     </div>
 
 
+
+
+
     <a href="{{ route('cart') }}" class="mobile-floating-cart d-lg-none">
         <div class="cart-icon-wrap">
             <i class="fas fa-shopping-cart"></i>
             <span class="badge cart-count bg-danger text-white">
-                {{ session()->has('cart') ? count(session()->get('cart')) : 0 }}
+                {{ $globalCartCount }}
             </span>
         </div>
         <div class="cart-info-wrap">
-            <span class="item-text"><span class="cart-count">{{ session()->has('cart') ? count(session()->get('cart')) : 0 }}</span> Items</span>
-            <span class="price-text">৳<span class="pro-total-amount">{{ session()->has('cart') ? array_sum(array_column(session()->get('cart'), 'total_price')) : '0.00' }}</span></span>
+            <span class="item-text"><span class="cart-count">{{ $globalCartCount }}</span> Items</span>
+            <span class="price-text">৳<span class="pro-total-amount">{{ number_format($globalCartTotal, 2) }}</span></span>
         </div>
     </a>
 
@@ -1275,7 +1297,7 @@
         <a href="{{ route('cart') }}" class="nav-item-box position-relative {{ Request::is('cart*') ? 'active' : '' }}">
             <i class="fas fa-shopping-cart"></i>
             <span class="badge nav-cart-count cart-count bg-danger">
-                {{ session()->has('cart') ? count(session()->get('cart')) : 0 }}
+                {{ $globalCartCount }}
             </span>
             <span>CART</span>
         </a>
@@ -1283,6 +1305,8 @@
             <i class="fas fa-search"></i>
             <span>SEARCH</span>
         </a>
+
+        
         @auth
         <a href="{{ route('profile') }}" class="nav-item-box {{ Request::is('profile*') ? 'active' : '' }}">
             <i class="fas fa-user"></i>
@@ -1312,7 +1336,7 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-xl-3 col-sm-6">
-                            <div class="footer-widget about-company-widget mb-40" data-aos="fade-up" data-aos-delay="10" data-aos-duration="1000">
+                            <div class="footer-widget about-company-widget mb-40" >
                                 <div class="widget-content">
                                     <img src="{{ isset($siteSettings->site_logo) ? asset('uploads/settings/' . $siteSettings->site_logo) : asset('assets/images/logo/logo-main.png') }}"
                                         alt="{{ $siteSettings->site_name ?? config('app.name') }} Logo" style="height: 100px; object-fit: contain;">
@@ -1346,7 +1370,7 @@
                             </div>
                         </div>
                         <div class="col-xl-3 col-md-6 col-sm-6">
-                            <div class="footer-widget footer-nav-widget mb-40" data-aos="fade-up" data-aos-delay="15" data-aos-duration="1200">
+                            <div class="footer-widget footer-nav-widget mb-40" >
                                 <div class="widget-content">
                                     <h4 class="widget-title">Customer Services</h4>
                                     <ul class="widget-menu">
@@ -1359,11 +1383,11 @@
                             </div>
                         </div>
                         <div class="col-xl-3 col-md-6 col-sm-6">
-                            <div class="footer-widget footer-nav-widget mb-40" data-aos="fade-up" data-aos-delay="20" data-aos-duration="1400">
+                            <div class="footer-widget footer-nav-widget mb-40" >
                                 <div class="widget-content">
                                     <h4 class="widget-title">Quick Link</h4>
                                     <ul class="widget-menu">
-                                        <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('terms.of.use') }}">Terms Of Use</a></li>
+        
                                         <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('faq') }}">FAQ</a></li>
                                         <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('contact') }}">Contact</a></li>
                                         <li><img src="{{ url('assets/images/icon/star-3.svg') }}" alt="star icon"><a href="{{ route('login') }}">Login / Register</a></li>
@@ -1372,7 +1396,7 @@
                             </div>
                         </div>
                         <div class="col-xl-3 col-sm-6">
-                            <div class="footer-widget footer-recent-post-widget" data-aos="fade-up" data-aos-delay="25" data-aos-duration="1600">
+                            <div class="footer-widget footer-recent-post-widget" >
                                 <h4 class="widget-title">Working Hours</h4>
                                 <div class="widget-content working-hours">
                                     <div class="hour-item">
@@ -1467,7 +1491,8 @@
             function updateCartCount() {
                 $.get('{{ route('cart.count') }}', function(data) {
                     if (data.count !== undefined) {
-                        $('.pro-count.cart-count').text(data.count);
+                        // pro-count ক্লাসটি বাদ দেওয়া হয়েছে যাতে সব .cart-count আপডেট হয়
+                        $('.cart-count').text(data.count); 
                     }
                 });
             }
